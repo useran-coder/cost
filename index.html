@@ -314,6 +314,75 @@
   .res-row2>div{flex:1;min-width:130px}
   .res-mat{border-left:2px solid var(--line);padding-left:14px}
   .res-mnote{font-size:10.5px;color:var(--sub);margin-top:2px;font-weight:600}
+
+
+  /* ===== 전체 페이지 버튼 마우스 오버 모션 ===== */
+  button{
+    transform-origin:center;
+    backface-visibility:hidden;
+  }
+  button:disabled{
+    cursor:not-allowed;
+    opacity:.55;
+  }
+  @media (hover:hover) and (pointer:fine){
+    button:not(:disabled){
+      transition:
+        transform .18s ease,
+        box-shadow .18s ease,
+        filter .18s ease,
+        border-color .18s ease,
+        background-color .18s ease,
+        color .18s ease,
+        opacity .18s ease;
+      will-change:transform;
+    }
+    button:not(:disabled):hover{
+      transform:translateY(-3px);
+      box-shadow:0 9px 20px rgba(31,42,68,.18);
+      filter:brightness(1.035);
+    }
+    button:not(:disabled):active{
+      transform:translateY(-1px) scale(.985);
+      transition-duration:.08s;
+    }
+
+    /* 탭·세그먼트·선택형 버튼은 선택 상태가 더 선명하게 보이도록 강조 */
+    header.app .tabs button:hover,
+    .seg button:hover,
+    .tonbtns button:hover,
+    .mp-yr .seg.sm button:hover{
+      box-shadow:0 7px 16px rgba(31,42,68,.14);
+    }
+    .seg button.on:hover,
+    .tonbtns button.on:hover,
+    .mp-yr .seg.sm button.on:hover,
+    .bigbtn:hover,
+    .applybtn:hover,
+    .mp-apply:hover,
+    .sb-ok:hover,
+    .sb-navy:hover,
+    .bottombar .print:hover{
+      box-shadow:0 10px 22px rgba(31,42,68,.25);
+    }
+
+    /* 삭제·닫기처럼 작은 버튼은 과하게 튀지 않게 작은 모션 */
+    .mtdel:hover,
+    .del:hover,
+    .em-hd button:hover{
+      transform:translateY(-1px) scale(1.05);
+      box-shadow:0 6px 13px rgba(31,42,68,.14);
+    }
+    .mtdel:active,
+    .del:active,
+    .em-hd button:active{
+      transform:scale(.94);
+    }
+  }
+  @media (prefers-reduced-motion:reduce){
+    button{transition:none!important;transform:none!important;}
+  }
+
   @media print{.bottombar,.note,.tonbtns,.seg,.tabs,.bigbtn,.applybtn,.rec-actions,.post:not(.on){display:none!important}header.app{position:static}body{padding-bottom:0;background:#fff}#postBody{display:block!important}}
 </style>
 </head>
