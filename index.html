@@ -294,7 +294,7 @@
   .mp-yr .seg.sm button{flex:none;min-height:0;padding:7px 18px;font-size:13px;white-space:nowrap;border:none;background:transparent;color:var(--sub);border-radius:8px;font-weight:700}
   .mp-yr .seg.sm button.on{background:var(--navy);color:#fff;box-shadow:0 1px 4px rgba(20,28,44,.18)}
   .mp-quote{font-size:11px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:5px;margin-left:24px}
-  .mp-quote input{width:80px;padding:6px 8px;border:1.5px solid var(--accent);border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;text-align:right;color:var(--accent);background:#fff5f5}
+  .mp-quote input{width:80px;padding:6px 8px;border:1px solid #c8d1e0;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;text-align:right;color:var(--ink);background:#fff}
   .mp-quote i{font-style:normal;color:var(--sub)}
   .mp-chart{margin-top:10px;padding:8px 10px;background:#fafbfd;border-radius:10px}
   .mp-chax-t{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--sub);margin-bottom:3px}
@@ -302,6 +302,14 @@
   .mp-chart svg{width:100%;height:auto;display:block}
   .mp-nochart{margin-top:10px;font-size:11px;color:var(--sub);text-align:center;padding:14px;background:#fafbfd;border-radius:10px}
   .mp-scrap .mp-head>b{color:#9a7b1a}
+
+  .mp-extra{border-color:#dbe3f0;background:#fcfdff}
+  .mp-extra .mp-head{margin-bottom:8px}
+  .mp-extra .mp-head b{color:var(--navy)}
+  .mp-extra .mp-hint{width:100%;font-size:11px;color:var(--sub);font-weight:500}
+  .mp-extra .mp-tbl .mpexitem{text-align:left;min-width:100px;font-weight:800;color:var(--ink);background:#f8fafc}
+  .mp-extra .mp-tbl .mpexamt{min-width:96px;text-align:right;font-weight:800;color:var(--ink);background:#fff}
+  .mp-extra .mp-tbl .mpexnote{min-width:260px;text-align:left;background:#fff}
   .res-row2{display:flex;gap:14px;flex-wrap:wrap}
   .res-row2>div{flex:1;min-width:130px}
   .res-mat{border-left:2px solid var(--line);padding-left:14px}
@@ -333,7 +341,7 @@
     <div class="sec-h"><span class="n">1</span><h2>제품 정보</h2></div>
     <div class="sec-b">
       <div style="display:grid;grid-template-columns:1.7fr 1fr;gap:10px">
-        <label class="fld" style="margin-bottom:0"><span class="lab">품명</span><input class="inp" id="pname" placeholder="예) 경첩보강대"></label>
+        <label class="fld" style="margin-bottom:0"><span class="lab">단가산정 제목</span><input class="inp" id="pname" placeholder="예) 경첩보강대 / 160톤 자동 견적"></label>
         <label class="fld" style="margin-bottom:0"><span class="lab">발주 수량</span><div class="suffix"><input class="inp" id="qty" type="text" inputmode="numeric" value="10000"><span class="u">개</span></div></label>
       </div>
     </div>
@@ -821,11 +829,14 @@ const DATA_YEAR={
 }
 };
 function emptyRows(){return [{v:'',m:Array(12).fill('')}];}
+const EXTRA_ITEMS=['미니샤 가공','소폭가공','판재 소량'];
+function defaultMatExtra(){return EXTRA_ITEMS.map(n=>({n,amt:'',note:''}));}
+function normalizeMatExtra(x){const d=defaultMatExtra();if(Array.isArray(x)){d.forEach((r,i)=>{const f=x.find(v=>v&&v.n===r.n)||x[i];if(f){r.amt=f.amt||'';r.note=f.note||'';}});}return d;}
 const DATA_SCRAP_DEF={'2026':[{v:'고철 시세',m:[410,'',440,440,505,'','','','','','','']}]};
 function defaultMatTable(){const t={};Y_LIST.forEach(y=>{t[y]={};MATERIALS.forEach(mt=>{const dy=DATA_YEAR[y];t[y][mt.k]=(dy&&dy[mt.k])?JSON.parse(JSON.stringify(dy[mt.k])):emptyRows();});t[y]['고철']=DATA_SCRAP_DEF[y]?JSON.parse(JSON.stringify(DATA_SCRAP_DEF[y])):emptyRows();});return t;}
-let matTable={},matQuote={},matUpdated='',matYear='2026';
-function loadMatTable(){try{const s=localStorage.getItem('dptMatTable');if(s){const o=JSON.parse(s);if(o.t&&o.t['2026']){matTable=o.t;matQuote=o.q||{};matUpdated=o.u||'';Y_LIST.forEach(y=>{if(matTable[y]&&!matTable[y]['고철'])matTable[y]['고철']=emptyRows();});return;}}}catch(e){}matTable=defaultMatTable();matQuote={};matUpdated='';}
-function saveMatTable(stamp){if(stamp){const d=new Date();matUpdated=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}try{localStorage.setItem('dptMatTable',JSON.stringify({t:matTable,q:matQuote,u:matUpdated}));}catch(e){}}
+let matTable={},matQuote={},matUpdated='',matYear='2026',matExtra=defaultMatExtra();
+function loadMatTable(){try{const s=localStorage.getItem('dptMatTable');if(s){const o=JSON.parse(s);if(o.t&&o.t['2026']){matTable=o.t;matQuote=o.q||{};matUpdated=o.u||'';matExtra=normalizeMatExtra(o.x);Y_LIST.forEach(y=>{if(matTable[y]&&!matTable[y]['고철'])matTable[y]['고철']=emptyRows();});return;}}}catch(e){}matTable=defaultMatTable();matQuote={};matUpdated='';matExtra=defaultMatExtra();}
+function saveMatTable(stamp){if(stamp){const d=new Date();matUpdated=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}try{localStorage.setItem('dptMatTable',JSON.stringify({t:matTable,q:matQuote,u:matUpdated,x:matExtra}));}catch(e){}}
 function yRows(k){return (matTable[matYear]&&matTable[matYear][k])||[];}
 function latestMat(k){const rows=yRows(k);for(let mi=11;mi>=0;mi--){for(const r of rows){const v=num(r.m[mi]);if(v>0)return{v,month:mi+1};}}return null;}
 function matSeries(k){const rows=yRows(k);return MONTHS.map((_,mi)=>{let s=0,c=0;rows.forEach(r=>{const v=num(r.m[mi]);if(v>0){s+=v;c++;}});return c?s/c:null;});}
@@ -836,9 +847,9 @@ function sparkline(k){const series=matSeries(k);const vals=series.filter(v=>v!=n
   const X=i=>padL+iW*(i/11),Y=v=>padT+iH*(1-v/mx);
   const pts=series.map((v,i)=>v==null?null:{i,v,x:X(i),y:Y(v)}).filter(Boolean);
   const poly=pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
-  const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="1.2" fill="#E5202A"/>`).join('');
+  const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.1" fill="#E5202A"/>`).join('');
   const prevYear=String((+matYear)-1),prevDec=(matTable[prevYear]&&matTable[prevYear][k])?avgMonth(matTable[prevYear][k],11):null;
-  const vlab=pts.map(p=>{const prev=p.i>0?series[p.i-1]:prevDec;let dlab='';if(prev!=null){const d=Math.round(p.v-prev);if(d!==0){const up=d>0;dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="7.5" font-weight="700" fill="${up?'#E5202A':'#2a6fdb'}">${up?'▲':'▼'}${cf(Math.abs(d))}</text>`;}else dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="7.5" fill="#9aa3b2">－</text>`;}return `<text x="${p.x.toFixed(1)}" y="${(p.y-7).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#E5202A">${cf(Math.round(p.v))}</text>${dlab}`;}).join('');
+  const vlab=pts.map(p=>{const prev=p.i>0?series[p.i-1]:prevDec;let dlab='';if(prev!=null){const d=Math.round(p.v-prev);if(d!==0){const up=d>0;dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="800" fill="${up?'#E5202A':'#2a6fdb'}">${up?'▲':'▼'}${cf(Math.abs(d))}</text>`;}else dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="800" fill="#9aa3b2">－</text>`;}return `<text x="${p.x.toFixed(1)}" y="${(p.y-7).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#111827">${cf(Math.round(p.v))}</text>${dlab}`;}).join('');
   const mlab=MONTHS.map((m,i)=>`<text x="${X(i).toFixed(1)}" y="${H-7}" text-anchor="middle" font-size="9" fill="#9aa3b2">${m}</text>`).join('');
   const base=`<line x1="${padL}" y1="${(padT+iH).toFixed(1)}" x2="${W-padR}" y2="${(padT+iH).toFixed(1)}" stroke="#eef1f6" stroke-width="1"/>`;
   return `<div class="mp-chart"><div class="mp-chax-t"><b>${matYear}년 단가 추이</b><span>최저 ${cf(Math.round(mn))} · 최고 ${cf(Math.round(mx))} 원/kg</span></div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${base}<polyline points="${poly}" fill="none" stroke="#E5202A" stroke-width="1.4" stroke-linejoin="round"/>${dots}${vlab}${mlab}</svg></div>`;
@@ -852,10 +863,16 @@ function scrapCard(){const k='고철',rows=yRows(k),lt=latestMat(k);
     </tbody></table></div>
     <div id="mpchart_${k}">${sparkline(k)}</div>
   </div>`;}
+function extraFeeCard(){return `<div class="mp-card mp-extra">
+  <div class="mp-head"><b>EGI 추가 금액</b><span class="mp-hint">미니샤 가공, 소폭가공, 판재 소량 등 추가 비용과 비고를 기록합니다.</span></div>
+  <div class="mp-scroll"><table class="mp-tbl"><thead><tr><th>항목</th><th>추가 금액</th><th>비고</th></tr></thead><tbody>
+  ${matExtra.map((r,ri)=>`<tr><td><input class="mpi mpexitem" value="${r.n}" readonly></td><td><input class="mpi mpexamt num" data-ri="${ri}" inputmode="numeric" value="${cf(r.amt)}" placeholder="0"></td><td><input class="mpi mpexnote" data-ri="${ri}" value="${r.note||''}" placeholder="비고 입력"></td></tr>`).join('')}
+  </tbody></table></div>
+</div>`;}
 function renderMatPage(){const el=$('mpBody');if(!el)return;
   $('mpUpdated').textContent='최종 업데이트 : '+(matUpdated||'—');
   const yr=`<div class="mp-yr"><span class="mp-yl">연도</span><div class="seg sm" id="mpYrSeg">${Y_LIST.map(y=>`<button class="${y===matYear?'on':''}" onclick="setMatYear('${y}')">${y}년</button>`).join('')}</div></div>`;
-  el.innerHTML=yr+scrapCard()+MATERIALS.map(mt=>{const k=mt.k,rows=yRows(k),lt=latestMat(k);const colMin=MONTHS.map((_,mi)=>{const vs=rows.map(r=>num(r.m[mi])).filter(n=>n>0);return vs.length>=2?Math.min(...vs):null;});
+  el.innerHTML=yr+scrapCard()+extraFeeCard()+MATERIALS.map(mt=>{const k=mt.k,rows=yRows(k),lt=latestMat(k);const colMin=MONTHS.map((_,mi)=>{const vs=rows.map(r=>num(r.m[mi])).filter(n=>n>0);return vs.length>=2?Math.min(...vs):null;});
     return `<div class="mp-card">
       <div class="mp-head"><b>${k}</b><span class="mp-cur">현재 적용 <b>${cf(prices['mat'+k]||0)}</b> 원/kg${lt?` · 최근 ${lt.month}월 ${cf(lt.v)}원`:''}</span><span class="mp-quote">견적 적용가 <input class="mpi mpq num" data-k="${k}" inputmode="numeric" value="${cf(matQuote[k]||'')}" placeholder="시장가"><i>원/kg</i></span><button class="mp-apply" onclick="applyMat('${k}')">적용 →</button></div>
       <div class="mp-scroll"><table class="mp-tbl"><thead><tr><th>업체명</th>${MONTHS.map(m=>`<th>${m}월</th>`).join('')}<th></th></tr></thead><tbody>
@@ -874,13 +891,15 @@ function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){retur
     const nt={};Y_LIST.forEach(y=>nt[y]={});
     rows.slice(1).forEach(row=>{if(!row||row.length<3)return;const y=String(row[0]).trim(),k=String(row[1]).trim(),v=String(row[2]==null?'':row[2]).trim();if(!Y_LIST.includes(y))return;const m=[];for(let i=0;i<12;i++){const c=row[3+i];m.push((c===''||c==null)?'':String(c).replace(/,/g,''));}if(!nt[y][k])nt[y][k]=[];nt[y][k].push({v,m});});
     Y_LIST.forEach(y=>{['고철',...MATERIALS.map(x=>x.k)].forEach(k=>{if(!nt[y][k]||!nt[y][k].length)nt[y][k]=emptyRows();});});
+    const xs=wb.Sheets['추가금액'];
+    if(xs){const xr=XLSX.utils.sheet_to_json(xs,{header:1});const nx=defaultMatExtra();xr.slice(1).forEach(row=>{if(!row||!row[0])return;const nm=String(row[0]).trim();const hit=nx.find(x=>x.n===nm);if(hit){hit.amt=(row[1]==null?'':String(row[1]).replace(/,/g,''));hit.note=(row[2]==null?'':String(row[2]));}});matExtra=nx;}
     matTable=nt;if(typeof saveMatTable==='function')saveMatTable(true);renderMatPage();estCalc();toast('자재단가를 엑셀에서 불러왔습니다');
   }catch(err){toast('불러오기 실패: 양식(연도/강종/업체명/1~12월)을 확인하세요');}input.value='';};
   r.readAsArrayBuffer(f);
 }
 function avgMonth(rows,mi){let s=0,c=0;(rows||[]).forEach(r=>{const v=num(r.m[mi]);if(v>0){s+=v;c++;}});return c?s/c:null;}
-function mpExport(){if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}const head=['연도','강종','업체명',...MONTHS.map(m=>m+'월')];const rows=[head];Y_LIST.forEach(y=>{['고철',...MATERIALS.map(m=>m.k)].forEach(k=>{(matTable[y][k]||[]).forEach(r=>rows.push([y,k,r.v,...r.m.map(v=>num(v)||'')]));});});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'자재단가');XLSX.writeFile(wb,`자재단가_${new Date().toISOString().slice(0,10)}.xlsx`);toast('자재단가를 엑셀로 저장했습니다');}
-document.addEventListener('input',e=>{const t=e.target;if(!t.classList)return;if(t.classList.contains('mpv')){matTable[matYear][t.dataset.k][+t.dataset.ri].v=t.value;saveMatTable(true);}else if(t.classList.contains('mpm')){matTable[matYear][t.dataset.k][+t.dataset.ri].m[+t.dataset.mi]=t.value.replace(/,/g,'');saveMatTable(true);const w=document.getElementById('mpchart_'+t.dataset.k);if(w)w.innerHTML=sparkline(t.dataset.k);}else if(t.classList.contains('mpq')){matQuote[t.dataset.k]=t.value.replace(/,/g,'');saveMatTable(true);}});
+function mpExport(){if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}const head=['연도','강종','업체명',...MONTHS.map(m=>m+'월')];const rows=[head];Y_LIST.forEach(y=>{['고철',...MATERIALS.map(m=>m.k)].forEach(k=>{(matTable[y][k]||[]).forEach(r=>rows.push([y,k,r.v,...r.m.map(v=>num(v)||'')]));});});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'자재단가');const xrows=[['항목','추가금액','비고'],...matExtra.map(r=>[r.n,num(r.amt)||'',r.note||''])];const xws=XLSX.utils.aoa_to_sheet(xrows);xws['!cols']=[{wch:16},{wch:12},{wch:32}];XLSX.utils.book_append_sheet(wb,xws,'추가금액');XLSX.writeFile(wb,`자재단가_${new Date().toISOString().slice(0,10)}.xlsx`);toast('자재단가를 엑셀로 저장했습니다');}
+document.addEventListener('input',e=>{const t=e.target;if(!t.classList)return;if(t.classList.contains('mpv')){matTable[matYear][t.dataset.k][+t.dataset.ri].v=t.value;saveMatTable(true);}else if(t.classList.contains('mpm')){matTable[matYear][t.dataset.k][+t.dataset.ri].m[+t.dataset.mi]=t.value.replace(/,/g,'');saveMatTable(true);const w=document.getElementById('mpchart_'+t.dataset.k);if(w)w.innerHTML=sparkline(t.dataset.k);}else if(t.classList.contains('mpq')){matQuote[t.dataset.k]=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexamt')){matExtra[+t.dataset.ri].amt=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexnote')){matExtra[+t.dataset.ri].note=t.value;saveMatTable(true);}});
 
 /* ================= 후공정 카드 ================= */
 function togglePostSection(){state.postOpen=!state.postOpen;$('postBody').classList.toggle('open',state.postOpen);$('postToggle').classList.toggle('open',state.postOpen);}
@@ -1084,9 +1103,11 @@ function estEditFromModal(){const r=estDB.find(x=>x.id===emEditId);if(!r){estClo
   toast('견적 내용을 불러왔습니다. 수정 후 [저장]하면 새 견적으로 저장됩니다');
 }
 function estSave(){
+  const title=($('pname')&&$('pname').value?$('pname').value:'').trim();
+  if(!title){toast('단가산정 제목을 입력해야 견적 저장이 가능합니다');if($('pname'))$('pname').focus();return;}
   estCalc();
   const onPosts=POSTS.filter(p=>state.posts[p.k].on).map(p=>({nm:p.nm,v:document.querySelector('#post_'+p.k+' .pv').textContent}));
-  const rec={id:Date.now(),time:nowStr(),pname:$('pname').value||'(품명없음)',mode:state.mode==='auto'?'자동':'단발',ton:TON.find(t=>t.key===state.ton).label,qty:num($('qty').value),
+  const rec={id:Date.now(),time:nowStr(),pname:title,mode:state.mode==='auto'?'자동':'단발',ton:TON.find(t=>t.key===state.ton).label,qty:num($('qty').value),
     mc:LAST.mc,lc:LAST.lc,postSum:LAST.postSum,mat:LAST.mat,subtotal:LAST.subtotal,marginPct:LAST.marginPct,addmargin:LAST.addmargin,adj:LAST.adj,unit:LAST.unit,total:LAST.total,sale:LAST.sale,saleRate:LAST.saleRate,posts:onPosts,proc:state.proc,snap:captureState()};
   estDB.unshift(rec);saveEstDB();estRender();toast('견적을 저장했습니다 ('+estDB.length+'건)');
 }
