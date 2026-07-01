@@ -765,7 +765,7 @@ function showPage(p){
 const TON=[{key:'300',label:'300톤',charge:24000,spm:25},{key:'250',label:'250톤',charge:21000,spm:30},{key:'200',label:'200톤',charge:18000,spm:35},{key:'160',label:'160톤',charge:15000,spm:40},{key:'80',label:'80톤',charge:11000,spm:50},{key:'45',label:'45톤↓',charge:8000,spm:60}];
 const DEFAULT_PRICES={margin:15,wage:37000,matkg:1100,
  matEGI:1100,matHGI:1100,matPO:1030,matCR:1300,matSTS201:1400,matSTS304:3800,matSTS430:1600,
- band:100,bend:200,tap:50,csk:100,spot:100,plate:400,asm:80,pack_mat:1500,pack_pallet:35000,pack_wrap:5,freight_5:220000,freight_35:160000,freight_12:90000,
+ band:100,punch:100,bend:200,tap:50,csk:100,spot:100,plate:400,asm:80,pack_mat:1500,pack_pallet:35000,pack_wrap:5,freight_5:220000,freight_35:160000,freight_12:90000,
  defect:0.2,scrap:400,insp:20,
  formBase:100,form10:1.5,gas:137,cut:100,pScrapW:0,pScrapL:4,lScrapW:10,lScrapL:10};
 const MATERIALS=[{k:'EGI',d:7.89},{k:'HGI',d:7.85},{k:'PO',d:7.85},{k:'CR',d:7.85},{k:'STS201',d:7.93},{k:'STS304',d:7.93},{k:'STS430',d:7.7}];
@@ -807,6 +807,7 @@ function renderSaveState(){
 
 const POSTS=[
   {k:'band',nm:'밴딩(프레스)',sub:'밴딩변수 × 변당단가',mode:'count',cntLab:'밴딩 변수',cntU:'변',dft:2,rate:'band',rateLab:'변당 단가'},
+  {k:'punch',nm:'타공(프레스)',sub:'타공변수 × 타공단가',mode:'count',cntLab:'타공 변수',cntU:'번',dft:1,rate:'punch',rateLab:'타공 단가'},
   {k:'bend',nm:'절곡(절곡기)',sub:'절곡변수 × 변당단가',mode:'count',cntLab:'절곡 변수',cntU:'변',dft:2,rate:'bend',rateLab:'변당 단가'},
   {k:'tap',nm:'탭핑',sub:'홀수 × 홀당단가',mode:'count',cntLab:'홀 수',cntU:'홀',dft:2,rate:'tap',rateLab:'홀당 단가'},
   {k:'csk',nm:'접시가공(카운터싱크)',sub:'개소 × 개소당단가',mode:'count',cntLab:'개소 수',cntU:'개소',dft:2,rate:'csk',rateLab:'개소당 단가'},
@@ -1012,7 +1013,7 @@ const SET_ROWS=[{t:'기준 단가'},{key:'margin',nm:'관리비·이윤율',u:'%
   {st:'레이저 기준'},{key:'lScrapW',nm:'레이저 스크랩 폭',u:'mm'},{key:'lScrapL',nm:'레이저 스크랩 길이',u:'mm'},{key:'gas',nm:'레이저 가스비',sub:'kg당',u:'원'},
   {st:'포밍 기준'},{key:'formBase',nm:'포밍 기준(850mm)',u:'원'},{key:'form10',nm:'포밍 10mm당 가산',u:'원'},
   {st:'절단 기준'},{key:'cut',nm:'절단',sub:'회당',u:'원'},
-  {t:'후공정 단가'},{key:'band',nm:'밴딩(프레스)',sub:'변당',u:'원'},{key:'bend',nm:'절곡(절곡기)',sub:'변당',u:'원'},{key:'tap',nm:'탭핑',sub:'홀당',u:'원'},{key:'csk',nm:'접시가공(카운터싱크)',sub:'개소당',u:'원'},{key:'spot',nm:'스폿용접',sub:'점당',u:'원'},{key:'plate',nm:'도금비 (도금·표면처리)',sub:'kg당',u:'원'},{key:'asm',nm:'조립',sub:'개당',u:'원'},{key:'pack_pallet',nm:'파렛트',sub:'대당',u:'원'},{key:'pack_wrap',nm:'포장 랩',sub:'개당',u:'원'},{key:'insp',nm:'검사·포장',sub:'개당',u:'원'},
+  {t:'후공정 단가'},{key:'band',nm:'밴딩(프레스)',sub:'변당',u:'원'},{key:'punch',nm:'타공(프레스)',sub:'타공 단가',u:'원'},{key:'bend',nm:'절곡(절곡기)',sub:'변당',u:'원'},{key:'tap',nm:'탭핑',sub:'홀당',u:'원'},{key:'csk',nm:'접시가공(카운터싱크)',sub:'개소당',u:'원'},{key:'spot',nm:'스폿용접',sub:'점당',u:'원'},{key:'plate',nm:'도금비 (도금·표면처리)',sub:'kg당',u:'원'},{key:'asm',nm:'조립',sub:'개당',u:'원'},{key:'pack_pallet',nm:'파렛트',sub:'대당',u:'원'},{key:'pack_wrap',nm:'포장 랩',sub:'개당',u:'원'},{key:'insp',nm:'검사·포장',sub:'개당',u:'원'},
   {t:'물류'},{key:'freight_5',nm:'물류 운임 5톤',sub:'편도',u:'원'},{key:'freight_35',nm:'물류 운임 3.5톤',sub:'편도',u:'원'},{key:'freight_12',nm:'물류 운임 1.2톤',sub:'편도',u:'원'}];
 function renderSetGrid(){const g=$('setgrid');g.innerHTML='';SET_ROWS.forEach(r=>{if(r.t){const e=document.createElement('div');e.className='set-sec-t';e.textContent=r.t;g.appendChild(e);return;}if(r.st){const e=document.createElement('div');e.className='set-sub-t';e.textContent=r.st;g.appendChild(e);return;}const c=document.createElement('div');c.className='setcell';c.innerHTML=`<span class="k"><b>${r.nm}</b>${r.sub?' · '+r.sub:''}</span><div class="suffix"><input class="inp num" data-price="${r.key}" type="text" inputmode="decimal" value="${cf(prices[r.key])}"><span class="u">${r.u}</span></div>`;g.appendChild(c);});
   const mk=(txt,fn)=>{const b=document.createElement('button');b.className='mtadd';b.style.gridColumn='1/-1';b.textContent=txt;b.onclick=fn;return b;};
