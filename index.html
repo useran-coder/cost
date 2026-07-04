@@ -295,7 +295,7 @@
   .mp-yr .seg.sm button{flex:none;min-height:0;padding:7px 18px;font-size:13px;white-space:nowrap;border:none;background:transparent;color:var(--sub);border-radius:8px;font-weight:700}
   .mp-yr .seg.sm button.on{background:var(--navy);color:#fff;box-shadow:0 1px 4px rgba(20,28,44,.18)}
   .mp-quote{font-size:11px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:5px;margin-left:24px}
-  .mp-quote input{width:80px;padding:6px 8px;border:1px solid #c8d1e0;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;text-align:right;color:var(--ink);background:#fff}
+  .mp-quote input{width:80px;padding:6px 8px;border:1px solid #efc4c8;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;text-align:right;color:var(--ink);background:#fff3f4}
   .mp-quote i{font-style:normal;color:var(--sub)}
   .mp-chart{margin-top:10px;padding:8px 10px;background:#fafbfd;border-radius:10px}
   .mp-chax-t{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--sub);margin-bottom:3px}
@@ -481,10 +481,11 @@
     body.print-form #quotePrintArea *{box-sizing:border-box;color:#000!important}
     @page{size:A4 landscape;margin:8mm}
     .qform{width:100%;font-family:'Malgun Gothic','Pretendard',sans-serif;font-size:11px;color:#000;background:#fff}
+    .qform.print-page + .qform.print-page{break-before:page;page-break-before:always}
     .qform .topline{display:flex;align-items:center;border-bottom:2px solid #000;height:26px}
     .qform .no{width:160px;text-align:center;font-weight:800}.qform .no b{margin-left:16px}
     .qform .brand{font-size:10px;margin-top:4px}.qform .title{font-size:30px;font-weight:900;margin:8px 0 5px}.qform .sub{font-size:14px;color:#555!important}
-    .qform .headgrid{display:grid;grid-template-columns:1fr 320px;gap:16px;border-bottom:1.5px solid #000;padding:4px 0 6px}
+    .qform .headgrid{display:grid;grid-template-columns:1fr;gap:0;border-bottom:1.5px solid #000;padding:4px 0 6px}
     .qform .supplier{border-top:2px solid #000;padding-top:2px}.qform .supplier .cap{text-align:center;font-size:15px;font-weight:900;letter-spacing:4px;border-bottom:1px solid #000;padding:2px 0}
     .qform .line{display:grid;grid-template-columns:92px 1fr 70px 85px;min-height:22px;align-items:center;border-bottom:1px solid #999}.qform .line span{padding:2px 4px}.qform .line .lbl{text-align:right;font-weight:700}
     .qform .meta{display:grid;grid-template-columns:95px 1fr 95px 1fr 70px 1fr;border-top:1px solid #000}.qform .meta div{border-bottom:1px solid #999;padding:4px 5px;min-height:22px}.qform .meta .lbl{text-align:right;font-weight:700;background:#fafafa}
@@ -855,6 +856,10 @@
   .est-line-table thead tr.grp th .head-sum{font-size:6.2px!important;line-height:1!important;font-weight:400!important}
   .est-line-table thead tr.cols th{font-weight:400!important}
 
+  /* ===== 요청 반영: 수정하여 새로 저장 버튼 2줄 + 견적리스트 제목 제거 ===== */
+  #btnSaveNew{white-space:normal;line-height:1.25}
+  body.tab-list #page-list > section.card > .sec-h{display:none!important}
+
   /* ===== 요청 반영: 견적리스트 구분 제목줄 행 높이 확대 ===== */
   @media screen{
     .est-line-table thead tr.grp th{
@@ -1021,7 +1026,6 @@
 
   <div class="subpage hidden" id="page-list">
   <section class="card">
-    <div class="sec-h"><span class="n">📑</span><h2>견적상세리스트</h2></div>
     <div class="sec-b">
       <div class="est-list-top">
         <div>
@@ -1452,7 +1456,7 @@ function sparkline(k){const series=matSeries(k);const vals=series.filter(v=>v!=n
   const poly=pts.map(p=>p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
   const dots=pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="2.1" fill="#E5202A"/>`).join('');
   const prevYear=String((+matYear)-1),prevDec=(matTable[prevYear]&&matTable[prevYear][k])?avgMonth(matTable[prevYear][k],11):null;
-  const vlab=pts.map(p=>{const prev=p.i>0?series[p.i-1]:prevDec;let dlab='';if(prev!=null){const d=Math.round(p.v-prev);if(d!==0){const up=d>0;dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="800" fill="${up?'#E5202A':'#2a6fdb'}">${up?'▲':'▼'}${cf(Math.abs(d))}</text>`;}else dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="800" fill="#9aa3b2">－</text>`;}return `<text x="${p.x.toFixed(1)}" y="${(p.y-7).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#111827">${cf(Math.round(p.v))}</text>${dlab}`;}).join('');
+  const vlab=pts.map(p=>{const prev=p.i>0?series[p.i-1]:prevDec;let dlab='';if(prev!=null){const d=Math.round(p.v-prev);if(d!==0){const up=d>0;dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="400" fill="${up?'#E5202A':'#2a6fdb'}">${up?'▲':'▼'}${cf(Math.abs(d))}</text>`;}else dlab=`<text x="${p.x.toFixed(1)}" y="${(p.y-16).toFixed(1)}" text-anchor="middle" font-size="9" font-weight="400" fill="#9aa3b2">－</text>`;}return `<text x="${p.x.toFixed(1)}" y="${(p.y-7).toFixed(1)}" text-anchor="middle" font-size="9.5" font-weight="700" fill="#111827">${cf(Math.round(p.v))}</text>${dlab}`;}).join('');
   const mlab=MONTHS.map((m,i)=>`<text x="${X(i).toFixed(1)}" y="${H-7}" text-anchor="middle" font-size="9" fill="#9aa3b2">${m}</text>`).join('');
   const base=`<line x1="${padL}" y1="${(padT+iH).toFixed(1)}" x2="${W-padR}" y2="${(padT+iH).toFixed(1)}" stroke="#eef1f6" stroke-width="1"/>`;
   return `<div class="mp-chart"><div class="mp-chax-t"><b>${matYear}년 단가 추이</b><span>최저 ${cf(Math.round(mn))} · 최고 ${cf(Math.round(mx))} 원/kg</span></div><svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="xMidYMid meet">${base}<polyline points="${poly}" fill="none" stroke="#E5202A" stroke-width="1.4" stroke-linejoin="round"/>${dots}${vlab}${mlab}</svg></div>`;
@@ -1868,7 +1872,7 @@ function estUpdateSave(){
 }
 function updateEstEditButtons(){
   const bNew=$('btnSaveNew'),bUpd=$('btnSaveUpdate');
-  if(bNew)bNew.textContent=editingEstId?'＋ 수정하여 새로 저장':'＋ 견적 저장';
+  if(bNew)bNew.innerHTML=editingEstId?'＋ 수정하여<br>새로 저장':'＋ 견적 저장';
   if(bUpd)bUpd.style.display=editingEstId?'block':'none';
 }
 function estDelete(id){estDB=estDB.filter(r=>r.id!==id);saveEstDB();estRender();}
@@ -2421,35 +2425,36 @@ function estListRender(){
   fitEstLineTable();
 }
 
-function quoteRowsForForm(){
-  const rows=estDB.map((r,i)=>{const d=normalizeEstDetail(r);return {no:i+1,title:r.pname,product:d.product||r.product||r.pname,spec:d.spec||'',qty:Number(r.qty)||0,unit:'EA',price:Number(r.unit)||0,amount:Number(r.total)||0,remark:r.time||''};});
+function quoteRowsForForm(records,offset){
+  records=Array.isArray(records)?records:estDB;
+  offset=Math.max(0,Number(offset)||0);
+  const rows=records.slice(offset,offset+14).map((r,i)=>{const d=normalizeEstDetail(r);return {no:offset+i+1,title:r.pname,product:d.product||r.product||r.pname,spec:d.spec||'',qty:Number(r.qty)||0,unit:'EA',price:Number(r.unit)||0,amount:Number(r.total)||0,remark:r.time||''};});
   while(rows.length<14)rows.push({no:'',title:'',product:'',spec:'',qty:'',unit:'',price:'',amount:'',remark:''});
-  return rows.slice(0,14);
+  return rows;
 }
 function quoteAmountKorean(n){return `일금 ${won(Math.round(n||0))}원정`;} 
-function quoteFormHtml(){
-  const t=estAggTotals(),rows=quoteRowsForForm(),today=(()=>{const d=new Date();return `${d.getFullYear()}년 ${String(d.getMonth()+1).padStart(2,'0')}월 ${String(d.getDate()).padStart(2,'0')}일`;})();
-  const first=estDB[0]||{},firstD=first.id?normalizeEstDetail(first):{};
+function quoteFormHtml(records,opt){
+  records=Array.isArray(records)&&records.length?records:estDB;
+  opt=opt||{};
+  const offset=Math.max(0,Number(opt.offset)||0);
+  const pageNo=Math.max(1,Number(opt.pageNo)||1);
+  const pageTotal=Math.max(1,Number(opt.pageTotal)||1);
+  const groupNo=Math.max(1,Number(opt.groupNo)||1);
+  const t=estAggTotals(records),rows=quoteRowsForForm(records,offset),today=(()=>{const d=new Date();return `${d.getFullYear()}년 ${String(d.getMonth()+1).padStart(2,'0')}월 ${String(d.getDate()).padStart(2,'0')}일`;})();
+  const first=records[0]||{},firstD=first.id?normalizeEstDetail(first):{};
   const tr=rows.map(r=>`<tr><td class="center">${r.no}</td><td>${esc(r.product||'')}</td><td>${esc(r.spec||'')}</td><td>${esc(r.title||'')}</td><td class="num">${r.qty!==''?won(r.qty):''}</td><td class="center">${r.unit||''}</td><td class="num">${r.price!==''?won(r.price):''}</td><td class="num">${r.amount!==''?won(r.amount):''}</td><td>${esc(r.remark||'')}</td></tr>`).join('');
-  return `<div class="qform">
-    <div class="topline"><div class="no">No. <b>19000100</b></div></div>
+  const pageLabel=pageTotal>1?` · ${pageNo}/${pageTotal} 페이지`:'';
+  return `<div class="qform print-page">
+    <div class="topline"><div class="no">견적 ${groupNo}${pageLabel}</div></div>
     <div class="headgrid">
       <div>
         <div class="brand">DONGBANG PASTEC FIREDOOR STORE</div>
         <div class="title">견적서</div>
         <div class="sub">Estimate Sheet</div>
       </div>
-      <div class="supplier">
-        <div class="cap">공 급 자</div>
-        <div class="line"><span class="lbl">등록번호 :</span><span colspan="3">127-81-97755</span><span></span><span></span></div>
-        <div class="line"><span class="lbl">상호 :</span><span>㈜동방파스텍</span><span class="lbl">성명 :</span><span>지 춘 남</span></div>
-        <div class="line"><span class="lbl">주소 :</span><span>경기도 양주시 백석읍 권율로 1203번길 39-31</span><span></span><span></span></div>
-        <div class="line"><span class="lbl">업태 :</span><span>제조업, 도소매</span><span class="lbl">종목 :</span><span>철물, 스텐</span></div>
-        <div class="line"><span class="lbl">전화 :</span><span>1577-9080</span><span class="lbl">팩스 :</span><span>031-847-9987</span></div>
-      </div>
     </div>
     <div class="meta">
-      <div class="lbl">견적일자 :</div><div>${today}</div><div class="lbl">제목 :</div><div>${esc(first.pname||'')}</div><div class="lbl">참조 :</div><div>${esc(firstD.product||'')}</div>
+      <div class="lbl">견적일자 :</div><div>${today}</div><div class="lbl">제목/거래처 :</div><div>${esc(first.pname||'')}</div><div class="lbl">참조 :</div><div>${esc(firstD.product||'')}</div>
       <div class="lbl">전화 :</div><div></div><div class="lbl">팩스 :</div><div></div><div class="lbl">CP :</div><div></div>
     </div>
     <div class="msg">견적요청에 감사드리며 다음과 같이 견적드립니다.</div>
@@ -2461,9 +2466,17 @@ function quoteFormHtml(){
 }
 function estPrintForm(){
   if(!estDB.length){toast('저장된 견적이 없습니다');return;}
+  const groups=estRecordsByTitle();
+  const pages=[];
+  groups.forEach((g,gi)=>{
+    const pageTotal=Math.max(1,Math.ceil(g.rows.length/14));
+    for(let pi=0;pi<pageTotal;pi++){
+      pages.push(quoteFormHtml(g.rows,{offset:pi*14,pageNo:pi+1,pageTotal,groupNo:gi+1}));
+    }
+  });
   let area=document.getElementById('quotePrintArea');
   if(!area){area=document.createElement('div');area.id='quotePrintArea';document.body.appendChild(area);} 
-  area.innerHTML=quoteFormHtml();
+  area.innerHTML=pages.join('');
   document.body.classList.add('print-form');
   const cleanup=()=>{document.body.classList.remove('print-form');window.removeEventListener('afterprint',cleanup);};
   window.addEventListener('afterprint',cleanup);
@@ -2727,7 +2740,7 @@ selectTon('160');
 loadEstDB();estRender();
 scLoadDB();scCalc();scRender();
 renderSaveState();
-eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent=`버전 v${ymd}`;})();
+eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-07-04 12:10';})();
 formatAllNums();
 estCalc();
 </script>
