@@ -45,6 +45,8 @@
   .inp:focus,select.inp:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,42,68,.08)}
   select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8 0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .mat-price-row{display:grid;grid-template-columns:minmax(0,1fr) 155px;gap:10px;align-items:start}
+  @media(max-width:430px){.mat-price-row{grid-template-columns:1fr}}
   .suffix{position:relative}
   .suffix .u{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sub);pointer-events:none}
   .suffix .inp{padding-right:42px}
@@ -907,7 +909,10 @@
     <div class="post-toggle-h open" id="matToggle" onclick="toggleMat()"><span class="n">2</span><h2>재료비 <small style="color:var(--sub);font-weight:600;font-size:11px">(판재·코일 중량 자동계산)</small></h2><span class="sum" id="matHeadSum">0원</span><span class="chev">▼</span></div>
     <div class="sec-b" id="matBody" style="padding-top:10px">
       <div class="seg sm" id="eSeg" style="margin-bottom:10px"><button class="on" data-em="plate" onclick="eSetMode('plate')">판재 <span style="font-size:11px;opacity:.6;font-weight:600;margin-left:4px">sheet</span></button><button data-em="coil" onclick="eSetMode('coil')">코일 <span style="font-size:11px;opacity:.6;font-weight:600;margin-left:4px">coil</span></button></div>
-      <label class="fld"><span class="lab">강종 <span class="pill2" id="eDensP">비중 7.89</span></span><select class="inp" id="eMat" onchange="eCalc()"><option value="7.89" data-mk="EGI">EGI (전기아연도금) · 7.89</option><option value="7.85" data-mk="PO">PO (산세강판) · 7.85</option><option value="7.85" data-mk="HGI">HGI (용융아연도금) · 7.85</option><option value="7.85" data-mk="CR">CR (냉연) · 7.85</option><option value="7.93" data-mk="STS201">STS201 · 7.93</option><option value="7.93" data-mk="STS304">STS304 · 7.93</option><option value="7.7" data-mk="STS430">STS430 · 7.7</option></select></label>
+      <div class="mat-price-row">
+        <label class="fld"><span class="lab">강종 <span class="pill2" id="eDensP">비중 7.89</span></span><select class="inp" id="eMat" onchange="eMatChange()"><option value="7.89" data-mk="EGI">EGI (전기아연도금) · 7.89</option><option value="7.85" data-mk="PO">PO (산세강판) · 7.85</option><option value="7.85" data-mk="HGI">HGI (용융아연도금) · 7.85</option><option value="7.85" data-mk="CR">CR (냉연) · 7.85</option><option value="7.93" data-mk="STS201">STS201 · 7.93</option><option value="7.93" data-mk="STS304">STS304 · 7.93</option><option value="7.7" data-mk="STS430">STS430 · 7.7</option></select></label>
+        <label class="fld"><span class="lab">철판단가</span><div class="suffix"><input class="inp num" id="eUnitPrice" type="text" inputmode="numeric" value="1,100" oninput="eUnitPriceInput(this)"><span class="u">원/kg</span></div></label>
+      </div>
       <div id="ePlateF">
         <div class="row4">
           <label class="fld"><span class="lab">두께 (t)</span><input class="inp" id="eT" inputmode="decimal" placeholder="0" oninput="eCalc()"></label>
@@ -1054,13 +1059,16 @@
   <!-- 판재 -->
   <div id="scPlate">
     <section class="card"><div class="sec-b">
-      <label class="fld"><span class="lab">강종 <span class="pill2" id="pDens">비중 7.89</span></span>
-        <select class="inp" id="pMat" onchange="scCalc()">
-          <option value="7.89" data-mk="EGI">EGI (전기아연도금) · 7.89</option><option value="7.85" data-mk="PO">PO (산세강판) · 7.85</option>
-          <option value="7.85" data-mk="HGI">HGI (용융아연도금) · 7.85</option><option value="7.85" data-mk="CR">CR (냉연) · 7.85</option>
-          <option value="7.93" data-mk="STS201">STS201 · 7.93</option><option value="7.93" data-mk="STS304">STS304 · 7.93</option>
-          <option value="7.7" data-mk="STS430">STS430 · 7.7</option><option value="custom" data-mk="">기타 (비중 직접입력)</option>
-        </select></label>
+      <div class="mat-price-row">
+        <label class="fld"><span class="lab">강종 <span class="pill2" id="pDens">비중 7.89</span></span>
+          <select class="inp" id="pMat" onchange="scMatChange()">
+            <option value="7.89" data-mk="EGI">EGI (전기아연도금) · 7.89</option><option value="7.85" data-mk="PO">PO (산세강판) · 7.85</option>
+            <option value="7.85" data-mk="HGI">HGI (용융아연도금) · 7.85</option><option value="7.85" data-mk="CR">CR (냉연) · 7.85</option>
+            <option value="7.93" data-mk="STS201">STS201 · 7.93</option><option value="7.93" data-mk="STS304">STS304 · 7.93</option>
+            <option value="7.7" data-mk="STS430">STS430 · 7.7</option><option value="custom" data-mk="">기타 (비중 직접입력)</option>
+          </select></label>
+        <label class="fld"><span class="lab">철판단가</span><div class="suffix"><input class="inp num" id="pUnitPrice" type="text" inputmode="numeric" value="1,100" oninput="scPlateUnitPriceInput(this)"><span class="u">원/kg</span></div></label>
+      </div>
       <label class="fld hidden" id="pCustomWrap"><span class="lab">비중 직접입력 (g/cm³)</span><input class="inp" id="pCustom" inputmode="decimal" placeholder="예) 7.85" oninput="scCalc()"></label>
       <div class="row4">
         <label class="fld"><span class="lab">두께 (t)</span><input class="inp" id="pT" inputmode="decimal" placeholder="0" oninput="scCalc()"></label>
@@ -1317,7 +1325,7 @@ function manualSave(){savePrices();renderSaveState();toast('단가를 저장했�
 function resetPrices(){askConfirm('모든 단가를 기본값으로 되돌릴까요?',()=>{
   prices=Object.assign({},DEFAULT_PRICES);ensureDynamicPrices();
   try{localStorage.removeItem('dptPressPrices');}catch(e){}usingSaved=false;
-  syncPriceInputs();renderSetGrid();renderSaveState();eCalc();toast('기본값으로 복원했습니다');
+  syncPriceInputs();renderSetGrid();renderSaveState();eSyncMatPrice();scSyncPlatePrice();eCalc();scCalc();toast('기본값으로 복원했습니다');
 });}
 function renderSaveState(){
   const el=$('saveState');if(!el)return;
@@ -1489,7 +1497,7 @@ function renderMatPage(){const el=$('mpBody');if(!el)return;
       <button class="mtadd" onclick="addVendor('${k}')">＋ 업체 추가</button>
     </div>`;}).join('');
 }
-function applyMat(k){const q=num(matQuote[k]);let v,src;if(q>0){v=q;src='견적 적용가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();saveMatTable(true);renderMatPage();estCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
+function applyMat(k){const q=num(matQuote[k]);let v,src;if(q>0){v=q;src='견적 적용가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
 function addVendor(k){if(!matTable[matYear][k])matTable[matYear][k]=[];matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function delVendor(k,ri){matTable[matYear][k].splice(ri,1);if(!matTable[matYear][k].length)matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){return;}if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}
@@ -1539,7 +1547,7 @@ pw.addEventListener('click',e=>{const h=e.target.closest('[data-toggle]');if(!h|
 
 document.addEventListener('input',e=>{const t=e.target;let priceChg=false;const postCard=t.closest&&t.closest('.post');
   if(t.dataset&&t.dataset.price){
-    prices[t.dataset.price]=num(t.value);savePrices();syncPriceInputs(t);renderSaveState();priceChg=true;
+    prices[t.dataset.price]=num(t.value);savePrices();syncPriceInputs(t);renderSaveState();if(t.dataset.price==='mat'+eMatKey())eSyncMatPrice();if(t.dataset.price==='mat'+scMatKey('pMat'))scSyncPlatePrice();priceChg=true;
     // 견적 화면에서 공정단가를 입력하면 해당 공정을 자동 적용한다.
     if(postCard&&num(t.value)!==0){const tg=postCard.querySelector('[data-toggle]'),k=tg&&tg.dataset.toggle;if(k&&state.posts[k]){state.posts[k].on=true;postCard.classList.add('on','open');}}
   }else if(t.classList&&t.classList.contains('pi')){
@@ -1552,7 +1560,7 @@ document.addEventListener('input',e=>{const t=e.target;let priceChg=false;const 
   if(t.tagName==='INPUT'&&(t.inputMode==='numeric'||t.inputMode==='decimal'))fmtNum(t);
   if(priceChg||(t.closest&&t.closest('#page-est'))||(t.closest&&t.closest('#resultPanel'))){
     const pk=t.dataset&&t.dataset.price;
-    if(pk&&['pScrapW','pScrapL','lScrapW','lScrapL'].includes(pk))eCalc();else estCalc();
+    if(pk&&(['pScrapW','pScrapL','lScrapW','lScrapL'].includes(pk)||pk==='mat'+eMatKey()))eCalc();else estCalc();
   }});
 function syncPriceInputs(except){document.querySelectorAll('[data-price]').forEach(inp=>{if(inp!==except)inp.value=cf(prices[inp.dataset.price]);});}
 
@@ -1593,7 +1601,7 @@ function restoreSettings(input){const f=input.files&&input.files[0];if(!f)return
     if(d.matTable){matTable=d.matTable;matQuote=d.matQuote||{};matUpdated=d.matUpdated||'';saveMatTable(false);}
     if(d.laserT&&typeof laserT!=='undefined'){laserT.length=0;d.laserT.forEach(x=>laserT.push(x));saveLaser();}
     if(d.products&&typeof products!=='undefined'){products.length=0;d.products.forEach(x=>products.push(x));saveProducts();}
-    renderPosts();syncPriceInputs();renderSetGrid();renderSaveState();renderLaserTbl();renderProdTbl();fillProdSelect();renderMatPage();eCalc();
+    renderPosts();syncPriceInputs();renderSetGrid();renderSaveState();renderLaserTbl();renderProdTbl();fillProdSelect();renderMatPage();eSyncMatPrice();scSyncPlatePrice();eCalc();scCalc();
     toast('설정값을 불러왔습니다 (사용자 추가 단가 포함)');
   }catch(e){console.error(e);toast('불러오기 실패: 올바른 백업 파일이 아닙니다');}input.value='';};
   r.readAsText(f);
@@ -1797,7 +1805,7 @@ function estNew(keepTitle=false){
   if($('adj'))$('adj').value='0';if($('sale'))$('sale').value='0';
   ['moldCost','moldQpm','moldY','moldM'].forEach(i=>{if($(i))$(i).value='0';});if($('moldApply'))$('moldApply').checked=false;
   if($('eff'))$('eff').value='80';if($('hits'))$('hits').value='1';if($('cyc'))$('cyc').value='6';if($('cutn'))$('cutn').value='1';if($('workersL'))$('workersL').value='1';if($('workersC'))$('workersC').value='1';
-  if($('prod'))$('prod').selectedIndex=0;if($('eMat'))$('eMat').selectedIndex=0;eSetMode('plate');
+  if($('prod'))$('prod').selectedIndex=0;if($('eMat')){$('eMat').selectedIndex=0;eSyncMatPrice();}eSetMode('plate');
   setProc('');const mb=document.querySelector('#modeSeg button[data-mode=auto]');if(mb)mb.click();selectTon('160');
   POSTS.forEach(p=>{state.posts[p.k]={on:DEF_ON.includes(p.k),cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,truck:'5',load:p.loadDft||5000};});
   renderPosts();
@@ -1806,7 +1814,7 @@ function estNew(keepTitle=false){
 }
 function estAdditional(){estNew(true);}
 function captureState(){
-  const ids=['pname','productName','specNote','qty','adj','sale','prod','moldCost','moldQpm','moldY','moldM','charge','eff','spm','hits','cyc','cutn','workersL','workersC','eMat','eT','eW','eL','eQ','eCT','eCW','eOD','eID'];
+  const ids=['pname','productName','specNote','qty','adj','sale','prod','moldCost','moldQpm','moldY','moldM','charge','eff','spm','hits','cyc','cutn','workersL','workersC','eMat','eUnitPrice','eT','eW','eL','eQ','eCT','eCW','eOD','eID'];
   const v={};ids.forEach(i=>{const e=$(i);if(e)v[i]=e.value;});
   const mk=document.querySelector('[data-price=matkg]');if(mk)v.matkg=mk.value;
   const posts={};POSTS.forEach(p=>posts[p.k]=!!(state.posts[p.k]&&state.posts[p.k].on));
@@ -1954,6 +1962,9 @@ function scMatName(id){const s=$(id);const t=s.options[s.selectedIndex].text;ret
 let eMode='plate',EM={one:0,unit:0,cost:0,t:0,w:0,l:0,key:'EGI'};
 function eMatKey(){const o=$('eMat').options[$('eMat').selectedIndex];return o?(o.dataset.mk||''):'';}
 function eDens(){const o=$('eMat').options[$('eMat').selectedIndex];return o?(parseFloat(o.value)||0):0;}
+function eSyncMatPrice(){const el=$('eUnitPrice'),k=eMatKey();if(el)el.value=cf(k?matPrice(k):num(prices.matkg));}
+function eMatChange(){eSyncMatPrice();eCalc();}
+function eUnitPriceInput(el){const k=eMatKey(),v=num(el.value);if(k){prices['mat'+k]=v;savePrices();renderSetGrid();renderSaveState();}eCalc();}
 function eSetMode(m){eMode=m;$('ePlateF').classList.toggle('hidden',m!=='plate');$('eCoilF').classList.toggle('hidden',m!=='coil');$('eSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.em===m));eCalc();}
 function eCalc(){
   const dens=eDens();$('eDensP').textContent='비중 '+(dens||'-');
@@ -1964,7 +1975,8 @@ function eCalc(){
     const sl=state.proc==='press'?num(prices.pScrapL):(state.proc==='laser'?num(prices.lScrapL):0);
     calcW=Math.max(0,w+sw);calcL=Math.max(0,l+sl);one=(calcW*calcL*t)*dens/1e6;total=one*q;
   }else{const ct=num($('eCT').value),cw=num($('eCW').value),od=num($('eOD').value),id2=num($('eID').value);if(od>0&&od>id2){const a=Math.PI/4*(od*od-id2*id2);one=a*cw*dens/1e6;}t=ct;w=cw;total=one;calcW=w;calcL=l;}
-  const unit=eMatKey()?matPrice(eMatKey()):num(prices.matkg),cost=one*unit;
+  const enteredUnit=num($('eUnitPrice')&&$('eUnitPrice').value);
+  const unit=enteredUnit>0?enteredUnit:(eMatKey()?matPrice(eMatKey()):num(prices.matkg)),cost=one*unit;
   const allowance=(eMode==='plate'&&(calcW!==w||calcL!==l))?` · 스크랩 포함 ${cf(calcW)}×${cf(calcL)}mm`:'';
   $('eOne').textContent=fmt(one,3);$('eMatCost').textContent=fmt(cost,0);$('eMatNote').textContent='중량 × '+cf(Math.round(unit))+'원/kg'+allowance;
   $('eTotal').textContent=fmt(total,3);$('eG').textContent=fmt(one*1000,1);
@@ -1972,6 +1984,22 @@ function eCalc(){
   if(typeof estCalc==='function')estCalc();
 }
 function scMatKey(id){const o=$(id).options[$(id).selectedIndex];return o?(o.dataset.mk||''):'';}
+function scSyncPlatePrice(){
+  const el=$('pUnitPrice'),k=scMatKey('pMat');
+  if(el)el.value=cf(k?matPrice(k):num(prices.matkg));
+}
+function scMatChange(){scSyncPlatePrice();scCalc();}
+function scPlateUnitPriceInput(el){
+  const k=scMatKey('pMat'),v=num(el.value);
+  if(k){
+    prices['mat'+k]=v;
+    savePrices();
+    if(eMatKey()===k)eSyncMatPrice();
+    renderSetGrid();
+    renderSaveState();
+  }
+  scCalc();
+}
 function scCalc(){
   [['pMat','pCustom','pCustomWrap','pDens'],['cMat','cCustom','cCustomWrap','cDens']].forEach(([m,c,w,d])=>{const isC=$(m).value==='custom';$(w).classList.toggle('hidden',!isC);const dn=isC?num($(c).value):parseFloat($(m).value);$(d).textContent='비중 '+(dn||'-');});
   const pd=scDensity('pMat','pCustom'),t=num($('pT').value),w=num($('pW').value),l=num($('pL').value);let q=num($('pQ').value);if(q<=0)q=1;
@@ -1983,7 +2011,7 @@ function scCalc(){
   const diff=sum2-sum1,dEl=$('pDiff');
   if(kg1>0&&kg2>0){dEl.textContent=(diff>0?'+':'')+fmt(diff,0)+' 원';dEl.style.color=diff>0?'var(--accent)':(diff<0?'var(--ok)':'var(--sub)');}else{dEl.textContent='-';dEl.style.color='var(--sub)';}
   $('pCol1').classList.remove('best');$('pCol2').classList.remove('best');if(kg1>0&&kg2>0)(sum1<=sum2?$('pCol1'):$('pCol2')).classList.add('best');
-  const mkUnit=kg1>0?kg1:matPrice(scMatKey('pMat'));const matUnitCost=one*mkUnit;
+  const enteredPlateUnit=num($('pUnitPrice')&&$('pUnitPrice').value);const basePlateUnit=enteredPlateUnit>0?enteredPlateUnit:matPrice(scMatKey('pMat'));const mkUnit=kg1>0?kg1:basePlateUnit;const matUnitCost=one*mkUnit;
   $('pMatCost').textContent=fmt(matUnitCost,0);$('pMatNote').textContent='중량 × '+cf(Math.round(mkUnit))+'원/kg'+(kg1>0?' (단가①)':' (강종단가)');
   scCur.plate={mat:scMatName('pMat'),dens:pd,t,w,l,qty:q,one,total,kg1,kg2,plate,sum1,sum2,mkUnit,matUnitCost};
   const cd=scDensity('cMat','cCustom'),ct=num($('cT').value),cw=num($('cW').value);
@@ -1999,7 +2027,7 @@ function scApply(){
   const c=scCur.plate;
   if(!c||!(c.one>0)){toast('판재 중량을 먼저 입력하세요');return;}
   eSetMode('plate');const mk=scMatKey('pMat'),sel=$('eMat');[...sel.options].forEach((o,i)=>{if(o.dataset.mk===mk)sel.selectedIndex=i;});
-  $('eT').value=cf(c.t);$('eW').value=cf(c.w);$('eL').value=cf(c.l);$('eQ').value=cf(c.qty);
+  eSyncMatPrice();$('eT').value=cf(c.t);$('eW').value=cf(c.w);$('eL').value=cf(c.l);$('eQ').value=cf(c.qty);
   eCalc();showPage('est');toast('견적 ② 재료비에 적용했습니다 ('+cf(Math.round(c.one*1000)/1000)+'kg)');
 }
 function scSave(type){const c=scCur[type];const wt=type==='plate'?c.total:c.weight;if(!(wt>0)){toast('값을 입력하세요');return;}scDB[type].unshift(Object.assign({id:Date.now(),time:nowStr()},c));scSaveDB();scRender();toast('저장되었습니다 ('+scDB[type].length+'건)');}
@@ -2738,9 +2766,9 @@ syncPriceInputs();
 $('cID').value='508';
 selectTon('160');
 loadEstDB();estRender();
-scLoadDB();scCalc();scRender();
+scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-07-04 12:10';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-07-09';})();
 formatAllNums();
 estCalc();
 </script>
