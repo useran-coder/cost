@@ -154,7 +154,8 @@
   .rec-row{background:#f7f8fb;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
   .rec-top{display:flex;align-items:center;gap:10px}
   .rec-top .l1{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rec-top .wt{font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums}
+  .rec-top .wt{font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;line-height:1.25;display:flex;align-items:center;gap:10px}
+  .rec-top .wt .saved-mat-cost{display:inline-block;margin:0;font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
   .rec-top .del{flex:none;width:26px;height:26px;border-radius:8px;border:none;background:#fdecec;color:var(--accent);font-size:16px;font-weight:700;cursor:pointer;line-height:1}
   .rec-row .l2{font-size:11.5px;color:var(--sub);margin-top:5px;white-space:nowrap;overflow-x:auto}
   .empty{text-align:center;color:var(--sub);font-size:13px;padding:20px 0}
@@ -2020,7 +2021,8 @@ function scCalc(){
   else{len=num($('cLen').value);const wt=(cw*ct*len*1000)*cd/1e6;cweight=wt>0?wt:0;extra=cw*ct;$('cExtra').textContent=fmt(extra,1);}
   if(!(cweight>0))cweight=0;
   $('cWeight').textContent=fmt(cweight,cweight<100&&cweight>0?2:0);$('cTon').textContent=fmt(cweight/1000,3);
-  scCur.coil={mat:scMatName('cMat'),dens:cd,method:scMethod,t:ct,w:cw,od,id,len,weight:cweight,lengthM:(scMethod==='od'?extra:len),ton:cweight/1000};
+  const coilMkKey=scMatKey('cMat'),coilMkUnit=coilMkKey?matPrice(coilMkKey):num(prices.matkg),coilMatUnitCost=cweight*coilMkUnit;
+  scCur.coil={mat:scMatName('cMat'),dens:cd,method:scMethod,t:ct,w:cw,od,id,len,weight:cweight,lengthM:(scMethod==='od'?extra:len),ton:cweight/1000,mkUnit:coilMkUnit,matUnitCost:coilMatUnitCost};
   if(typeof estCalc==='function')estCalc();
 }
 function scApply(){
@@ -2032,15 +2034,35 @@ function scApply(){
 }
 function scSave(type){const c=scCur[type];const wt=type==='plate'?c.total:c.weight;if(!(wt>0)){toast('값을 입력하세요');return;}scDB[type].unshift(Object.assign({id:Date.now(),time:nowStr()},c));scSaveDB();scRender();toast('저장되었습니다 ('+scDB[type].length+'건)');}
 function scDelete(type,id){scDB[type]=scDB[type].filter(r=>r.id!==id);scSaveDB();scRender();}
+function scWeight3(n){
+  n=Number(n)||0;
+  return n.toLocaleString('ko-KR',{minimumFractionDigits:3,maximumFractionDigits:3});
+}
 function scRender(){
   const type=scMode,list=$('scList'),sumEl=$('scSum');
   $('scCnt').textContent=scDB[type].length+'건';
   if(!scDB[type].length){list.innerHTML='<div class="empty">저장된 데이터가 없습니다</div>';sumEl.classList.remove('show');return;}
   const sumW=scDB[type].reduce((a,r)=>a+(type==='plate'?r.total:r.weight),0);
-  let sumTxt='합계중량 '+fmt(sumW,1)+' kg ('+fmt(sumW/1000,3)+' ton)';
+  let sumTxt='합계중량 '+scWeight3(sumW)+' kg ('+scWeight3(sumW/1000)+' ton)';
   if(type==='plate'){const s1=scDB.plate.reduce((a,r)=>a+(r.kg1>0?r.sum1:0),0),s2=scDB.plate.reduce((a,r)=>a+(r.kg2>0?r.sum2:0),0);if(s2>0)sumTxt+=' · 단가① '+fmt(s1,0)+'원 / ② '+fmt(s2,0)+'원';else if(s1>0)sumTxt+=' · 단가 합계 '+fmt(s1,0)+'원';}
   sumEl.textContent=sumTxt;sumEl.classList.add('show');
-  list.innerHTML=scDB[type].map(r=>{let l1,l2,wt;if(type==='plate'){l1=`${r.mat} ${r.t}t · ${fmt(r.w,0)}×${fmt(r.l,0)} ×${r.qty}매`;l2=`1매 ${fmt(r.one,2)}kg${r.kg1>0?' · 합계 '+fmt(r.sum1,0)+'원':''} · ${r.time}`;wt=fmt(r.total,1)+'kg';}else{l1=`${r.mat} ${r.t}t · W${fmt(r.w,0)}`+(r.method==='od'?` · OD${fmt(r.od,0)}/ID${fmt(r.id,0)}`:` · L${fmt(r.len,0)}m`);l2=`길이 ${fmt(r.lengthM,1)}m · ${fmt(r.ton,3)}ton · ${r.time}`;wt=fmt(r.weight,r.weight<100?2:0)+'kg';}return `<div class="rec-row"><div class="rec-top"><div class="l1">${l1}</div><div class="wt">${wt}</div><button class="del" onclick="scDelete('${type}',${r.id})">×</button></div><div class="l2">${l2}</div></div>`;}).join('');
+  list.innerHTML=scDB[type].map(r=>{
+    let l1,l2,wt,matCostHtml='';
+    if(type==='plate'){
+      l1=`${r.mat} ${r.t}t · ${fmt(r.w,0)}×${fmt(r.l,0)} ×${r.qty}매`;
+      l2=`1매 ${scWeight3(r.one)}kg${r.kg1>0?' · 합계 '+fmt(r.sum1,0)+'원':''} · ${r.time}`;
+      wt=scWeight3(r.total)+'kg';
+      const savedMatCost=Number(r.matUnitCost)>0?Number(r.matUnitCost):((Number(r.one)||0)*(Number(r.mkUnit)||Number(r.kg1)||0));
+      matCostHtml=`<span class="saved-mat-cost">재료비 단가 ${savedMatCost>0?fmt(savedMatCost,0)+'원':'-'}</span>`;
+    }else{
+      l1=`${r.mat} ${r.t}t · W${fmt(r.w,0)}`+(r.method==='od'?` · OD${fmt(r.od,0)}/ID${fmt(r.id,0)}`:` · L${fmt(r.len,0)}m`);
+      l2=`길이 ${fmt(r.lengthM,1)}m · ${scWeight3(r.ton)}ton · ${r.time}`;
+      wt=scWeight3(r.weight)+'kg';
+      const savedCoilMatCost=Number(r.matUnitCost)>0?Number(r.matUnitCost):((Number(r.weight)||0)*(Number(r.mkUnit)||0));
+      matCostHtml=`<span class="saved-mat-cost">재료비 단가 ${savedCoilMatCost>0?fmt(savedCoilMatCost,0)+'원':'-'}</span>`;
+    }
+    return `<div class="rec-row"><div class="rec-top"><div class="l1">${l1}</div><div class="wt"><span>${wt}</span>${matCostHtml}</div><button class="del" onclick="scDelete('${type}',${r.id})">×</button></div><div class="l2">${l2}</div></div>`;
+  }).join('');
 }
 function scRows(type){
   if(type==='plate'){const recs=scDB.plate,hasP1=recs.some(r=>r.kg1>0),hasP2=recs.some(r=>r.kg2>0);let head=['일시','강종','비중','두께(t,mm)','폭(mm)','너비(mm)','수량(매)','1매중량(kg)','합계중량(kg)'];if(hasP1)head=head.concat(['단가①(원/kg)','도금비(원/kg)','단가①합계(원)']);if(hasP2)head=head.concat(['단가②(원/kg)','단가②합계(원)','차액②-①(원)']);
