@@ -88,7 +88,7 @@
   .post-tgl{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;flex:0 0 auto;width:300px}
   .post-tgl .nm{font-size:13.5px;font-weight:700}
   .post-tgl .nm{min-width:0}
-  .post-tgl .nm span{font-size:9.5px;color:var(--sub);font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
+  .post-tgl .nm span{font-size:11px;color:var(--sub);font-weight:500;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.35}
   .post-tgl .tg{width:44px;height:25px;border-radius:13px;background:#d3d8e2;position:relative;flex:0 0 auto;transition:.15s}
   .post-tgl .tg::after{content:"";position:absolute;width:19px;height:19px;border-radius:50%;background:#fff;top:3px;left:3px;transition:.15s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
   .post.on .post-tgl .tg{background:var(--ok)}.post.on .post-tgl .tg::after{left:22px}
@@ -104,7 +104,7 @@
   .post-inline .cfld>span{font-size:11px}
   .post-row .pv{font-size:14px;font-weight:800;color:var(--sub);margin-left:auto}
   .post.on .post-row .pv{color:var(--ok)}.post.on.credit .post-row .pv{color:var(--accent)}
-  .post .formula{font-size:10.5px;color:var(--sub);background:var(--chip);padding:7px 9px;border-radius:7px;margin-top:9px;font-weight:500}
+  .post .formula{font-size:11px;color:var(--sub);background:var(--chip);padding:7px 9px;border-radius:7px;margin-top:9px;font-weight:500}
 
   .sum-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;font-size:13.5px;border-bottom:1px dashed var(--line)}
   .sum-row.sub{color:var(--sub);font-size:12.5px}.sum-row b{font-weight:700}
@@ -155,7 +155,10 @@
   .rec-top{display:flex;align-items:center;gap:10px}
   .rec-top .l1{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rec-top .wt{font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;line-height:1.25;display:flex;align-items:center;gap:10px}
-  .rec-top .wt .saved-mat-cost{display:inline-block;margin:0;font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
+  .rec-top .wt .saved-mat-cost{display:inline-flex;align-items:baseline;gap:4px;margin:0;font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
+  .rec-top .wt .saved-mat-cost-label{font-size:11px;font-weight:700;color:var(--accent)}
+  .rec-top .wt .saved-mat-cost-amount{font-size:16px;font-weight:900;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
+  .rec-top .wt .saved-steel-unit{margin-left:6px;font-size:11px;font-weight:700;color:var(--sub);font-variant-numeric:tabular-nums}
   .rec-top .del{flex:none;width:26px;height:26px;border-radius:8px;border:none;background:#fdecec;color:var(--accent);font-size:16px;font-weight:700;cursor:pointer;line-height:1}
   .rec-row .l2{font-size:11.5px;color:var(--sub);margin-top:5px;white-space:nowrap;overflow-x:auto}
   .empty{text-align:center;color:var(--sub);font-size:13px;padding:20px 0}
@@ -871,6 +874,80 @@
     }
   }
 
+  /* ===== v42: 저장된 견적 상세표 글자 크기 최종 고정 ===== */
+  @media screen{
+    /* NO·제품 정보·재료 정보·공정비·견적금액 구분 제목 */
+    body.tab-list #page-list .est-line-table thead tr.grp > th{
+      font-size:13px!important;
+    }
+    /* 구분 제목 아래 합계금액 */
+    body.tab-list #page-list .est-line-table thead tr.grp th .head-sum{
+      font-size:12px!important;
+    }
+    /* 일반 열 제목 */
+    body.tab-list #page-list .est-line-table thead tr.cols > th{
+      font-size:12px!important;
+    }
+    /* 제품명·규격 열 제목 */
+    body.tab-list #page-list .est-line-table thead tr.cols > th.prod,
+    body.tab-list #page-list .est-line-table thead tr.cols > th.spec{
+      font-size:12px!important;
+    }
+    /* 재질·두께·폭·길이·무게 열 제목 */
+    body.tab-list #page-list .est-line-table thead tr.cols > th.matkey,
+    body.tab-list #page-list .est-line-table thead tr.cols > th.dim,
+    body.tab-list #page-list .est-line-table thead tr.cols > th.kg{
+      font-size:12px!important;
+    }
+    /* 세부 공정 열 제목 */
+    body.tab-list #page-list .est-line-table thead tr.cols > th.subc{
+      font-size:12px!important;
+    }
+    /* 일반 데이터 */
+    body.tab-list #page-list .est-line-table tbody > tr > td{
+      font-size:12px!important;
+    }
+    /* 제품명·규격 데이터 */
+    body.tab-list #page-list .est-line-table tbody > tr > td.prod,
+    body.tab-list #page-list .est-line-table tbody > tr > td.spec{
+      font-size:12.25px!important;
+    }
+    /* 재질·치수·무게 데이터 */
+    body.tab-list #page-list .est-line-table tbody > tr > td.matkey,
+    body.tab-list #page-list .est-line-table tbody > tr > td.dim,
+    body.tab-list #page-list .est-line-table tbody > tr > td.kg{
+      font-size:12px!important;
+    }
+    /* 원자재비·개당단가 데이터 */
+    body.tab-list #page-list .est-line-table tbody > tr > td.raw-start,
+    body.tab-list #page-list .est-line-table tbody > tr > td.cost.money.grp-start.equal-cell{
+      font-size:12px!important;
+    }
+    /* 세부 공정비 데이터 */
+    body.tab-list #page-list .est-line-table tbody > tr > td.subc{
+      font-size:12px!important;
+    }
+    /* 수량·이익률 데이터 */
+    body.tab-list #page-list .est-line-table tbody > tr > td.small{
+      font-size:12px!important;
+    }
+    /* 견적총액·판매가 제목과 데이터 */
+    body.tab-list #page-list .est-line-table th.totalamt,
+    body.tab-list #page-list .est-line-table td.totalamt,
+    body.tab-list #page-list .est-line-table th.saleamt,
+    body.tab-list #page-list .est-line-table td.saleamt{
+      font-size:12px!important;
+    }
+    /* 합계행 일반 데이터 */
+    body.tab-list #page-list .est-line-table tfoot > tr > td{
+      font-size:12px!important;
+    }
+    /* 합계행 세부 공정비 */
+    body.tab-list #page-list .est-line-table tfoot > tr > td.subc{
+      font-size:12px!important;
+    }
+  }
+
 </style>
 </head>
 <body>
@@ -1158,6 +1235,7 @@
       <div class="mp-top"><span class="mp-upd" id="mpUpdated">최종 업데이트 : -</span><span class="mp-hint">월별 매입단가를 입력하고 강종별 <b>적용</b>을 누르면 견적 자재단가에 반영됩니다.</span></div>
       <div id="mpBody"></div>
       <div class="rec-actions" style="margin-top:12px">
+        <button class="btn-xl" onclick="syncPurchaseMaterialPrices(true,true)" style="background:#0f766e;color:#fff;border-color:#0f766e">🔄 매입단가 가져오기</button>
         <button class="btn-xl" onclick="mpExport()">⤓ 엑셀 내보내기</button>
         <button class="btn-xl" onclick="document.getElementById('mpImportFile').click()" style="background:#fff;color:var(--navy);border:1.5px solid var(--navy)">⤒ 엑셀 불러오기</button>
         <input type="file" id="mpImportFile" accept=".xlsx,.xls" style="display:none" onchange="mpImport(this)">
@@ -1281,6 +1359,7 @@ $('modalOk').addEventListener('click',()=>{const cb=_modalCb;closeModal();if(cb)
 function showPage(p){
   ['est','list','mat','mp','set'].forEach(x=>{$('page-'+x).classList.toggle('hidden',x!==p);$('tab-'+x).classList.toggle('on',x===p);});
   document.body.className='tab-'+p;
+  if(p==='mp')syncPurchaseMaterialPrices(false,false);
   if(p==='set')renderSaveState();
   if(p==='list')estListRender();
   window.scrollTo(0,0);
@@ -1422,7 +1501,7 @@ function delProd(i){products.splice(i,1);saveProducts();renderProdTbl();fillProd
 
 /* ================= 자재단가 관리 ================= */
 const MONTHS=['1','2','3','4','5','6','7','8','9','10','11','12'];
-const Y_LIST=['2024','2025','2026'];
+let Y_LIST=['2024','2025','2026'];
 const DATA_YEAR={
 '2026':{
   EGI:[{v:'대창스틸',m:[880,880,886,950,1005,'','','','','','','']},{v:'에스에이(영진)',m:Array(12).fill('')},{v:'한신칼라',m:Array(12).fill('')},{v:'아이에스스틸',m:[880,'','','','','','','','','','','']},{v:'신라철강',m:Array(12).fill('')},{v:'기보스틸',m:Array(12).fill('')},{v:'아주스틸 (가공비+25원)',m:[890,890,895,935,985,1005,'','','','','','']},{v:'대신스틸 (레이저용)',m:Array(12).fill('')}],
@@ -1447,12 +1526,93 @@ const DATA_YEAR={
 function emptyRows(){return [{v:'',m:Array(12).fill('')}];}
 const EXTRA_ITEMS=['미니샤 가공','소폭가공','판재 소량'];
 function defaultMatExtra(){return EXTRA_ITEMS.map(n=>({n,amt:'',note:''}));}
-function normalizeMatExtra(x){const d=defaultMatExtra();if(Array.isArray(x)){d.forEach((r,i)=>{const f=x.find(v=>v&&v.n===r.n)||x[i];if(f){r.amt=f.amt||'';r.note=f.note||'';}});}return d;}
+function normalizeMatExtra(x){const d=defaultMatExtra();if(Array.isArray(x)){d.forEach((r,i)=>{const f=x.find(v=>v&&(v.n===r.n||v.name===r.n))||x[i];if(f){r.amt=f.amt!=null?f.amt:(f.amount||'');r.note=f.note||'';}});x.forEach(f=>{if(!f)return;const n=String(f.n!=null?f.n:(f.name||'')).trim();if(n&&!d.some(r=>r.n===n))d.push({n,amt:f.amt!=null?f.amt:(f.amount||''),note:f.note||''});});}return d;}
 const DATA_SCRAP_DEF={'2026':[{v:'고철 시세',m:[410,'',440,440,505,'','','','','','','']}]};
 function defaultMatTable(){const t={};Y_LIST.forEach(y=>{t[y]={};MATERIALS.forEach(mt=>{const dy=DATA_YEAR[y];t[y][mt.k]=(dy&&dy[mt.k])?JSON.parse(JSON.stringify(dy[mt.k])):emptyRows();});t[y]['고철']=DATA_SCRAP_DEF[y]?JSON.parse(JSON.stringify(DATA_SCRAP_DEF[y])):emptyRows();});return t;}
 let matTable={},matQuote={},matUpdated='',matYear='2026',matExtra=defaultMatExtra();
 function loadMatTable(){try{const s=localStorage.getItem('dptMatTable');if(s){const o=JSON.parse(s);if(o.t&&o.t['2026']){matTable=o.t;matQuote=o.q||{};matUpdated=o.u||'';matExtra=normalizeMatExtra(o.x);Y_LIST.forEach(y=>{if(matTable[y]&&!matTable[y]['고철'])matTable[y]['고철']=emptyRows();});return;}}}catch(e){}matTable=defaultMatTable();matQuote={};matUpdated='';matExtra=defaultMatExtra();}
 function saveMatTable(stamp){if(stamp){const d=new Date();matUpdated=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}try{localStorage.setItem('dptMatTable',JSON.stringify({t:matTable,q:matQuote,u:matUpdated,x:matExtra}));}catch(e){}}
+const PURCHASE_MAT_KEY='dbfastec_material_price_history_v1';
+let purchaseMatSyncSig='';
+function purchaseRowsArray(v){
+  if(Array.isArray(v))return v;
+  if(v&&typeof v==='object')return Object.keys(v).sort((a,b)=>(+a||0)-(+b||0)).map(k=>v[k]);
+  return [];
+}
+function purchaseMatSource(){
+  try{
+    const raw=localStorage.getItem(PURCHASE_MAT_KEY)||'';
+    if(!raw)return null;
+    const db=JSON.parse(raw);
+    if(!db||typeof db!=='object'||!db.years||typeof db.years!=='object')return null;
+    return {db,raw};
+  }catch(e){return null;}
+}
+function syncPurchaseMaterialPrices(notify=true,force=false){
+  const src=purchaseMatSource();
+  if(!src){
+    if(notify)toast('매입분석도구에서 원자재 단가를 먼저 저장·동기화해 주세요');
+    return {ok:false,reason:'missing'};
+  }
+  const sig=src.raw.length+':'+src.raw.slice(0,48)+':'+src.raw.slice(-96);
+  if(!force&&sig===purchaseMatSyncSig)return {ok:true,unchanged:true};
+  const db=src.db,grades=['고철',...MATERIALS.map(x=>x.k)];
+  const years=Object.keys(db.years||{}).filter(y=>/^\d{4}$/.test(y)).sort();
+  let addedRows=0,updatedCells=0,updatedQuotes=0,updatedExtras=0,sourceRows=0;
+  years.forEach(y=>{
+    if(!matTable[y])matTable[y]={};
+    if(!Y_LIST.includes(y))Y_LIST.push(y);
+    grades.forEach(k=>{
+      const incoming=purchaseRowsArray((db.years[y]||{})[k]);
+      if(!incoming.length){if(!matTable[y][k])matTable[y][k]=emptyRows();return;}
+      if(!Array.isArray(matTable[y][k]))matTable[y][k]=[];
+      incoming.forEach(sr=>{
+        if(!sr||typeof sr!=='object')return;
+        const vendor=String(sr.vendor!=null?sr.vendor:(sr.v||'')).trim();
+        const sm=Array.isArray(sr.m)?sr.m:[];
+        if(!vendor&&!sm.some(v=>String(v==null?'':v).trim()!==''))return;
+        sourceRows++;
+        let tr=matTable[y][k].find(r=>String(r&&r.v||'').trim()===vendor);
+        if(!tr){tr={v:vendor,m:Array(12).fill('')};matTable[y][k].push(tr);addedRows++;}
+        if(!Array.isArray(tr.m))tr.m=Array(12).fill('');
+        while(tr.m.length<12)tr.m.push('');
+        for(let mi=0;mi<12;mi++){
+          const cell=sm[mi],txt=String(cell==null?'':cell).replace(/,/g,'').trim();
+          if(txt==='')continue;
+          if(String(tr.m[mi]==null?'':tr.m[mi]).replace(/,/g,'').trim()!==txt){tr.m[mi]=txt;updatedCells++;}
+        }
+      });
+      if(matTable[y][k].length>1)matTable[y][k]=matTable[y][k].filter(r=>String(r&&r.v||'').trim()||(r&&Array.isArray(r.m)&&r.m.some(v=>String(v==null?'':v).trim()!=='')));
+      if(!matTable[y][k].length)matTable[y][k]=emptyRows();
+    });
+  });
+  Y_LIST=[...new Set(Y_LIST)].sort();
+  if(!Y_LIST.includes(matYear))matYear=Y_LIST.includes(String(new Date().getFullYear()))?String(new Date().getFullYear()):Y_LIST[Y_LIST.length-1];
+  const markets=db.marketPrices&&db.marketPrices[matYear];
+  if(markets&&typeof markets==='object')MATERIALS.forEach(m=>{const v=String(markets[m.k]==null?'':markets[m.k]).replace(/,/g,'').trim();if(v&&num(v)>0&&String(matQuote[m.k]||'')!==v){matQuote[m.k]=v;updatedQuotes++;}});
+  if(Array.isArray(db.egiExtras)){
+    db.egiExtras.forEach(se=>{
+      if(!se)return;const n=String(se.name!=null?se.name:(se.n||'')).trim();if(!n)return;
+      let te=matExtra.find(x=>x.n===n);if(!te){te={n,amt:'',note:''};matExtra.push(te);updatedExtras++;}
+      const amt=String(se.amount!=null?se.amount:(se.amt||'')).replace(/,/g,'').trim(),note=String(se.note||'');
+      if(amt!==''&&String(te.amt||'')!==amt){te.amt=amt;updatedExtras++;}
+      if(note!==''&&String(te.note||'')!==note){te.note=note;updatedExtras++;}
+    });
+  }
+  const changed=addedRows+updatedCells+updatedQuotes+updatedExtras>0;
+  matUpdated=String(db.updated||'').trim()||new Date().toLocaleString('sv-SE');
+  purchaseMatSyncSig=sig;
+  if(changed){saveMatTable(false);renderMatPage();estCalc();}
+  else if($('mpUpdated'))$('mpUpdated').textContent='최종 업데이트 : '+(matUpdated||'-');
+  if(notify){
+    if(!sourceRows)toast('매입분석도구에 동기화할 원자재 단가 데이터가 없습니다');
+    else if(changed)toast(`매입단가 가져오기 완료 · 신규 업체 ${addedRows}행 · 단가 ${updatedCells}칸 갱신`);
+    else toast('매입분석도구의 원자재 단가와 이미 동기화되어 있습니다');
+  }
+  return {ok:true,changed,addedRows,updatedCells,updatedQuotes,updatedExtras,sourceRows,years};
+}
+window.addEventListener('storage',e=>{if(e&&e.key===PURCHASE_MAT_KEY)syncPurchaseMaterialPrices(false,true);});
+window.addEventListener('materialPriceChanged',()=>syncPurchaseMaterialPrices(false,true));
 function yRows(k){return (matTable[matYear]&&matTable[matYear][k])||[];}
 function latestMat(k){const rows=yRows(k);for(let mi=11;mi>=0;mi--){for(const r of rows){const v=num(r.m[mi]);if(v>0)return{v,month:mi+1};}}return null;}
 function matSeries(k){const rows=yRows(k);return MONTHS.map((_,mi)=>{let s=0,c=0;rows.forEach(r=>{const v=num(r.m[mi]);if(v>0){s+=v;c++;}});return c?s/c:null;});}
@@ -2053,13 +2213,15 @@ function scRender(){
       l2=`1매 ${scWeight3(r.one)}kg${r.kg1>0?' · 합계 '+fmt(r.sum1,0)+'원':''} · ${r.time}`;
       wt=scWeight3(r.total)+'kg';
       const savedMatCost=Number(r.matUnitCost)>0?Number(r.matUnitCost):((Number(r.one)||0)*(Number(r.mkUnit)||Number(r.kg1)||0));
-      matCostHtml=`<span class="saved-mat-cost">재료비 단가 ${savedMatCost>0?fmt(savedMatCost,0)+'원':'-'}</span>`;
+      const savedPlateUnit=Number(r.mkUnit)>0?Number(r.mkUnit):(Number(r.kg1)>0?Number(r.kg1):((savedMatCost>0&&Number(r.one)>0)?savedMatCost/Number(r.one):0));
+      matCostHtml=`<span class="saved-mat-cost"><span class="saved-mat-cost-label">재료비 단가</span><strong class="saved-mat-cost-amount">${savedMatCost>0?fmt(savedMatCost,0)+'원':'-'}</strong><span class="saved-steel-unit">철판단가 ${savedPlateUnit>0?fmt(savedPlateUnit,0)+'원/kg':'-'}</span></span>`;
     }else{
       l1=`${r.mat} ${r.t}t · W${fmt(r.w,0)}`+(r.method==='od'?` · OD${fmt(r.od,0)}/ID${fmt(r.id,0)}`:` · L${fmt(r.len,0)}m`);
       l2=`길이 ${fmt(r.lengthM,1)}m · ${scWeight3(r.ton)}ton · ${r.time}`;
       wt=scWeight3(r.weight)+'kg';
       const savedCoilMatCost=Number(r.matUnitCost)>0?Number(r.matUnitCost):((Number(r.weight)||0)*(Number(r.mkUnit)||0));
-      matCostHtml=`<span class="saved-mat-cost">재료비 단가 ${savedCoilMatCost>0?fmt(savedCoilMatCost,0)+'원':'-'}</span>`;
+      const savedCoilUnit=Number(r.mkUnit)>0?Number(r.mkUnit):((savedCoilMatCost>0&&Number(r.weight)>0)?savedCoilMatCost/Number(r.weight):0);
+      matCostHtml=`<span class="saved-mat-cost"><span class="saved-mat-cost-label">재료비 단가</span><strong class="saved-mat-cost-amount">${savedCoilMatCost>0?fmt(savedCoilMatCost,0)+'원':'-'}</strong><span class="saved-steel-unit">철판단가 ${savedCoilUnit>0?fmt(savedCoilUnit,0)+'원/kg':'-'}</span></span>`;
     }
     return `<div class="rec-row"><div class="rec-top"><div class="l1">${l1}</div><div class="wt"><span>${wt}</span>${matCostHtml}</div><button class="del" onclick="scDelete('${type}',${r.id})">×</button></div><div class="l2">${l2}</div></div>`;
   }).join('');
@@ -2780,7 +2942,7 @@ function estTitleLineHtml(records,groupNo,title){
 
 /* ================= 초기화 ================= */
 document.body.className='tab-est';
-loadMatTable();renderMatPage();
+loadMatTable();syncPurchaseMaterialPrices(false,true);renderMatPage();
 fillProdSelect();renderLaserTbl();renderProdTbl();
 $('prod').addEventListener('change',estCalc);
 setProc('');
