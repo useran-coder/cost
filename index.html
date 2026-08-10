@@ -322,9 +322,13 @@
   .mp-extra .mp-head{margin-bottom:8px}
   .mp-extra .mp-head b{color:var(--navy)}
   .mp-extra .mp-hint{width:100%;font-size:11px;color:var(--sub);font-weight:500}
-  .mp-extra .mp-tbl .mpexitem{text-align:left;min-width:100px;font-weight:800;color:var(--ink);background:#f8fafc}
-  .mp-extra .mp-tbl .mpexamt{min-width:96px;text-align:right;font-weight:800;color:var(--ink);background:#fff}
-  .mp-extra .mp-tbl .mpexnote{min-width:260px;text-align:left;background:#fff}
+  .mp-extra .mp-tbl{width:100%;table-layout:fixed}
+  .mp-extra .mp-tbl th:nth-child(1),.mp-extra .mp-tbl td:nth-child(1){width:11%}
+  .mp-extra .mp-tbl th:nth-child(2),.mp-extra .mp-tbl td:nth-child(2){width:11%}
+  .mp-extra .mp-tbl th:nth-child(3),.mp-extra .mp-tbl td:nth-child(3){width:78%}
+  .mp-extra .mp-tbl .mpexitem{text-align:left;min-width:0;font-weight:800;color:var(--ink);background:#f8fafc}
+  .mp-extra .mp-tbl .mpexamt{min-width:0;text-align:right;font-weight:800;color:var(--ink);background:#fff}
+  .mp-extra .mp-tbl .mpexnote{min-width:0;text-align:left;background:#fff}
   .res-row2{display:flex;gap:14px;flex-wrap:wrap}
   .res-row2>div{flex:1;min-width:130px}
   .res-mat{border-left:2px solid var(--line);padding-left:14px}
@@ -1245,7 +1249,7 @@
       <input type="file" id="mpImportFile" accept=".xlsx,.xls" style="display:none" onchange="mpImport(this)">
     </div></div>
     <div class="sec-b">
-      <div class="mp-top"><span class="mp-upd" id="mpUpdated">최종 업데이트 : -</span><span class="mp-hint">월별 매입단가를 입력하고 강종별 <b>적용</b>을 누르면 견적 자재단가에 반영됩니다.</span></div>
+      <div class="mp-top"><span class="mp-upd" id="mpUpdated">업데이트 일시 : -</span><span class="mp-hint">월별 매입단가를 입력하고 강종별 <b>적용</b>을 누르면 견적 자재단가에 반영됩니다.</span></div>
       <div id="mpBody"></div>
       <div class="rec-actions" style="margin-top:12px">
         <button onclick="showPage('est')" style="flex:1;padding:11px;border:none;background:var(--navy);color:#fff;border-radius:10px;font-weight:700;font-family:inherit;cursor:pointer">견적으로</button>
@@ -1538,9 +1542,10 @@ function defaultMatExtra(){return EXTRA_ITEMS.map(n=>({n,amt:'',note:''}));}
 function normalizeMatExtra(x){const d=defaultMatExtra();if(Array.isArray(x)){d.forEach((r,i)=>{const f=x.find(v=>v&&(v.n===r.n||v.name===r.n))||x[i];if(f){r.amt=f.amt!=null?f.amt:(f.amount||'');r.note=f.note||'';}});x.forEach(f=>{if(!f)return;const n=String(f.n!=null?f.n:(f.name||'')).trim();if(n&&!d.some(r=>r.n===n))d.push({n,amt:f.amt!=null?f.amt:(f.amount||''),note:f.note||''});});}return d;}
 const DATA_SCRAP_DEF={'2026':[{v:'고철 시세',m:[410,'',440,440,505,'','','','','','','']}]};
 function defaultMatTable(){const t={};Y_LIST.forEach(y=>{t[y]={};MATERIALS.forEach(mt=>{const dy=DATA_YEAR[y];t[y][mt.k]=(dy&&dy[mt.k])?JSON.parse(JSON.stringify(dy[mt.k])):emptyRows();});t[y]['고철']=DATA_SCRAP_DEF[y]?JSON.parse(JSON.stringify(DATA_SCRAP_DEF[y])):emptyRows();});return t;}
-let matTable={},matQuote={},matUpdated='',matYear='2026',matExtra=defaultMatExtra();
-function loadMatTable(){try{const s=localStorage.getItem('dptMatTable');if(s){const o=JSON.parse(s);if(o.t&&o.t['2026']){matTable=o.t;matQuote=o.q||{};matUpdated=o.u||'';matExtra=normalizeMatExtra(o.x);Y_LIST.forEach(y=>{if(matTable[y]&&!matTable[y]['고철'])matTable[y]['고철']=emptyRows();});return;}}}catch(e){}matTable=defaultMatTable();matQuote={};matUpdated='';matExtra=defaultMatExtra();}
-function saveMatTable(stamp){if(stamp){const d=new Date();matUpdated=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;}try{localStorage.setItem('dptMatTable',JSON.stringify({t:matTable,q:matQuote,u:matUpdated,x:matExtra}));}catch(e){}}
+let matTable={},matQuote={},matUpdated='',matSourceUpdated='',matYear='2026',matExtra=defaultMatExtra();
+function matNowText(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;}
+function loadMatTable(){try{const s=localStorage.getItem('dptMatTable');if(s){const o=JSON.parse(s);if(o.t&&o.t['2026']){matTable=o.t;matQuote=o.q||{};matUpdated=o.u||'';matSourceUpdated=o.su||'';matExtra=normalizeMatExtra(o.x);Y_LIST.forEach(y=>{if(matTable[y]&&!matTable[y]['고철'])matTable[y]['고철']=emptyRows();});return;}}}catch(e){}matTable=defaultMatTable();matQuote={};matUpdated='';matSourceUpdated='';matExtra=defaultMatExtra();}
+function saveMatTable(stamp){if(stamp)matUpdated=matNowText();try{localStorage.setItem('dptMatTable',JSON.stringify({t:matTable,q:matQuote,u:matUpdated,su:matSourceUpdated,x:matExtra}));}catch(e){}}
 const PURCHASE_MAT_KEY='dbfastec_material_price_history_v1';
 let purchaseMatSyncSig='';
 function purchaseRowsArray(v){
@@ -1557,68 +1562,109 @@ function purchaseMatSource(){
     return {db,raw};
   }catch(e){return null;}
 }
+function purchaseGradeValue(yearDb,k){
+  if(!yearDb||typeof yearDb!=='object')return undefined;
+  if(k==='고철'){
+    if(yearDb['고철']!==undefined)return yearDb['고철'];
+    if(yearDb['고철단가']!==undefined)return yearDb['고철단가'];
+    if(yearDb['SCRAP']!==undefined)return yearDb['SCRAP'];
+  }
+  return yearDb[k];
+}
+function normalizePurchaseRows(v){
+  return purchaseRowsArray(v).map(sr=>{
+    if(!sr||typeof sr!=='object')return null;
+    const vendor=String(sr.vendor!=null?sr.vendor:(sr.v||'')).trim();
+    const sm=Array.isArray(sr.m)?sr.m:[];
+    const m=Array.from({length:12},(_,mi)=>String(sm[mi]==null?'':sm[mi]).replace(/,/g,'').trim());
+    if(!vendor&&!m.some(Boolean))return null;
+    return {v:vendor,m};
+  }).filter(Boolean);
+}
+function matRowsSame(a,b){
+  const aa=Array.isArray(a)?a:[],bb=Array.isArray(b)?b:[];
+  if(aa.length!==bb.length)return false;
+  for(let i=0;i<aa.length;i++){
+    if(String(aa[i]&&aa[i].v||'').trim()!==String(bb[i]&&bb[i].v||'').trim())return false;
+    const am=aa[i]&&Array.isArray(aa[i].m)?aa[i].m:[],bm=bb[i]&&Array.isArray(bb[i].m)?bb[i].m:[];
+    for(let mi=0;mi<12;mi++)if(String(am[mi]==null?'':am[mi]).replace(/,/g,'').trim()!==String(bm[mi]==null?'':bm[mi]).replace(/,/g,'').trim())return false;
+  }
+  return true;
+}
+function matRowsDiffCount(a,b){
+  const aa=Array.isArray(a)?a:[],bb=Array.isArray(b)?b:[];
+  let cells=0;
+  const max=Math.max(aa.length,bb.length);
+  for(let i=0;i<max;i++){
+    const ar=aa[i]||{v:'',m:[]},br=bb[i]||{v:'',m:[]};
+    if(String(ar.v||'').trim()!==String(br.v||'').trim())cells++;
+    for(let mi=0;mi<12;mi++)if(String((ar.m||[])[mi]==null?'':(ar.m||[])[mi]).replace(/,/g,'').trim()!==String((br.m||[])[mi]==null?'':(br.m||[])[mi]).replace(/,/g,'').trim())cells++;
+  }
+  return cells;
+}
 function syncPurchaseMaterialPrices(notify=true,force=false){
   const src=purchaseMatSource();
   if(!src){
-    if(notify)toast('매입분석도구에서 원자재 단가를 먼저 저장·동기화해 주세요');
+    if(notify)toast('매입분석도구의 원자재 단가 저장데이터를 찾지 못했습니다');
     return {ok:false,reason:'missing'};
   }
   const sig=src.raw.length+':'+src.raw.slice(0,48)+':'+src.raw.slice(-96);
   if(!force&&sig===purchaseMatSyncSig)return {ok:true,unchanged:true};
   const db=src.db,grades=['고철',...MATERIALS.map(x=>x.k)];
   const years=Object.keys(db.years||{}).filter(y=>/^\d{4}$/.test(y)).sort();
-  let addedRows=0,updatedCells=0,updatedQuotes=0,updatedExtras=0,sourceRows=0;
+  let addedRows=0,removedRows=0,updatedCells=0,updatedQuotes=0,updatedExtras=0,sourceRows=0,updatedTables=0;
   years.forEach(y=>{
     if(!matTable[y])matTable[y]={};
     if(!Y_LIST.includes(y))Y_LIST.push(y);
+    const yd=db.years[y]||{};
     grades.forEach(k=>{
-      const incoming=purchaseRowsArray((db.years[y]||{})[k]);
-      if(!incoming.length){if(!matTable[y][k])matTable[y][k]=emptyRows();return;}
-      if(!Array.isArray(matTable[y][k]))matTable[y][k]=[];
-      incoming.forEach(sr=>{
-        if(!sr||typeof sr!=='object')return;
-        const vendor=String(sr.vendor!=null?sr.vendor:(sr.v||'')).trim();
-        const sm=Array.isArray(sr.m)?sr.m:[];
-        if(!vendor&&!sm.some(v=>String(v==null?'':v).trim()!==''))return;
-        sourceRows++;
-        let tr=matTable[y][k].find(r=>String(r&&r.v||'').trim()===vendor);
-        if(!tr){tr={v:vendor,m:Array(12).fill('')};matTable[y][k].push(tr);addedRows++;}
-        if(!Array.isArray(tr.m))tr.m=Array(12).fill('');
-        while(tr.m.length<12)tr.m.push('');
-        for(let mi=0;mi<12;mi++){
-          const cell=sm[mi],txt=String(cell==null?'':cell).replace(/,/g,'').trim();
-          if(txt==='')continue;
-          if(String(tr.m[mi]==null?'':tr.m[mi]).replace(/,/g,'').trim()!==txt){tr.m[mi]=txt;updatedCells++;}
-        }
-      });
-      if(matTable[y][k].length>1)matTable[y][k]=matTable[y][k].filter(r=>String(r&&r.v||'').trim()||(r&&Array.isArray(r.m)&&r.m.some(v=>String(v==null?'':v).trim()!=='')));
-      if(!matTable[y][k].length)matTable[y][k]=emptyRows();
+      const rawRows=purchaseGradeValue(yd,k);
+      if(rawRows===undefined){if(!matTable[y][k])matTable[y][k]=emptyRows();return;}
+      const incoming=normalizePurchaseRows(rawRows);
+      sourceRows+=incoming.length;
+      const nextRows=incoming.length?incoming:emptyRows();
+      const prevRows=Array.isArray(matTable[y][k])?matTable[y][k]:[];
+      if(!matRowsSame(prevRows,nextRows)){
+        addedRows+=Math.max(0,nextRows.length-prevRows.length);
+        removedRows+=Math.max(0,prevRows.length-nextRows.length);
+        updatedCells+=matRowsDiffCount(prevRows,nextRows);
+        matTable[y][k]=JSON.parse(JSON.stringify(nextRows));
+        updatedTables++;
+      }
     });
   });
   Y_LIST=[...new Set(Y_LIST)].sort();
   if(!Y_LIST.includes(matYear))matYear=Y_LIST.includes(String(new Date().getFullYear()))?String(new Date().getFullYear()):Y_LIST[Y_LIST.length-1];
   const markets=db.marketPrices&&db.marketPrices[matYear];
-  if(markets&&typeof markets==='object')MATERIALS.forEach(m=>{const v=String(markets[m.k]==null?'':markets[m.k]).replace(/,/g,'').trim();if(v&&num(v)>0&&String(matQuote[m.k]||'')!==v){matQuote[m.k]=v;updatedQuotes++;}});
+  if(markets&&typeof markets==='object')MATERIALS.forEach(m=>{
+    const v=String(markets[m.k]==null?'':markets[m.k]).replace(/,/g,'').trim();
+    const cur=String(matQuote[m.k]==null?'':matQuote[m.k]).replace(/,/g,'').trim();
+    if(cur!==v){matQuote[m.k]=v;updatedQuotes++;}
+  });
   if(Array.isArray(db.egiExtras)){
     db.egiExtras.forEach(se=>{
       if(!se)return;const n=String(se.name!=null?se.name:(se.n||'')).trim();if(!n)return;
       let te=matExtra.find(x=>x.n===n);if(!te){te={n,amt:'',note:''};matExtra.push(te);updatedExtras++;}
       const amt=String(se.amount!=null?se.amount:(se.amt||'')).replace(/,/g,'').trim(),note=String(se.note||'');
-      if(amt!==''&&String(te.amt||'')!==amt){te.amt=amt;updatedExtras++;}
-      if(note!==''&&String(te.note||'')!==note){te.note=note;updatedExtras++;}
+      if(String(te.amt==null?'':te.amt).replace(/,/g,'').trim()!==amt){te.amt=amt;updatedExtras++;}
+      if(String(te.note==null?'':te.note)!==note){te.note=note;updatedExtras++;}
     });
   }
-  const changed=addedRows+updatedCells+updatedQuotes+updatedExtras>0;
-  matUpdated=String(db.updated||'').trim()||new Date().toLocaleString('sv-SE');
+  const changed=updatedTables+updatedQuotes+updatedExtras>0;
+  matSourceUpdated=String(db.updated||'').trim();
   purchaseMatSyncSig=sig;
-  if(changed){saveMatTable(false);renderMatPage();estCalc();}
-  else if($('mpUpdated'))$('mpUpdated').textContent='최종 업데이트 : '+(matUpdated||'-');
+  if(changed){
+    matUpdated=matNowText();
+    saveMatTable(false);
+    renderMatPage();
+    estCalc();
+  }else if($('mpUpdated'))$('mpUpdated').textContent='업데이트 일시 : '+(matUpdated||'-');
   if(notify){
-    if(!sourceRows)toast('매입분석도구에 동기화할 원자재 단가 데이터가 없습니다');
-    else if(changed)toast(`매입단가 가져오기 완료 · 신규 업체 ${addedRows}행 · 단가 ${updatedCells}칸 갱신`);
-    else toast('매입분석도구의 원자재 단가와 이미 동기화되어 있습니다');
+    if(!sourceRows&&!updatedQuotes&&!updatedExtras)toast('매입분석도구에 동기화할 원자재 단가 데이터가 없습니다');
+    else if(changed)toast(`매입단가 업데이트 완료 · 표 ${updatedTables}개 · ${updatedCells}칸 반영 · ${matUpdated}`);
+    else toast(`현재 매입분석도구 데이터와 동일합니다${matSourceUpdated?' · 원본 '+matSourceUpdated:''}`);
   }
-  return {ok:true,changed,addedRows,updatedCells,updatedQuotes,updatedExtras,sourceRows,years};
+  return {ok:true,changed,addedRows,removedRows,updatedCells,updatedQuotes,updatedExtras,updatedTables,sourceRows,years,updatedAt:matUpdated,sourceUpdatedAt:matSourceUpdated};
 }
 window.addEventListener('storage',e=>{if(e&&e.key===PURCHASE_MAT_KEY)syncPurchaseMaterialPrices(false,true);});
 window.addEventListener('materialPriceChanged',()=>syncPurchaseMaterialPrices(false,true));
@@ -1655,13 +1701,13 @@ function extraFeeCard(){return `<div class="mp-card mp-extra">
   </tbody></table></div>
 </div>`;}
 function renderMatPage(){const el=$('mpBody');if(!el)return;
-  $('mpUpdated').textContent='최종 업데이트 : '+(matUpdated||'-');
+  $('mpUpdated').textContent='업데이트 일시 : '+(matUpdated||'-');
   const yr=`<div class="mp-yr"><span class="mp-yl">연도</span><div class="seg sm" id="mpYrSeg">${Y_LIST.map(y=>`<button class="${y===matYear?'on':''}" onclick="setMatYear('${y}')">${y}년</button>`).join('')}</div></div>`;
   el.innerHTML=yr+scrapCard()+extraFeeCard()+MATERIALS.map(mt=>{const k=mt.k,rows=yRows(k),lt=latestMat(k);const colMin=MONTHS.map((_,mi)=>{const vs=rows.map(r=>num(r.m[mi])).filter(n=>n>0);return vs.length>=2?Math.min(...vs):null;});
     return `<div class="mp-card">
       <div class="mp-head"><b>${k}</b><span class="mp-cur">현재 적용 <b>${cf(prices['mat'+k]||0)}</b> 원/kg${lt?` · 최근 ${lt.month}월 ${cf(lt.v)}원`:''}</span><span class="mp-quote">견적 적용가 <input class="mpi mpq num" data-k="${k}" inputmode="numeric" value="${cf(matQuote[k]||'')}" placeholder="시장가"><i>원/kg</i></span><button class="mp-apply" onclick="applyMat('${k}')">적용 →</button></div>
-      <div class="mp-scroll"><table class="mp-tbl"><thead><tr><th>업체명</th>${MONTHS.map(m=>`<th>${m}월</th>`).join('')}<th></th></tr></thead><tbody>
-      ${rows.map((r,ri)=>`<tr><td><input class="mpi mpv" data-k="${k}" data-ri="${ri}" value="${r.v||''}"></td>${r.m.map((v,mi)=>`<td><input class="mpi mpm num${(colMin[mi]!=null&&num(v)===colMin[mi])?' mn':''}" data-k="${k}" data-ri="${ri}" data-mi="${mi}" inputmode="numeric" value="${cf(v)}"></td>`).join('')}<td><button class="mtdel" onclick="delVendor('${k}',${ri})">×</button></td></tr>`).join('')}
+      <div class="mp-scroll"><table class="mp-tbl"><thead><tr><th>업체명</th>${MONTHS.map(m=>`<th>${m}월</th>`).join('')}</tr></thead><tbody>
+      ${rows.map((r,ri)=>`<tr><td><input class="mpi mpv" data-k="${k}" data-ri="${ri}" value="${r.v||''}"></td>${r.m.map((v,mi)=>`<td><input class="mpi mpm num${(colMin[mi]!=null&&num(v)===colMin[mi])?' mn':''}" data-k="${k}" data-ri="${ri}" data-mi="${mi}" inputmode="numeric" value="${cf(v)}"></td>`).join('')}</tr>`).join('')}
       </tbody></table></div>
       <div id="mpchart_${k}">${sparkline(k)}</div>
       <button class="mtadd" onclick="addVendor('${k}')">＋ 업체 추가</button>
@@ -1865,6 +1911,16 @@ function saveEstDB(){try{localStorage.setItem('dptEstDB',JSON.stringify(estDB));
 function nowStr(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
 function estPostText(r){return (r.posts&&r.posts.length)?r.posts.map(p=>p.nm+' '+p.v).join(' / '):'-';}
+function estSteelUnit(r){
+  const d=normalizeEstDetail(r);
+  let v=Number(d&&d.mat&&d.mat.unit)||0;
+  if(!(v>0)){
+    const ids=(r&&r.snap&&r.snap.ids)||{};
+    v=num(ids.eUnitPrice||ids.pUnitPrice||ids.matkg||0);
+  }
+  return v>0?v:0;
+}
+function estSteelUnitText(r){const v=estSteelUnit(r);return v>0?won(Math.round(v))+'원/kg':'-';}
 function estMoney(v){v=Number(v)||0;return (v<0?'−':'')+won(Math.abs(v));}
 function estKg(v){v=Number(v)||0;return v>0?(Math.round(v*1000)/1000).toLocaleString()+' kg':'-';}
 function estDim(v,suf){v=Number(v)||0;return v>0?cf(v)+(suf||''): '-';}
@@ -2008,7 +2064,7 @@ let emEditId=null;
 function estView(id){const r=estDB.find(x=>x.id===id);if(!r)return;emEditId=id;
   $('emTitle').textContent=r.pname;
   const row=(l,v)=>`<div class="er"><span>${l}</span><b>${v}</b></div>`;
-  let html=row('저장 일시',r.time)+row('가공/톤수',`${r.mode} · ${r.ton}`)+row('발주 수량',won(r.qty)+'개');
+  let html=row('저장 일시',r.time)+row('가공/톤수',`${r.mode} · ${r.ton}`)+row('발주 수량',won(r.qty)+'개')+row('적용 철판단가',estSteelUnitText(r));
   html+='<div class="em-sec">개당 원가 구성</div>';
   html+=row('재료비',won(r.mat)+'원')+row('가공비',won(r.mc)+'원')+row('인건비',won(r.lc)+'원')+row('후공정비 ('+(r.posts?r.posts.length:0)+'공정)',(r.postSum<0?'−':'')+won(Math.abs(r.postSum))+'원');
   if(r.posts&&r.posts.length){html+='<div class="em-sec">후공정 내역</div>';r.posts.forEach(p=>{html+=row(p.nm,p.v);});}
@@ -2063,7 +2119,7 @@ function estRender(){
     sumEl.textContent=`견적 ${estDB.length}건 · 총액 합계 ${won(tot)}원`;sumEl.classList.add('show');
     list.innerHTML=estDB.map(r=>{
       const sale=r.sale>0?` · 판매 ${won(r.sale)}/이익 ${r.saleRate!=null?r.saleRate.toFixed(1)+'%':'-'}`:'';
-      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.mode}·${r.ton}·${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
+      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2"><b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${r.mode}·${r.ton}·${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
     }).join('');
   }
   estListRender();
@@ -2820,12 +2876,16 @@ function estTotalLineRow(t,st,vis,records){
 }
 function estTableHtml(records,groupIndex,title){
   const t=estAggTotals(records),st=estSubTotals(records),vis=estVisibleColumnSet(st);
+  const steelUnits=[...new Set((records||[]).map(r=>Math.round(estSteelUnit(r))).filter(v=>v>0))].sort((a,b)=>a-b);
+  const steelUnitHead=steelUnits.length===1
+    ? won(steelUnits[0])+'원/kg'
+    : (steelUnits.length>1?won(steelUnits[0])+'~'+won(steelUnits[steelUnits.length-1])+'원/kg':'-');
   return `<div class="est-title-block">${estTitleLineHtml(records,groupIndex,title)}<div class="est-line-wrap"><table class="est-line-table">${estLineColGroup(vis,records)}
     <thead>
       <tr class="grp">
         <th rowspan="2" class="no">NO</th>
         <th colspan="2">제품 정보</th>
-        <th colspan="5" class="grp-start material-start">재료 정보</th>
+        <th colspan="5" class="grp-start material-start">재료 정보<span class="head-sum">적용 철판단가 ${steelUnitHead}</span></th>
         <th colspan="1" class="cost grp-start raw-start">${estHeaderMoney('원자재비',t.material,true)}</th>
         ${estProcGroupHead('레이저가공비',t.laser,vis.laser,'laser')}
         ${estProcGroupHead('프레스가공비',t.press,vis.press,'press')}
@@ -2961,7 +3021,7 @@ selectTon('160');
 loadEstDB();estRender();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-07-09';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-08-11 · v49';})();
 formatAllNums();
 estCalc();
 </script>
