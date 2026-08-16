@@ -2118,8 +2118,8 @@ function estRender(){
     const tot=estDB.reduce((a,r)=>a+r.total,0);
     sumEl.textContent=`견적 ${estDB.length}건 · 총액 합계 ${won(tot)}원`;sumEl.classList.add('show');
     list.innerHTML=estDB.map(r=>{
-      const sale=r.sale>0?` · 판매 ${won(r.sale)}/이익 ${r.saleRate!=null?r.saleRate.toFixed(1)+'%':'-'}`:'';
-      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2"><b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${r.mode}·${r.ton}·${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
+      const sale=r.sale>0?` · 판매 ${won(r.sale)}`:'';
+      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2"><b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
     }).join('');
   }
   estListRender();
