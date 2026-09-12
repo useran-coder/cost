@@ -292,9 +292,10 @@
   .mp-tbl td{border:1px solid var(--line);padding:0}
   .mp-tbl .mpi{border:none;width:100%;padding:7px 6px;font-size:12px;font-family:inherit;text-align:right;background:transparent;outline:none}
   .mp-tbl .mpv{text-align:left;min-width:120px;font-weight:600}
+  .mp-tbl .mpm,.mp-extra .mp-tbl .mpexamt{font-weight:400}
   .mp-tbl .mpm{min-width:58px}
   .mp-tbl .mpi:focus{background:#fffbe6}
-  .mp-tbl .mpm.mn{background:#fff7d6;font-weight:800;color:#9a7b1a}
+  .mp-tbl .mpm.mn{background:#fff7d6;font-weight:400;color:#9a7b1a}
   .mp-yr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
   .mp-yl{font-size:13px;font-weight:800;color:var(--navy)}
   .mp-yr .seg.sm{max-width:none;gap:4px;background:#eef1f6;padding:4px;border-radius:11px;border:none}
@@ -309,7 +310,8 @@
     .mp-title-actions{width:100%;justify-content:flex-end;overflow-x:auto;padding-bottom:1px}
   }
   .mp-quote{font-size:11px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:5px;margin-left:24px}
-  .mp-quote input{width:80px;padding:6px 8px;border:1px solid #efc4c8;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:700;text-align:right;color:var(--ink);background:#fff3f4}
+  .mp-quote input{width:80px;padding:6px 8px;border:1px solid #efc4c8;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:400;text-align:right;color:var(--ink);background:#fff3f4}
+  .mp-quote em.auto{font-style:normal;color:var(--accent);font-weight:400;font-size:11px}
   .mp-quote i{font-style:normal;color:var(--sub)}
   .mp-chart{margin-top:10px;padding:8px 10px;background:#fafbfd;border-radius:10px}
   .mp-chax-t{display:flex;justify-content:space-between;align-items:baseline;font-size:11px;color:var(--sub);margin-bottom:3px}
@@ -996,6 +998,48 @@
   .fw-tbl input:focus{border-color:var(--navy);background:#fff;outline:none}
   .fw-tbl td.sel input{background:#fff0f1;color:var(--accent)}
 
+  /* ===== v63 : 로그인 게이트 · 클라우드 동기화 ===== */
+  #auGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#f8fafc,#eef2f8);display:flex;align-items:center;justify-content:center;padding:20px}
+  #auForm{width:100%;max-width:360px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.10);padding:26px 24px 20px}
+  #auForm .au-h{text-align:center;margin-bottom:16px}
+  #auForm .au-t{font-size:18px;font-weight:900;color:var(--navy)}
+  #auForm .au-s{font-size:12px;font-weight:700;color:var(--sub);margin-top:4px}
+  #auForm .au-l{display:block;font-size:11.5px;font-weight:800;color:var(--sub);margin:10px 0 4px}
+  #auForm .au-i{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:10px;font-family:inherit;font-size:14px;color:var(--ink);background:#fff}
+  #auForm .au-i:focus{outline:none;border-color:var(--navy)}
+  #auForm .au-c{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11.5px;font-weight:700;color:var(--navy);cursor:pointer}
+  #auForm .au-c span{color:var(--sub);font-weight:600}
+  #auForm .au-b{width:100%;margin-top:14px;padding:11px;border:0;border-radius:10px;background:var(--navy);color:#fff;font-family:inherit;font-size:14px;font-weight:900;cursor:pointer}
+  #auForm .au-m{margin-top:10px;font-size:11.5px;font-weight:700;white-space:pre-line;text-align:center;min-height:14px}
+  #auForm .au-srv{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+  #auForm .au-srv-t{width:100%;padding:7px;border:1px solid var(--line);background:#f7f9fc;border-radius:9px;font-family:inherit;font-size:11.5px;font-weight:800;color:var(--navy);cursor:pointer}
+  #auForm .au-b2{flex:1;padding:8px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:11.5px;font-weight:800;color:var(--navy);cursor:pointer}
+  #auForm .au-srv-b .au-i{font-size:12px;padding:8px 9px}
+  #auForm .au-f{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:11px;color:var(--sub);line-height:1.6}
+  #auChip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--sub)}
+  #auChip b{color:var(--ink)}
+  #auChip small{color:var(--accent);font-weight:800}
+  #auChip button{padding:3px 8px;border:1px solid var(--line);background:#fff;border-radius:7px;font-family:inherit;font-size:10.5px;font-weight:800;color:var(--navy);cursor:pointer}
+  .cloudbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}
+  .cloudbar .cb-l{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--sub)}
+  .cloudbar .cb-l b{font-size:13px;color:var(--navy)}
+  .cloudbar .cb-at{color:var(--accent);font-weight:700}
+  .cloudbar .cb-r{display:flex;gap:6px;flex-wrap:wrap}
+  .cloudbar button{padding:8px 11px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
+  .cloudbar button.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .cloudbar button.cb-auto{color:var(--sub)}
+  .cloudbar button.cb-auto.on{background:#e8f5ee;color:#0a7d4b;border-color:#b9e0c9}
+
+  /* ===== v60 : 1차 가공별 단가기준 인라인 패널 ===== */
+  .procstd{margin:10px 0 2px;padding:10px 11px;border:1px solid var(--line);border-radius:10px;background:#f7f9fc}
+  .procstd .pstd-h{font-size:12px;font-weight:800;color:var(--navy);margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+  .procstd .pstd-h small{font-weight:600;color:var(--sub);font-size:11px}
+  .procstd .pstd-g{display:grid;grid-template-columns:repeat(auto-fit,minmax(138px,1fr));gap:8px}
+  .procstd .fld{margin-bottom:0}
+  .procstd .fld .lab{font-size:11px}
+  .procstd .inp{background:#fff}
+  .procstd .pstd-add{margin-top:5px;width:100%;padding:5px 6px;border:1px dashed var(--accent);background:#fff3f3;color:var(--accent);border-radius:7px;font-family:inherit;font-size:11px;font-weight:800;cursor:pointer}
+
   /* ===== A4 견적 산정서 (1장 출력 / PDF) ===== */
   #estimateReportArea{display:none}
   #estimateReportArea.measuring{display:block;position:absolute;left:-20000px;top:0;z-index:-1}
@@ -1068,7 +1112,7 @@
   <div class="bar">
     <img class="ci" onclick="showPage('est')" style="cursor:pointer" src="data:image/jpeg;base64,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" alt="(주)동방파스텍 DONGBANG PASTEC CO., LTD.">
     <div class="meta"><div class="t">가공비 견적 <span class="bsep">|</span> 방화문부자재사업부</div></div>
-    <div class="bar-right"><span class="bd-date" id="barDate"></span><span class="bd-ver" id="barVersion"></span></div>
+    <div class="bar-right"><span id="auChip"></span><span class="bd-date" id="barDate"></span><span class="bd-ver" id="barVersion"></span></div>
   </div>
   <div class="tabs">
     <button id="tab-est" class="on" onclick="showPage('est')">단가산정</button>
@@ -1200,6 +1244,7 @@
           <label class="fld"><span class="lab">투입 인원</span><div class="suffix"><input class="inp" id="workersC" type="text" inputmode="decimal" value="1"><span class="u">명</span></div></label>
         </div>
       </div>
+      <div class="procstd" id="procStd"></div>
       <p class="hint" style="margin-top:4px">※ 임율(인건비 단가)은 <b>[단가산정 기준]</b> 탭의 값을 사용합니다.</p>
       <div class="procfml" id="procFormula"></div>
       <div class="breakdown">
@@ -1367,6 +1412,7 @@
     <div class="sec-b">
       <div class="savestate" id="saveState"></div>
       <div class="notice">※ 입력한 단가는 <b>이 기기(브라우저)에 자동 저장</b>되어 다음에도 그대로 유지됩니다. 단, 브라우저 청소(캐시·쿠키·사이트데이터 삭제)·시크릿 모드·다른 기기에서는 <b>기본값으로 초기화</b>될 수 있습니다. 중요한 단가는 아래 [설정값 백업]·[단가산정 엑셀 내보내기]로 보관하세요.</div>
+      <div class="cloudbar" id="cloudBar"></div>
       <div class="setgrid" id="setgrid"></div>
       <div id="freightPanel"></div>
       <div id="laserTbl"></div>
@@ -1428,7 +1474,7 @@
     <button class="ag ag-line" onclick="document.getElementById('btnCopy').click()">복사</button>
     <button class="ag ag-line" onclick="printEstimateReport('print')">출력</button>
     <button class="ag ag-pdf" onclick="saveEstimatePdf()">PDF 저장</button>
-    <button class="ag ag-ok" onclick="estExport()">엑셀</button>
+    <button class="ag ag-ok" onclick="estExportCalcSheet()">엑셀</button>
     <button class="ag ag-sh" onclick="estShare()">공유</button>
     <button class="ag ag-rs" onclick="estClear()">초기화</button>
   </div>
@@ -1590,9 +1636,57 @@ function setProc(p){
   $('cutFields').classList.toggle('hidden',p!=='cut');
   const bendDisabled=(p==='form');const bc=$('post_bend');
   if(bc){bc.classList.toggle('disabled',bendDisabled);if(bendDisabled){state.posts.bend.on=false;bc.classList.remove('on','open');}}
+  if(typeof renderProcStd==='function')renderProcStd();
   if(typeof eCalc==='function')eCalc();else estCalc();
 }
 $('procSeg').querySelectorAll('button').forEach(b=>b.onclick=()=>setProc(b.dataset.proc));
+
+/* === 1차 가공별 단가기준 (견적 화면에서 바로 수정) === */
+function pstdFld(label,key,unit){
+  return `<label class="fld"><span class="lab">${label}</span><div class="suffix"><input class="inp num" data-price="${key}" type="text" inputmode="decimal" value="${cf(prices[key])}"><span class="u">${unit}</span></div></label>`;
+}
+function laserRateIdx(t){let bi=-1,bd=1e9;laserT.forEach((r,i)=>{const d=Math.abs(num(r.t)-num(t));if(d<bd){bd=d;bi=i;}});return bi;}
+function procLaserRate(el){const i=+el.dataset.li;if(laserT[i]){laserT[i].p=num(el.value);saveLaser();if(typeof renderLaserTbl==='function')renderLaserTbl();estCalc();}}
+function procAddLaserT(){
+  const t=num(EM.t);if(!(t>0))return;
+  if(laserT.some(r=>num(r.t)===t)){renderProcStd();return;}
+  const li=laserRateIdx(t),base=li>=0?num(laserT[li].p):0;
+  laserT.push({t,p:base});laserT.sort((a,b)=>num(b.t)-num(a.t));saveLaser();
+  if(typeof renderLaserTbl==='function')renderLaserTbl();
+  renderProcStd();estCalc();
+  toast(cf(t)+'T 두께단가를 단가표에 추가했습니다 (기본 '+cf(base)+'원/mm)');
+}
+function renderProcStd(){
+  const el=$('procStd');if(!el)return;
+  const p=state.proc;
+  if(!p){el.style.display='none';el.innerHTML='';return;}
+  el.style.display='';
+  let title='',g='';
+  if(p==='press'){
+    title='프레스 기준';
+    g=pstdFld('프레스 스크랩 폭','pScrapW','mm')+pstdFld('프레스 스크랩 길이','pScrapL','mm')+pstdFld('임율 (인건비)','wage','원/h');
+  }else if(p==='laser'){
+    title='레이저 기준';
+    const t=num(EM.t),li=laserRateIdx(t);
+    let lrFld='';
+    if(!(t>0)){
+      lrFld=`<label class="fld"><span class="lab">두께단가</span><div class="suffix"><input class="inp" type="text" value="" placeholder="재료비 두께 입력 시 표시" disabled style="background:#f2f4f8;color:var(--sub)"><span class="u">원/mm</span></div></label>`;
+    }else if(li>=0){
+      const exact=num(laserT[li].t)===t;
+      const lab=`두께단가 <b style="color:var(--accent)">${cf(t)}T</b>${exact?'':` <small style="color:var(--sub);font-weight:600">· 표 ${cf(laserT[li].t)}T 적용</small>`}`;
+      const add=exact?'':`<button type="button" class="pstd-add" onclick="procAddLaserT()">＋ ${cf(t)}T 단가 추가</button>`;
+      lrFld=`<label class="fld"><span class="lab">${lab}</span><div class="suffix"><input class="inp" type="text" inputmode="decimal" data-li="${li}" value="${cf(laserT[li].p)}" oninput="procLaserRate(this)"><span class="u">원/mm</span></div>${add}</label>`;
+    }
+    g=pstdFld('레이저 스크랩 폭','lScrapW','mm')+pstdFld('레이저 스크랩 길이','lScrapL','mm')+lrFld+pstdFld('레이저 가스비','gas','원/kg')+pstdFld('임율 (인건비)','wage','원/h');
+  }else if(p==='form'){
+    title='포밍 기준';
+    g=pstdFld('포밍 기준 (850mm)','formBase','원')+pstdFld('포밍 10mm당 가산','form10','원')+pstdFld('임율 (인건비)','wage','원/h');
+  }else if(p==='cut'){
+    title='절단 기준';
+    g=pstdFld('절단 · 회당','cut','원')+pstdFld('임율 (인건비)','wage','원/h');
+  }
+  el.innerHTML=`<div class="pstd-h">${title} <small>수정 시 [단가산정 기준] 탭에 함께 저장됩니다</small></div><div class="pstd-g">${g}</div>`;
+}
 
 function toggleAutoMat(){
   state.autoMat=$('autoMatChk').checked;
@@ -1818,7 +1912,7 @@ function renderMatPage(){const el=$('mpBody');if(!el)return;
   const yr=`<div class="mp-yr"><span class="mp-yl">연도</span><div class="seg sm" id="mpYrSeg">${Y_LIST.map(y=>`<button class="${y===matYear?'on':''}" onclick="setMatYear('${y}')">${y}년</button>`).join('')}</div></div>`;
   el.innerHTML=yr+scrapCard()+extraFeeCard()+MATERIALS.map(mt=>{const k=mt.k,rows=yRows(k),lt=latestMat(k);const colMin=MONTHS.map((_,mi)=>{const vs=rows.map(r=>num(r.m[mi])).filter(n=>n>0);return vs.length>=2?Math.min(...vs):null;});
     return `<div class="mp-card">
-      <div class="mp-head"><b>${k}</b><span class="mp-cur">현재 적용 <b>${cf(prices['mat'+k]||0)}</b> 원/kg${lt?` · 최근 ${lt.month}월 ${cf(lt.v)}원`:''}</span><span class="mp-quote">견적 적용가 <input class="mpi mpq num" data-k="${k}" inputmode="numeric" value="${cf(matQuote[k]||'')}" placeholder="시장가"><i>원/kg</i></span><button class="mp-apply" onclick="applyMat('${k}')">적용 →</button></div>
+      <div class="mp-head"><b>${k}</b><span class="mp-cur">현재 적용 <b>${cf(prices['mat'+k]||0)}</b> 원/kg${lt?` · 최근 ${lt.month}월 ${cf(lt.v)}원`:''}</span><span class="mp-quote">견적 적용가 <input class="mpi mpq num" data-k="${k}" inputmode="numeric" value="${cf(quoteShown(k))}" placeholder="시장가"><i>원/kg</i>${quoteAutoTag(k)}</span><button class="mp-apply" onclick="applyMat('${k}')">적용 →</button></div>
       <div class="mp-scroll"><table class="mp-tbl"><thead><tr><th>업체명</th>${MONTHS.map(m=>`<th>${m}월</th>`).join('')}</tr></thead><tbody>
       ${rows.map((r,ri)=>`<tr><td><input class="mpi mpv" data-k="${k}" data-ri="${ri}" value="${r.v||''}"></td>${r.m.map((v,mi)=>`<td><input class="mpi mpm num${(colMin[mi]!=null&&num(v)===colMin[mi])?' mn':''}" data-k="${k}" data-ri="${ri}" data-mi="${mi}" inputmode="numeric" value="${cf(v)}"></td>`).join('')}</tr>`).join('')}
       </tbody></table></div>
@@ -1826,7 +1920,10 @@ function renderMatPage(){const el=$('mpBody');if(!el)return;
       <button class="mtadd" onclick="addVendor('${k}')">＋ 업체 추가</button>
     </div>`;}).join('');
 }
-function applyMat(k){const q=num(matQuote[k]);let v,src;if(q>0){v=q;src='견적 적용가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();renderSetGrid();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
+function quoteAuto(k){const r=(typeof lastMatRange==='function')?lastMatRange(k):null;return r?r.max:0;}
+function quoteAutoTag(k){const r=(typeof lastMatRange==='function')?lastMatRange(k):null;if(!r)return '';const cur=num(matQuote[k]);return `<em class="auto">${r.month}월 입고 최고가 ${cf(r.max)}${cur>0&&cur!==r.max?' (직접입력 적용중)':''}</em>`;}
+function quoteShown(k){const v=num(matQuote[k]);return v>0?v:(quoteAuto(k)||'');}
+function applyMat(k){const q=num(matQuote[k])||quoteAuto(k);let v,src;if(q>0){v=q;src=num(matQuote[k])>0?'견적 적용가':'마지막 매입월 최고가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();renderSetGrid();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
 function addVendor(k){if(!matTable[matYear][k])matTable[matYear][k]=[];matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function delVendor(k,ri){matTable[matYear][k].splice(ri,1);if(!matTable[matYear][k].length)matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){return;}if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}
@@ -2427,6 +2524,372 @@ function estExport(){
   if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map(h=>({wch:Math.max(9,h.length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'견적');XLSX.writeFile(wb,`프레스견적_${stamp}.xlsx`);toast('엑셀로 저장했습니다');}
   else{const csv=[head,...rows].map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));a.download=`프레스견적_${stamp}.csv`;document.body.appendChild(a);a.click();a.remove();toast('CSV로 저장했습니다');}
 }
+
+/* ================= 현재 견적 → 전체 항목·선택목록·조건부서식 포함 엑셀 (v67) ================= */
+function xlLoad(src,test){
+  if(test())return Promise.resolve(true);
+  return new Promise(res=>{const sc=document.createElement('script');sc.src=src;sc.onload=()=>res(test());sc.onerror=()=>res(false);document.head.appendChild(sc);});
+}
+function xlStyleReady(){return xlLoad('https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js',()=>!!(window.XLSX&&window.__xlStyled))
+  .then(ok=>{if(window.XLSX)window.__xlStyled=window.__xlStyled||ok;return ok;});}
+function xlZipReady(){return xlLoad('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',()=>!!window.JSZip);}
+const XLB={style:'thin',color:{rgb:'C9D0DB'}};
+const XLBORD={top:XLB,bottom:XLB,left:XLB,right:XLB};
+const XLS={
+  title:{font:{bold:true,sz:15,color:{rgb:'1F2A44'}}},
+  sec:{font:{bold:true,sz:12,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'1F2A44'}}},
+  sub:{font:{bold:true,sz:11,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'51607A'}}},
+  lab:{font:{sz:11,bold:true,color:{rgb:'1F2A44'}},border:XLBORD},
+  inp:{font:{sz:11,bold:true,color:{rgb:'92400E'}},fill:{patternType:'solid',fgColor:{rgb:'FFF6D5'}},border:XLBORD,alignment:{horizontal:'right'}},
+  sel:{font:{sz:11,bold:true,color:{rgb:'0A5C36'}},fill:{patternType:'solid',fgColor:{rgb:'D9F0E1'}},border:XLBORD,alignment:{horizontal:'center'}},
+  fx:{font:{sz:11,color:{rgb:'26324A'}},border:XLBORD,alignment:{horizontal:'right'}},
+  txt:{font:{sz:11,color:{rgb:'26324A'}},border:XLBORD},
+  note:{font:{sz:10,color:{rgb:'6B7280'}}},
+  hi:{font:{sz:12,bold:true,color:{rgb:'C61620'}},fill:{patternType:'solid',fgColor:{rgb:'FFF0F1'}},border:XLBORD,alignment:{horizontal:'right'}},
+  hiL:{font:{sz:12,bold:true,color:{rgb:'C61620'}},fill:{patternType:'solid',fgColor:{rgb:'FFF0F1'}},border:XLBORD},
+  head:{font:{sz:11,bold:true,color:{rgb:'FFFFFF'}},fill:{patternType:'solid',fgColor:{rgb:'51607A'}},alignment:{horizontal:'center'}}
+};
+function aoaToWsX(S,cols){
+  const ws={};let maxC=0;
+  S.forEach((row,R)=>{
+    const first=String((row&&row[0])||'');
+    const isSec=/^■/.test(first), isSub=/^▣/.test(first), isHead=!!(row&&row._head);
+    (row||[]).forEach((v,C)=>{
+      if(v===''||v==null){
+        if((isSec||isSub)&&C<6){ws[XLSX.utils.encode_cell({r:R,c:C})]={t:'s',v:'',s:isSec?XLS.sec:XLS.sub};if(C>maxC)maxC=C;}
+        return;
+      }
+      let cell;
+      if(typeof v==='object')cell=Object.assign({t:'n'},v);
+      else if(typeof v==='number')cell={t:'n',v:v};
+      else cell={t:'s',v:String(v)};
+      const hi=cell._hi||row._hi;
+      if(cell._raw)cell.s=cell.s||XLS.txt;
+      else if(isSec&&C<6)cell.s=XLS.sec;
+      else if(isSub&&C<6)cell.s=XLS.sub;
+      else if(isHead&&C<6)cell.s=XLS.head;
+      else if(R===0)cell.s=C===0?XLS.title:XLS.note;
+      else if(cell._sel)cell.s=XLS.sel;
+      else if(cell._in)cell.s=hi?XLS.hi:XLS.inp;
+      else if(cell.f)cell.s=hi?XLS.hi:XLS.fx;
+      else if(C===5)cell.s=XLS.note;
+      else if(C===0)cell.s=hi?XLS.hiL:(first?XLS.lab:XLS.txt);
+      else cell.s=XLS.txt;
+      ['_in','_hi','_sel','_raw'].forEach(k=>delete cell[k]);
+      ws[XLSX.utils.encode_cell({r:R,c:C})]=cell;
+      if(C>maxC)maxC=C;
+    });
+  });
+  ws['!ref']=XLSX.utils.encode_range({s:{r:0,c:0},e:{r:Math.max(0,S.length-1),c:Math.max(5,maxC)}});
+  if(cols)ws['!cols']=cols;
+  return ws;
+}
+function hiMark(c){c._hi=1;return c;}
+async function estExportCalcSheet(){
+  const styled=await xlStyleReady();
+  if(!window.XLSX){toast('엑셀 모듈을 불러오지 못했습니다 (인터넷 연결 확인)');return;}
+  estCalc();
+  const M='#,##0', M2='#,##0.00', M3='#,##0.000', P='0.0%';
+  const mn=(v,z)=>({t:'n',v:Number(v)||0,z:z||M,_in:1});
+  const mf=(f,v,z)=>({t:'n',f:f,v:Number(v)||0,z:z||M});
+  const ms=(txt)=>({t:'s',v:String(txt==null?'':txt),_sel:1});
+  const DV=[],CF=[];
+  const dv=(ref,f)=>DV.push({ref,f});
+  const cf=(sqref,formula)=>CF.push({sqref,formula});
+
+  /* ───────── 목록 시트 ───────── */
+  const L=[];
+  const Lp=(r,c,v)=>{while(L.length<=r)L.push([]);const row=L[r];while(row.length<=c)row.push('');row[c]=v;};
+  const Lh=(r,c,t)=>Lp(r,c,{t:'s',v:t,_raw:1,s:XLS.head});
+  const Lv=(r,c,v,z)=>Lp(r,c,(typeof v==='number')?{t:'n',v:v,z:z||M2,_raw:1,s:XLS.inp}:{t:'s',v:String(v),_raw:1,s:XLS.txt});
+  Lp(0,0,{t:'s',v:'선택 목록 · 참조표 (노란 칸은 수정 가능 — 견적산정 시트가 이 값을 불러옵니다)',_raw:1,s:XLS.title});
+  Lh(1,0,'강종');Lh(1,1,'비중');Lh(1,2,'철판단가(원/kg)');
+  MATERIALS.forEach((m,i)=>{Lv(2+i,0,m.k);Lv(2+i,1,m.d,'0.00');Lv(2+i,2,num(prices['mat'+m.k])||num(prices.matkg),M2);});
+  const RM=`'목록'!$A$3:$C$${2+MATERIALS.length}`, RMK=`'목록'!$A$3:$A$${2+MATERIALS.length}`;
+  Lh(1,4,'설비 톤수');Lh(1,5,'시간당 설비차지');Lh(1,6,'SPM');
+  TON.forEach((t,i)=>{const cur=(t.key===state.ton);Lv(2+i,4,t.label);Lv(2+i,5,cur?(num($('charge').value)||num(t.charge)):num(t.charge),M);Lv(2+i,6,cur?(num($('spm').value)||num(t.spm)):num(t.spm),M);});
+  const RT=`'목록'!$E$3:$G$${2+TON.length}`, RTK=`'목록'!$E$3:$E$${2+TON.length}`;
+  Lh(1,8,'프레스 작업방식');Lv(2,8,'프로그래시브(자동)');Lv(3,8,'단발(수동)');
+  const RMODE=`'목록'!$I$3:$I$4`;
+  Lh(1,10,'레이저 제품');Lh(1,11,'시간당 작업수량');Lh(1,12,'포장수량');
+  products.forEach((p,i)=>{Lv(2+i,10,p.n);Lv(2+i,11,num(p.u),M);Lv(2+i,12,num(p.pk),M);});
+  const RP=`'목록'!$K$3:$M$${2+Math.max(1,products.length)}`, RPK=`'목록'!$K$3:$K$${2+Math.max(1,products.length)}`;
+  const ltab=laserT.slice().sort((a,b)=>num(a.t)-num(b.t));
+  Lh(1,14,'레이저 두께(T)');Lh(1,15,'두께단가(원/mm)');
+  ltab.forEach((r,i)=>{Lv(2+i,14,num(r.t),M2);Lv(2+i,15,num(r.p),M2);});
+  const RL=`'목록'!$O$3:$P$${2+Math.max(1,ltab.length)}`;
+  Lh(1,17,'금형비 가산');Lv(2,17,'가산');Lv(3,17,'미가산');
+  const RMOLD=`'목록'!$R$3:$R$4`;
+  Lh(1,19,'운송 구분');Lv(2,19,'편도');Lv(3,19,'왕복');
+  const RTRIP=`'목록'!$T$3:$T$4`;
+  Lh(1,21,'납품 지역');
+  FR_REGIONS.forEach((g,i)=>Lv(2+i,21,g.n));
+  const RREG=`'목록'!$V$3:$V$${2+FR_REGIONS.length}`;
+  FR_TRUCKS.forEach((t,j)=>Lh(1,22+j,t.label));
+  FR_REGIONS.forEach((g,i)=>FR_TRUCKS.forEach((t,j)=>Lv(2+i,22+j,num((frCfg.tbl[g.k]||{})[t.t]),M)));
+  const c0=XLSX.utils.encode_col(22), c1=XLSX.utils.encode_col(22+FR_TRUCKS.length-1);
+  const RFARE=`'목록'!$${c0}$3:$${c1}$${2+FR_REGIONS.length}`;
+  const RTRUCKH=`'목록'!$${c0}$2:$${c1}$2`;
+  const trkR=2+FR_REGIONS.length+2;
+  Lh(trkR,21,'차종 목록');
+  FR_TRUCKS.forEach((t,i)=>Lv(trkR+1+i,21,t.label));
+  const RTRK=`'목록'!$V$${trkR+2}:$V$${trkR+1+FR_TRUCKS.length}`;
+  const useR=trkR+FR_TRUCKS.length+3;
+  Lh(useR,0,'사용 여부');Lv(useR+1,0,'사용');Lv(useR+2,0,'미사용');
+  const RUSE=`'목록'!$A$${useR+2}:$A$${useR+3}`;
+  Lh(useR,4,'1차 가공 방식');
+  const PROCS=[{k:'press',n:'프레스 가공'},{k:'laser',n:'레이저 가공'},{k:'form',n:'포밍'},{k:'cut',n:'절단'},{k:'',n:'선택 안 함'}];
+  PROCS.forEach((p,i)=>Lv(useR+1+i,4,p.n));
+  const RPROC=`'목록'!$E$${useR+2}:$E$${useR+1+PROCS.length}`;
+
+  /* ───────── 단가기준 시트 ───────── */
+  const PR=[[{t:'s',v:'항목',_raw:1,s:XLS.head},{t:'s',v:'단가',_raw:1,s:XLS.head},{t:'s',v:'단위',_raw:1,s:XLS.head},{t:'s',v:'키',_raw:1,s:XLS.head}]];
+  const pref={};
+  const addP=(nm,key,unit)=>{PR.push([nm,mn(num(prices[key]),M2),unit||'',key]);pref[key]="'단가기준'!$B$"+PR.length;};
+  SET_ROWS.concat(FREIGHT_ROWS).forEach(r=>{if(r.key&&!pref[r.key]&&!/^mat/.test(r.key))addP(r.nm+(r.sub?' ('+r.sub+')':''),r.key,r.u);});
+  POSTS.forEach(p=>{if(p.rate&&!pref[p.rate])addP(p.nm,p.rate,'원');});
+  TRUCKS.forEach(t=>{const k='freight_'+t.t;if(!pref[k])addP('물류 운임 '+t.label,k,'원');});
+  const PREF=k=>pref[k]||String(num(prices[k]));
+  const PV=k=>num(prices[k]);
+
+  /* ───────── 견적산정 시트 ───────── */
+  const S=[];
+  const push6=(a,b,c,d,e,f)=>{S.push([a==null?'':a,b==null?'':b,c==null?'':c,d==null?'':d,e==null?'':e,f==null?'':f]);return S.length;};
+  const add=(label,val,unit,desc)=>push6(label,val,unit,'','',desc);
+  const sec=t=>{push6('');return push6(t);};
+  const sub=t=>push6(t);
+  const now=new Date(),pad=n=>String(n).padStart(2,'0');
+  const dens=(typeof eDens==='function'?eDens():0)||0;
+  const qty=num($('qty').value);
+  const wageV=PV('wage');
+  const procName={press:'프레스 가공',laser:'레이저 가공',form:'포밍',cut:'절단'}[state.proc]||'선택 안 함';
+
+  push6('가공비 견적 산정서','','','','','ⓒ (주)동방파스텍 방화문부자재사업부');
+  add('제목 / 거래처',($('pname').value||'').trim());
+  add('제품명',($('productName').value||'').trim());
+  add('규격 / 비고',($('specNote').value||'').trim());
+  add('작성일시',`${now.getFullYear()}.${pad(now.getMonth()+1)}.${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`);
+
+  sec('■ 1. 기본 입력');
+  const rQty=add('발주 수량',mn(qty),'개','초록칸 = 선택(드롭다운) · 노란칸 = 입력 · 흰칸 = 자동계산');
+  const rProcSel=add('1차 가공 방식 (선택)',ms(procName),'','선택한 방식의 가공비·인건비만 반영됩니다');
+  dv(`B${rProcSel}`,RPROC);
+
+  /* 재료비 */
+  sec('■ 2. 재료비');
+  const rMatK=add('강종 (선택)',ms(EM.key||'EGI'),'','목록 시트의 강종표에서 선택');
+  dv(`B${rMatK}`,RMK);
+  const rDens=add('비중',mf(`IFERROR(VLOOKUP(B${rMatK},${RM},2,FALSE),0)`,dens,'0.00'),'','=강종표 조회');
+  const rMatUnit=add('철판단가',mf(`IFERROR(VLOOKUP(B${rMatK},${RM},3,FALSE),0)`,num(EM.unit),M2),'원/kg','=강종표 조회');
+  const rT=add('두께 (T)',mn(num(EM.t)||num($('eCT').value),M2),'mm');
+  const rPW=add('제품 폭',mn(num(EM.w)||num($('eCW').value),M2),'mm');
+  const rPL=add('제품 길이',mn(num(EM.l),M2),'mm');
+  const rSW=add('스크랩 여유 폭',{t:'n',f:`IF($B$${rProcSel}="레이저 가공",${PREF('lScrapW')},IF($B$${rProcSel}="프레스 가공",${PREF('pScrapW')},0))`,v:num(EM.calcW||0)-num(EM.w||0),z:M2},'mm','=가공 방식에 따라 자동');
+  const rSL=add('스크랩 여유 길이',{t:'n',f:`IF($B$${rProcSel}="레이저 가공",${PREF('lScrapL')},IF($B$${rProcSel}="프레스 가공",${PREF('pScrapL')},0))`,v:num(EM.calcL||0)-num(EM.l||0),z:M2},'mm','=가공 방식에 따라 자동');
+  const rCW=add('소재 폭 (스크랩 포함)',mf(`B${rPW}+B${rSW}`,num(EM.calcW||EM.w),M2),'mm','=제품 폭+여유 폭');
+  const rCL=add('소재 길이 (스크랩 포함)',mf(`B${rPL}+B${rSL}`,num(EM.calcL||EM.l),M2),'mm','=제품 길이+여유 길이');
+  const rWeight=add('제품 1개 중량',mf(`B${rCW}*B${rCL}*B${rT}*B${rDens}/1000000`,EM.one,M3),'kg','=소재폭×소재길이×두께×비중÷10^6');
+  const rMat=add('① 개당 재료비',mf(`B${rWeight}*B${rMatUnit}`,LAST.mat),'원','=중량×철판단가');
+
+  /* 1차 가공 : 4개 방식 전체 */
+  sec('■ 3. 1차 가공 (4개 방식 전체 · 선택한 방식만 반영)');
+  const effV=num($('eff').value)||80, spmV=num($('spm').value), hitsV=num($('hits').value)||1, cycV=num($('cyc').value)||6;
+  const chargeV=num($('charge').value);
+  /* 3-1 프레스 */
+  const sPress=sub('▣ 3-1. 프레스 가공');
+  const tonObj=TON.find(t=>t.key===state.ton)||TON[3]||TON[0];
+  const rTon=add('설비 톤수 (선택)',ms(tonObj.label),'','목록 시트의 톤수표');dv(`B${rTon}`,RTK);
+  const rMode=add('작업 방식 (선택)',ms(state.mode==='auto'?'프로그래시브(자동)':'단발(수동)'));dv(`B${rMode}`,RMODE);
+  const rCharge=add('시간당 설비차지',mf(`IFERROR(VLOOKUP(B${rTon},${RT},2,FALSE),0)`,chargeV||num(tonObj.charge)),'원/h','=톤수표 조회');
+  const rEff=add('가동률',mn(effV,'0.0'),'%');
+  const rSpm=add('SPM (분당 타발수)',mf(`IFERROR(VLOOKUP(B${rTon},${RT},3,FALSE),0)`,spmV||num(tonObj.spm),'0.0'),'타/분','=톤수표 조회');
+  const rHits=add('공정 타발수 (1개)',mn(hitsV),'타','자동일 때 사용');
+  const rCyc=add('1개당 작업시간',mn(cycV,M2),'초/개','단발일 때 사용');
+  const prodPV=(state.mode==='auto'?(hitsV>0?(spmV||num(tonObj.spm))*60*effV/100/hitsV:0):(cycV>0?3600/cycV*effV/100:0));
+  const rProdP=add('시간당 생산량',mf(`IF(LEFT(B${rMode},3)="프로그",IF(B${rHits}>0,B${rSpm}*60*B${rEff}/100/B${rHits},0),IF(B${rCyc}>0,3600/B${rCyc}*B${rEff}/100,0))`,prodPV),'개/h','자동=SPM×60×가동률÷타발수 / 단발=3,600÷작업시간×가동률');
+  const mcPV=prodPV>0?(chargeV||num(tonObj.charge))/prodPV:0;
+  const rMcP=add('프레스 가공비',mf(`IF(B${rProdP}>0,B${rCharge}/B${rProdP},0)`,mcPV,M2),'원','=설비차지÷시간당 생산량');
+  const rLcP=add('프레스 인건비',mf(`IF(B${rProdP}>0,${PREF('wage')}/B${rProdP},0)`,prodPV>0?wageV/prodPV:0,M2),'원','=임율÷시간당 생산량');
+  cf(`A${sPress}:F${rLcP}`,`$B$${rProcSel}="프레스 가공"`);
+  /* 3-2 레이저 */
+  const sLaser=sub('▣ 3-2. 레이저 가공');
+  const pName=($('prod')&&$('prod').value)||(products[0]&&products[0].n)||'';
+  const rProdSel=add('제품 (선택)',ms(pName),'','목록 시트의 제품표');dv(`B${rProdSel}`,RPK);
+  const li=(typeof laserRateIdx==='function')?laserRateIdx(EM.t):-1;
+  const rRate=add('두께단가',mf(`IFERROR(VLOOKUP(B${rT},${RL},2,TRUE),0)`,li>=0?num(laserT[li].p):0,M2),'원/mm','=두께별 단가표 조회');
+  const periV=(num(EM.w)+num(EM.l))*2;
+  const rPeri=add('가공 둘레',mf(`(B${rPW}+B${rPL})*2`,periV,M2),'mm','=(폭+길이)×2');
+  const lrV=li>=0?num(laserT[li].p):0;
+  const rMcL=add('레이저 가공비',mf(`B${rRate}*B${rPeri}`,lrV*periV,M2),'원','=두께단가×둘레');
+  const rGasU=add('가스 단가',{t:'n',f:PREF('gas'),v:PV('gas'),z:M},'원/kg','=단가기준 시트');
+  const rGas=add('레이저 가스비',mf(`B${rWeight}*B${rGasU}`,num(EM.one)*PV('gas'),M2),'원','=제품중량×가스단가');
+  const uphLV=(products.find(x=>x.n===pName)||{u:0}).u;
+  const rUphL=add('시간당 작업수량',mf(`IFERROR(VLOOKUP(B${rProdSel},${RP},2,FALSE),0)`,num(uphLV)),'개/h','=제품표 조회');
+  const rWkL=add('투입 인원',mn(num($('workersL').value)||1,'0.0'),'명');
+  const wkLV=num($('workersL').value)||1;
+  const rLcL=add('레이저 인건비',mf(`IF(B${rUphL}>0,${PREF('wage')}/B${rUphL}*B${rWkL},0)`,num(uphLV)>0?wageV/num(uphLV)*wkLV:0,M2),'원','=임율÷시간당 작업수량×인원');
+  cf(`A${sLaser}:F${rLcL}`,`$B$${rProcSel}="레이저 가공"`);
+  /* 3-3 포밍 */
+  const sForm=sub('▣ 3-3. 포밍');
+  const rFBase=add('포밍 기준단가 (850mm)',{t:'n',f:PREF('formBase'),v:PV('formBase'),z:M},'원','=단가기준 시트');
+  const rFAdd=add('10mm당 가산',{t:'n',f:PREF('form10'),v:PV('form10'),z:M2},'원','=단가기준 시트');
+  const formV=(num(EM.l)<=850)?PV('formBase'):PV('formBase')+((num(EM.l)-850)/10*PV('form10'));
+  const rMcF=add('포밍비',mf(`IF(B${rPL}>850,B${rFBase}+(B${rPL}-850)/10*B${rFAdd},B${rFBase})`,formV,M2),'원','=기준단가+(길이−850)÷10×가산');
+  const rUphF=add('시간당 작업수량',mn(700),'개/h');
+  const rWkF=add('투입 인원',mn(1,'0.0'),'명');
+  const rLcF=add('포밍 인건비',mf(`IF(B${rUphF}>0,${PREF('wage')}/B${rUphF}*B${rWkF},0)`,wageV/700,M2),'원','=임율÷시간당 작업수량×인원');
+  cf(`A${sForm}:F${rLcF}`,`$B$${rProcSel}="포밍"`);
+  /* 3-4 절단 */
+  const sCut=sub('▣ 3-4. 절단');
+  const cnV=num($('cutn').value)||1;
+  const rCn=add('절단 횟수',mn(cnV),'회');
+  const rCut=add('회당 절단단가',{t:'n',f:PREF('cut'),v:PV('cut'),z:M},'원','=단가기준 시트');
+  const rMcC=add('절단비',mf(`B${rCn}*B${rCut}`,cnV*PV('cut'),M2),'원','=절단횟수×회당단가');
+  const rUphC=add('시간당 작업수량',mn(700),'개/h');
+  const rWkC=add('투입 인원',mn(num($('workersC').value)||1,'0.0'),'명');
+  const rLcC=add('절단 인건비',mf(`IF(B${rUphC}>0,${PREF('wage')}/B${rUphC}*B${rWkC},0)`,wageV/700,M2),'원','=임율÷시간당 작업수량×인원');
+  cf(`A${sCut}:F${rLcC}`,`$B$${rProcSel}="절단"`);
+  /* 선택 반영 */
+  const selMc=`IF($B$${rProcSel}="프레스 가공",B${rMcP},IF($B$${rProcSel}="레이저 가공",B${rMcL}+B${rGas},IF($B$${rProcSel}="포밍",B${rMcF},IF($B$${rProcSel}="절단",B${rMcC},0))))`;
+  const selLc=`IF($B$${rProcSel}="프레스 가공",B${rLcP},IF($B$${rProcSel}="레이저 가공",B${rLcL},IF($B$${rProcSel}="포밍",B${rLcF},IF($B$${rProcSel}="절단",B${rLcC},0))))`;
+  const rMc=add('② 개당 가공비 (선택 방식)',mf(selMc,LAST.mc,M2),'원','=선택한 가공 방식의 가공비 (레이저는 가스비 포함)');
+  const rLc=add('③ 개당 인건비 (선택 방식)',mf(selLc,LAST.lc,M2),'원','=선택한 가공 방식의 인건비');
+
+  /* 후공정 : 전체 목록 */
+  push6('');
+  const hPost=push6('■ 4. 후공정 (전체 목록 · 사용 선택)','수량 / 변수','단가','금액(원)','사용','산출 방법');
+  S[hPost-1]._head=1;
+  const pmap=LAST.postMap||{};
+  /* 물류 선택 블록 */
+  const regName=(FR_REGIONS.find(g=>g.k===frCfg.region)||FR_REGIONS[0]).n;
+  const trkName=frTruckLabel((state.posts.freight&&state.posts.freight.truck)||frCfg.truck);
+  const rRegion=add('물류 · 납품지역 (선택)',ms(regName),'','목록 시트의 운임표');dv(`B${rRegion}`,RREG);
+  const rTruck=add('물류 · 차종 (선택)',ms(trkName));dv(`B${rTruck}`,RTRK);
+  const rTrip=add('물류 · 운송구분 (선택)',ms(num(frCfg.trip)===2?'왕복':'편도'));dv(`B${rTrip}`,RTRIP);
+  const rExtra=add('물류 · 할증',mn(num(frCfg.extra),'0.0'),'%');
+  const fareV=num((frCfg.tbl[frCfg.region]||{})[frCfg.truck]);
+  const rFare=add('물류 · 적용 운임',mf(`IFERROR(INDEX(${RFARE},MATCH(B${rRegion},${RREG},0),MATCH(B${rTruck},${RTRUCKH},0)),0)*IF(B${rTrip}="왕복",2,1)*(1+B${rExtra}/100)`,fareV,M),'원','=운임표 × 왕복 × (1+할증)');
+  const postRows=[];let firstRow=0,lastRow=0;
+  const normals=POSTS.filter(p=>p.mode!=='defect'&&p.mode!=='scrap');
+  const specials=POSTS.filter(p=>p.mode==='defect'||p.mode==='scrap');
+  const onOf=k=>(state.posts[k]&&state.posts[k].on)?'사용':'미사용';
+  normals.forEach(p=>{
+    const st=state.posts[p.k]||{},amt=num(pmap[p.k]);
+    let qv='',cv='',fx='',inner='';
+    const rn=push6(p.nm,'','','',ms(onOf(p.k)),'');
+    dv(`E${rn}`,RUSE);
+    if(p.mode==='count'){qv=mn(num(st.cnt)||num(p.dft)||1,M2);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`B${rn}*C${rn}`;fx='=수량×단가';}
+    else if(p.mode==='kg'){qv=mn(num(st.w)||num(p.wDft)||0,M3);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`B${rn}*C${rn}`;fx='=중량×kg당 단가';}
+    else if(p.mode==='piece'){qv=mn(1);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`C${rn}`;fx='=개당 단가';}
+    else if(p.mode==='pack'){qv=mn(num(currentPack())||num(p.inDft)||100);cv='';inner=`(${PREF('pack_pallet')}/30+${PREF('pack_mat')})/B${rn}+${PREF('pack_wrap')}`;fx='=(파렛트÷30+포장자재)÷포장수량+랩';}
+    else if(p.mode==='freight'){qv=mn(num(st.load)||num(p.loadDft)||5000);cv='';inner=`IF(B${rn}>0,B${rFare}/B${rn},0)`;fx='=적용 운임÷적재수량';}
+    else {qv=mn(1);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`B${rn}*C${rn}`;fx='=수량×단가';}
+    S[rn-1][1]=qv;S[rn-1][2]=cv;S[rn-1][5]=fx;
+    S[rn-1][3]=mf(`IF(E${rn}="사용",${inner},0)`,(state.posts[p.k]&&state.posts[p.k].on)?amt:0,M2);
+    cf(`A${rn}:F${rn}`,`$E$${rn}="사용"`);
+    if(!firstRow)firstRow=rn;lastRow=rn;postRows.push(rn);
+  });
+  const baseRef=`B${rMat}+B${rMc}+B${rLc}${firstRow?`+SUM(D${firstRow}:D${lastRow})`:''}`;
+  specials.forEach(p=>{
+    const st=state.posts[p.k]||{},amt=num(pmap[p.k]);
+    const rn=push6(p.nm,'','','',ms(onOf(p.k)),'');
+    dv(`E${rn}`,RUSE);
+    if(p.mode==='defect'){
+      S[rn-1][1]='';S[rn-1][2]={t:'n',f:PREF('defect'),v:PV('defect'),z:'0.00'};S[rn-1][5]='=(재료비+가공비+인건비+후공정)×불량률%';
+      S[rn-1][3]=mf(`IF(E${rn}="사용",(${baseRef})*C${rn}/100,0)`,(state.posts[p.k]&&state.posts[p.k].on)?amt:0,M2);
+    }else{
+      S[rn-1][1]=mn(num(st.w)||num(p.wDft)||0.05,M3);S[rn-1][2]={t:'n',f:PREF('scrap'),v:PV('scrap'),z:M2};S[rn-1][5]='=−(발생중량×스크랩단가)';
+      S[rn-1][3]=mf(`IF(E${rn}="사용",-B${rn}*C${rn},0)`,(state.posts[p.k]&&state.posts[p.k].on)?amt:0,M2);
+    }
+    cf(`A${rn}:F${rn}`,`$E$${rn}="사용"`);
+    postRows.push(rn);
+  });
+  const rPost=push6('④ 개당 후공정비 합계','','',postRows.length?mf(postRows.map(n=>`D${n}`).join('+'),LAST.postSum,M2):mn(0),'','=사용으로 표시된 공정의 합계');
+
+  /* 금형 */
+  sec('■ 5. 금형 제작 (선택)');
+  const moldC=num($('moldCost').value),moldQ=num($('moldQpm').value),moldM=num($('moldY').value)*12+num($('moldM').value);
+  const moldU=(moldQ*moldM>0)?moldC/(moldQ*moldM):0,moldOn=($('moldApply')&&$('moldApply').checked);
+  const rMoldOn=add('금형비 가산 (선택)',ms(moldOn?'가산':'미가산'),'','가산을 선택하면 견적단가에 더해집니다');dv(`B${rMoldOn}`,RMOLD);
+  const rMoldC=add('금형비',mn(moldC),'원');
+  const rMoldQ=add('금형 회수 월수량',mn(moldQ),'개/월');
+  const rMoldM=add('금형 회수 기간',mn(moldM),'개월');
+  const rMoldU=add('금형비 회수단가',mf(`IF(B${rMoldQ}*B${rMoldM}>0,B${rMoldC}/(B${rMoldQ}*B${rMoldM}),0)`,moldU,M2),'원','=금형비÷(월수량×개월)');
+  const rMoldJ=add('예상 회수 판단',{t:'s',f:`IF(B${rMoldM}=0,"-",IF(B${rMoldM}<=3,"매우 양호",IF(B${rMoldM}<=6,"투자 가능",IF(B${rMoldM}<=12,"조건부 가능","신중 검토"))))`,v:moldM<=0?'-':(moldM<=3?'매우 양호':(moldM<=6?'투자 가능':(moldM<=12?'조건부 가능':'신중 검토')))},'','=회수 기간 기준');
+  cf(`A${rMoldOn}:F${rMoldJ}`,`$B$${rMoldOn}="가산"`);
+
+  /* 종합 */
+  sec('■ 6. 단가 종합');
+  const rSub=add('제조원가 소계',mf(`B${rMat}+B${rMc}+B${rLc}+D${rPost}`,LAST.subtotal,M2),'원','=①+②+③+④');
+  const rMr=add('관리비·이윤율',{t:'n',f:PREF('margin'),v:PV('margin'),z:'0.0'},'%','=단가기준 시트');
+  const rMargin=add('관리비·이윤',mf(`B${rSub}*B${rMr}/100`,LAST.addmargin,M2),'원','=제조원가×이윤율');
+  const rAdj=add('조정 (할인/가산)',mn(num($('adj').value)),'원','직접 입력');
+  const rUnit=add('개당 최종 견적단가',hiMark(mf(`B${rSub}+B${rMargin}+B${rAdj}+IF(B${rMoldOn}="가산",B${rMoldU},0)`,LAST.unit)),'원','=제조원가+관리비·이윤+조정+금형비');S[rUnit-1]._hi=1;
+  const rTotal=add('견적 총액',hiMark(mf(`B${rUnit}*B${rQty}`,LAST.total)),'원','=개당 단가×발주 수량');S[rTotal-1]._hi=1;
+  add('제조 원가율',mf(`IF(B${rUnit}>0,B${rSub}/B${rUnit},0)`,LAST.unit>0?LAST.subtotal/LAST.unit:0,P),'','=제조원가÷견적단가');
+
+  /* 판매가 */
+  sec('■ 7. 판매가 분석');
+  const saleV=num($('sale').value);
+  const rSale=add('판매 예상가 · 개당',mn(saleV),'원','직접 입력');
+  add('개당 차액 (판매−견적)',mf(`B${rSale}-B${rUnit}`,saleV-LAST.unit),'원');
+  add('총 차액',mf(`(B${rSale}-B${rUnit})*B${rQty}`,(saleV-LAST.unit)*qty),'원');
+  add('예상 이익율',mf(`IF(B${rSale}>0,(B${rSale}-B${rUnit})/B${rSale},0)`,saleV>0?(saleV-LAST.unit)/saleV:0,P),'','=(판매−견적)÷판매');
+  push6('');
+  push6('※ 초록칸 = 선택(드롭다운) · 노란칸 = 입력 · 흰칸 = 자동계산. 선택하면 해당 블록·행에 녹색 음영이 자동으로 표시됩니다.');
+  push6('※ 가공 방식·후공정 사용·금형 가산을 바꾸면 견적단가가 즉시 다시 계산됩니다. 단가는 [단가기준], 강종·톤수·제품·운임표는 [목록] 시트에서 수정하세요.');
+
+  /* ───────── 파일 생성 ───────── */
+  const ws=aoaToWsX(S,[{wch:28},{wch:18},{wch:13},{wch:15},{wch:10},{wch:44}]);
+  const ws2=aoaToWsX(PR,[{wch:30},{wch:14},{wch:10},{wch:14}]);
+  const ws3=aoaToWsX(L,[{wch:16},{wch:9},{wch:15},{wch:3},{wch:14},{wch:15},{wch:9},{wch:3},{wch:18},{wch:3},{wch:18},{wch:15},{wch:12},{wch:3},{wch:14},{wch:15},{wch:3},{wch:12},{wch:3},{wch:11},{wch:3},{wch:22},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11},{wch:11}]);
+  const wb=XLSX.utils.book_new();
+  wb.Workbook={CalcPr:{fullCalcOnLoad:true}};
+  XLSX.utils.book_append_sheet(wb,ws,'견적산정');
+  XLSX.utils.book_append_sheet(wb,ws2,'단가기준');
+  XLSX.utils.book_append_sheet(wb,ws3,'목록');
+  const d=new Date(),ymd=`${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+  const fname=`quote_calc_${ymd}.xlsx`;
+  let done=false;
+  if(DV.length||CF.length){
+    try{
+      const zipOk=await xlZipReady();
+      if(zipOk){
+        const buf=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+        const zip=await JSZip.loadAsync(buf);
+        const esc1=v=>String(v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+        /* styles.xml : dxf(조건부서식 서식) 추가 */
+        if(CF.length){
+          const sp='xl/styles.xml';
+          let sx=await zip.file(sp).async('string');
+          const dxf='<dxfs count="1"><dxf><font><color rgb="FF0A5C36"/></font><fill><patternFill patternType="solid"><bgColor rgb="FFE8F5EA"/></patternFill></fill></dxf></dxfs>';
+          if(/<dxfs[^>]*\/>/.test(sx))sx=sx.replace(/<dxfs[^>]*\/>/,dxf);
+          else if(/<dxfs[^>]*>[\s\S]*?<\/dxfs>/.test(sx))sx=sx.replace(/<dxfs[^>]*>[\s\S]*?<\/dxfs>/,dxf);
+          else if(sx.indexOf('<tableStyles')>=0)sx=sx.replace('<tableStyles',dxf+'<tableStyles');
+          else sx=sx.replace('</styleSheet>',dxf+'</styleSheet>');
+          zip.file(sp,sx);
+        }
+        /* sheet1.xml : conditionalFormatting → dataValidations 순서로 삽입 */
+        const path='xl/worksheets/sheet1.xml';
+        let xml=await zip.file(path).async('string');
+        let blk='';
+        CF.forEach((c,i)=>{blk+=`<conditionalFormatting sqref="${c.sqref}"><cfRule type="expression" dxfId="0" priority="${i+1}"><formula>${esc1(c.formula)}</formula></cfRule></conditionalFormatting>`;});
+        if(DV.length)blk+='<dataValidations count="'+DV.length+'">'+DV.map(v=>`<dataValidation type="list" allowBlank="1" showInputMessage="1" showErrorMessage="1" sqref="${v.ref}"><formula1>${esc1(v.f)}</formula1></dataValidation>`).join('')+'</dataValidations>';
+        const AFTER=['<hyperlinks','<printOptions','<pageMargins','<pageSetup','<headerFooter','<rowBreaks','<colBreaks','<customProperties','<cellWatches','<ignoredErrors','<smartTags','<drawing','<legacyDrawing','<picture','<oleObjects','<controls','<webPublishItems','<tableParts','<extLst','</worksheet>'];
+        let at=-1;
+        AFTER.forEach(t=>{const i=xml.indexOf(t);if(i>=0&&(at<0||i<at))at=i;});
+        xml=(at>=0)?(xml.slice(0,at)+blk+xml.slice(at)):xml.replace('</worksheet>',blk+'</worksheet>');
+        zip.file(path,xml);
+        const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();
+        setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);
+        done=true;
+      }
+    }catch(e){console.warn('선택목록/조건부서식 적용 실패',e);}
+  }
+  if(!done)XLSX.writeFile(wb,fname);
+  toast('견적 산정 내역을 엑셀로 저장했습니다'+(done?' (선택목록·조건부서식 포함)':'')+(styled?'':' · 색상 제외'));
+}
 function estText(){let s=`[프레스 가공비 견적] ${estDB.length}건\n`;estDB.forEach((r,i)=>{const d=normalizeEstDetail(r);s+=`\n${i+1}. ${r.pname} / 제품 ${d.product}${d.spec?' / 규격·비고 '+d.spec:''} / ${won(r.qty)}개 → 개당 ${won(r.unit)}원 / 총 ${won(r.total)}원`;});return s;}
 async function estShare(){if(!estDB.length){toast('저장된 견적이 없습니다');return;}try{if(window.XLSX){const {head,rows}=estRows();const ws=XLSX.utils.aoa_to_sheet([head,...rows]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'견적');const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});const file=new File([new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})],`프레스견적_${new Date().toISOString().slice(0,10)}.xlsx`);if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'프레스 견적',text:estText()});return;}}}catch(e){if(e&&e.name==='AbortError')return;}try{if(navigator.share){await navigator.share({title:'프레스 견적',text:estText()});return;}}catch(e){if(e&&e.name==='AbortError')return;}try{await navigator.clipboard.writeText(estText());toast('클립보드에 복사했습니다');}catch(e){toast('공유 미지원 환경입니다');}}
 function estClear(){if(!estDB.length){toast('저장된 견적이 없습니다');return;}askConfirm('저장된 견적 '+estDB.length+'건을 모두 삭제할까요?',()=>{estDB=[];saveEstDB();estRender();toast('초기화되었습니다');});}
@@ -2467,6 +2930,7 @@ function eCalc(){
   $('eOne').textContent=fmt(one,3);$('eMatCost').textContent=fmt(cost,0);$('eMatNote').textContent='중량 × '+cf(Math.round(unit))+'원/kg'+allowance;
   $('eTotal').textContent=fmt(total,3);$('eG').textContent=fmt(one*1000,1);
   EM={one,unit,cost,t,w,l,calcW,calcL,key:eMatKey()};
+  if(state.proc==='laser'&&typeof renderProcStd==='function'&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#procStd')))renderProcStd();
   if(typeof estCalc==='function')estCalc();
 }
 function scMatKey(id){const o=$(id).options[$(id).selectedIndex];return o?(o.dataset.mk||''):'';}
@@ -3463,19 +3927,300 @@ function printEstimateReport(mode){
 function saveEstimatePdf(){printEstimateReport('pdf');}
 
 
+
+/* ═══════════════════════════════════════════════════════════
+   v63 · 로그인 (매출분석도구와 동일 서버 계정) + 단가산정 클라우드 동기화
+   ═══════════════════════════════════════════════════════════ */
+var AU_URL_DEFAULT='';                 /* 서버 주소는 아래 [서버 주소 설정]에서 지정 */
+var AU_KEY_DEFAULT='dbang2026!';
+function auUrl(){try{return String(localStorage.getItem('dpt_auth_url')||AU_URL_DEFAULT||'').trim();}catch(e){return AU_URL_DEFAULT;}}
+function auKey(){try{return String(localStorage.getItem('dpt_auth_key')||AU_KEY_DEFAULT||'').trim();}catch(e){return AU_KEY_DEFAULT;}}
+function auSetServer(u,k){try{
+  u=String(u||'').trim();k=String(k||'').trim()||AU_KEY_DEFAULT;
+  if(u)localStorage.setItem('dpt_auth_url',u);else localStorage.removeItem('dpt_auth_url');
+  localStorage.setItem('dpt_auth_key',k);
+}catch(e){}}
+/* 같은 브라우저(같은 주소)에서 매출분석도구가 저장해 둔 서버 주소를 찾아본다 */
+async function auDiscoverUrl(){
+  if(auUrl())return auUrl();
+  try{
+    const st=await xTimeout(idbGet('settings'),1500,null);
+    const u=st&&st.gsync&&String(st.gsync.url||'').trim();
+    if(u){auSetServer(u,(st.gsync.key||'').trim()||AU_KEY_DEFAULT);return u;}
+  }catch(e){}
+  try{
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);const v=String(localStorage.getItem(k)||'');
+      const m=v.match(/https:\/\/script\.google\.com\/macros\/s\/[A-Za-z0-9_-]{20,}\/exec/);
+      if(m){auSetServer(m[0],AU_KEY_DEFAULT);return m[0];}
+    }
+  }catch(e){}
+  return '';
+}
+var AU_STORE='auth_v1', AU_AUTO='auth_auto_v1';
+var IDB_NAME='dbpastec_sales', IDB_STORE='kv';
+
+function idbOpen(){return new Promise((res,rej)=>{try{const r=indexedDB.open(IDB_NAME,1);r.onupgradeneeded=()=>{try{r.result.createObjectStore(IDB_STORE);}catch(e){}};r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);r.onblocked=()=>rej(new Error('blocked'));}catch(e){rej(e);}});}
+function xTimeout(p,ms,dflt){return Promise.race([Promise.resolve(p).catch(()=>dflt),new Promise(r=>setTimeout(()=>r(dflt),ms||1500))]);}
+function lsGet(k){try{const v=localStorage.getItem(k);return v?JSON.parse(v):null;}catch(e){return null;}}
+function lsSet(k,v){try{if(v==null)localStorage.removeItem(k);else localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+async function storeGet(k){const v=lsGet('dpt_'+k);if(v)return v;return await xTimeout(idbGet(k),1500,null);}
+async function storeSet(k,v){lsSet('dpt_'+k,v);xTimeout(idbSet(k,v),1500,null);}
+async function idbSet(k,v){try{const db=await idbOpen();return new Promise((res,rej)=>{const tx=db.transaction(IDB_STORE,'readwrite');tx.objectStore(IDB_STORE).put(v,k);tx.oncomplete=()=>res();tx.onerror=()=>rej(tx.error);});}catch(e){}}
+async function idbGet(k){try{const db=await idbOpen();return new Promise(res=>{const tx=db.transaction(IDB_STORE,'readonly');const rq=tx.objectStore(IDB_STORE).get(k);rq.onsuccess=()=>res(rq.result);rq.onerror=()=>res(null);});}catch(e){return null;}}
+
+function auMask(s){try{s=String(s||'');const k='dbps@2026#au';let o='';for(let i=0;i<s.length;i++)o+=String.fromCharCode(s.charCodeAt(i)^k.charCodeAt(i%k.length));return btoa(unescape(encodeURIComponent(o)));}catch(e){return '';}}
+function auUnmask(s){try{const t=decodeURIComponent(escape(atob(String(s||''))));const k='dbps@2026#au';let o='';for(let i=0;i<t.length;i++)o+=String.fromCharCode(t.charCodeAt(i)^k.charCodeAt(i%k.length));return o;}catch(e){return '';}}
+var AU={token:'',id:'',name:'',role:'',exp:0};
+var AU_ROLE={admin:'관리자',uploader:'업로더',user:'일반'};
+async function auRestore(){try{const v=await storeGet(AU_STORE);if(v&&typeof v==='object')AU=Object.assign(AU,v);}catch(e){}}
+async function auPersist(){try{await storeSet(AU_STORE,{token:AU.token,id:AU.id,name:AU.name,role:AU.role,exp:AU.exp});}catch(e){}}
+function auValid(){return !!(AU.token&&AU.exp&&Date.now()<AU.exp);}
+async function auCall(payload,timeoutMs){
+  const URL_=auUrl();
+  if(!URL_)throw new Error('서버 주소가 설정되지 않았습니다.\n아래 [⚙ 서버 주소 설정]에 매출분석도구와 같은 웹앱 주소(.../exec)를 입력하세요.');
+  payload.key=auKey();if(AU.token&&!payload.token)payload.token=AU.token;
+  const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+  const timer=ctl?setTimeout(()=>{try{ctl.abort();}catch(e){}},timeoutMs||25000):null;
+  let r;
+  try{r=await fetch(URL_,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload),signal:ctl?ctl.signal:undefined});}
+  catch(e){if(timer)clearTimeout(timer);throw new Error(e&&e.name==='AbortError'?'서버가 25초 안에 응답하지 않았습니다':'서버에 연결하지 못했습니다 — '+(e.message||e));}
+  if(timer)clearTimeout(timer);
+  const tx=await r.text();let d;
+  try{d=JSON.parse(tx);}catch(e){
+    const hint=(r.status===404||r.status===405)
+      ?'\n· 배포 주소가 바뀌었거나 잘못되었습니다.\n· 매출분석도구 → 구글시트 동기화 설정의 웹앱 주소(.../exec)를 복사해 아래 [⚙ 서버 주소 설정]에 붙여넣으세요.'
+      :'\n· 앱스스크립트 배포의 «액세스 권한»이 «모든 사용자»인지 확인하세요.';
+    throw new Error('서버가 JSON이 아닌 응답을 보냈습니다 (HTTP '+r.status+')'+hint);
+  }
+  if(d&&d.error)throw new Error(d.error);
+  return d;
+}
+async function auTryAuto(){
+  const a=await storeGet(AU_AUTO);if(!a||!a.id)return false;
+  const pw=auUnmask(a.p);if(!pw)return false;
+  try{const d=await auCall({action:'auLogin',id:a.id,pw:pw});if(!d||!d.token||!d.user)return false;
+    AU.token=d.token;AU.id=d.user.id;AU.name=d.user.name;AU.role=d.user.role;AU.exp=d.exp;await auPersist();return true;
+  }catch(e){return false;}
+}
+function auGateHtml(){
+  return `<div id="auGate"><form id="auForm">
+    <div class="au-h"><div class="au-t">(주)동방파스텍</div><div class="au-s">가공비 견적 프로그램 · 로그인</div></div>
+    <label class="au-l">아이디</label><input id="auId" class="au-i" autocomplete="username" autocapitalize="off" spellcheck="false">
+    <label class="au-l">비밀번호</label><input id="auPw" class="au-i" type="password" autocomplete="current-password">
+    <label class="au-c"><input type="checkbox" id="auAuto"> 자동 로그인 <span>— 이 PC에서 다음부터 바로 접속</span></label>
+    <label class="au-c"><input type="checkbox" id="auKeep" checked> 이 PC에서 로그인 유지 (12시간)</label>
+    <button type="submit" id="auBtn" class="au-b">로그인</button>
+    <div id="auMsg" class="au-m"></div>
+    <div class="au-srv">
+      <button type="button" class="au-srv-t" onclick="auToggleSrv()">⚙ 서버 주소 설정</button>
+      <div id="auSrvBox" class="au-srv-b" style="display:none">
+        <label class="au-l">웹앱 주소 (…/exec)</label><input id="auSrvUrl" class="au-i" placeholder="https://script.google.com/macros/s/.../exec" spellcheck="false">
+        <label class="au-l">비밀키</label><input id="auSrvKey" class="au-i" spellcheck="false">
+        <div style="display:flex;gap:6px;margin-top:8px">
+          <button type="button" class="au-b2" onclick="auSaveSrv()">저장</button>
+          <button type="button" class="au-b2" onclick="auTestSrv()">연결 확인</button>
+        </div>
+        <div id="auSrvMsg" class="au-m" style="text-align:left"></div>
+        <div style="margin-top:6px;font-size:10.5px;color:var(--sub);line-height:1.55">매출분석도구의 <b>구글시트 동기화</b> 설정에 있는 주소와 동일해야 합니다.</div>
+      </div>
+    </div>
+    <div class="au-f">계정은 <b>매출분석도구</b>와 동일합니다. 계정 신청·승인은 관리자에게 요청하세요.<br>공용 PC에서는 자동 로그인을 켜지 마세요.
+      <div style="margin-top:9px;text-align:center"><a href="javascript:void(0)" onclick="auSkip()" style="color:#64748b;font-weight:800;text-decoration:underline">서버 연결 없이 이 PC에서만 사용</a></div></div>
+  </form></div>`;
+}
+function auShowGate(){
+  if(document.getElementById('auGate'))return;
+  const d=document.createElement('div');d.innerHTML=auGateHtml();document.body.appendChild(d.firstElementChild);
+  const f=document.getElementById('auForm'),msg=document.getElementById('auMsg');
+  storeGet(AU_AUTO).then(a=>{if(a&&a.id){const e1=document.getElementById('auId');if(e1)e1.value=a.id;const e2=document.getElementById('auAuto');if(e2)e2.checked=true;}});
+  setTimeout(()=>{const i=document.getElementById('auId');if(i&&!i.value)i.focus();else{const p=document.getElementById('auPw');if(p)p.focus();}},80);
+  auDiscoverUrl().then(u=>{
+    if(!u){auToggleSrv();auSrvMsg('서버 주소가 아직 설정되지 않았습니다. 매출분석도구와 같은 주소를 입력하세요.','#b45309');}
+  });
+  f.addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    const id=document.getElementById('auId').value.trim(),pw=document.getElementById('auPw').value;
+    if(!id||!pw){msg.style.color='#dc2626';msg.textContent='아이디와 비밀번호를 입력하세요.';return;}
+    const btn=document.getElementById('auBtn');btn.disabled=true;btn.textContent='확인 중…';msg.style.color='#64748b';msg.textContent='';
+    try{
+      const d=await auCall({action:'auLogin',id,pw});
+      if(!d||!d.token||!d.user)throw new Error('서버가 로그인 요청을 처리하지 못했습니다.');
+      AU.token=d.token;AU.id=d.user.id;AU.name=d.user.name;AU.role=d.user.role;AU.exp=d.exp;
+      if(document.getElementById('auKeep').checked)await auPersist();else await storeSet(AU_STORE,null);
+      if(document.getElementById('auAuto').checked)await storeSet(AU_AUTO,{id,p:auMask(pw)});else await storeSet(AU_AUTO,null);
+      auHideGate();auApply();toast('로그인되었습니다 · '+(AU.name||AU.id));
+      setTimeout(()=>{try{cloudPull(true);}catch(e){}},400);
+    }catch(e){msg.style.color='#dc2626';msg.textContent=(e.message||e);}
+    finally{btn.disabled=false;btn.textContent='로그인';}
+  });
+}
+function auToggleSrv(){
+  const b=document.getElementById('auSrvBox');if(!b)return;
+  const open=b.style.display==='none';b.style.display=open?'':'none';
+  if(open){document.getElementById('auSrvUrl').value=auUrl();document.getElementById('auSrvKey').value=auKey();}
+}
+function auSaveSrv(){
+  const u=document.getElementById('auSrvUrl').value.trim(),k=document.getElementById('auSrvKey').value.trim();
+  if(u&&!/\/exec\s*$/.test(u)){auSrvMsg('주소는 …/exec 로 끝나야 합니다','#dc2626');return;}
+  auSetServer(u,k);auSrvMsg('저장했습니다. 다시 로그인해 주세요.','#0a7d4b');
+}
+function auSrvMsg(t,c){const m=document.getElementById('auSrvMsg');if(m){m.style.color=c||'#64748b';m.textContent=t;}}
+async function auTestSrv(){
+  const u=(document.getElementById('auSrvUrl').value||'').trim()||auUrl();
+  if(!u){auSrvMsg('주소를 입력하세요','#dc2626');return;}
+  auSrvMsg('확인 중…','#64748b');
+  try{
+    const r=await xFetch(u+(u.indexOf('?')>=0?'&':'?')+'action=get&key='+encodeURIComponent((document.getElementById('auSrvKey').value||auKey()))+'&_t='+Date.now(),{},20000);
+    const tx=await r.text();
+    let d=null;try{d=JSON.parse(tx);}catch(e){}
+    if(!d){auSrvMsg('응답이 JSON이 아닙니다 (HTTP '+r.status+') — 주소·배포 권한을 확인하세요','#dc2626');return;}
+    if(d.error){auSrvMsg('서버 응답: '+d.error,'#b45309');return;}
+    auSrvMsg('✓ 연결 정상 (HTTP '+r.status+')','#0a7d4b');
+  }catch(e){auSrvMsg('연결 실패 — '+(e.message||e),'#dc2626');}
+}
+function auHideGate(){const g=document.getElementById('auGate');if(g)g.remove();}
+function auSkip(){window.__auSkipped=true;auHideGate();auApply();toast('로그인 없이 사용합니다 · 클라우드 동기화는 사용할 수 없습니다');}
+async function auLogout(){
+  AU={token:'',id:'',name:'',role:'',exp:0};
+  try{await storeSet(AU_STORE,null);await storeSet(AU_AUTO,null);}catch(e){}
+  auApply();auShowGate();
+}
+function auApply(){
+  const chip=$('auChip');
+  if(chip)chip.innerHTML=auValid()
+    ?`👤 <b>${esc(AU.name||AU.id)}</b> <small>${AU_ROLE[AU.role]||AU.role||''}</small> <button onclick="auLogout()">로그아웃</button>`
+    :`<button onclick="auShowGate()">🔐 로그인</button>`;
+  renderCloudBar();
+}
+
+/* ===== 단가산정 클라우드 동기화 (서버 공용 문서의 pressEstV1 영역) ===== */
+var CLOUD_NS='pressEstV1';
+async function xFetch(url,opt,ms){
+  const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
+  const t=ctl?setTimeout(()=>{try{ctl.abort();}catch(e){}},ms||30000):null;
+  try{return await fetch(url,Object.assign({},opt,{signal:ctl?ctl.signal:undefined}));}
+  catch(e){if(e&&e.name==='AbortError')throw new Error('서버가 응답하지 않았습니다 (시간 초과)');throw e;}
+  finally{if(t)clearTimeout(t);}
+}
+var cloudCfg=(()=>{try{return Object.assign({auto:false,at:'',by:'',localAt:0},JSON.parse(localStorage.getItem('dptCloudCfg')||'{}'));}catch(e){return {auto:false,at:'',by:'',localAt:0};}})();
+function cloudSaveCfg(){try{localStorage.setItem('dptCloudCfg',JSON.stringify(cloudCfg));}catch(e){}}
+var _cloudBusy=false,_cloudT=null,_cloudApplying=false;
+function cloudPayload(){
+  return {updatedAt:Date.now(),by:(AU.name||AU.id||'사용자'),
+    prices:prices,
+    laserT:laserT,products:products,
+    custom:{posts:POSTS.filter(p=>p.custom),trucks:TRUCKS.filter(t=>t.custom),seq:custSeq},
+    freight:frCfg,
+    mat:{t:matTable,q:matQuote,u:matUpdated,x:matExtra},
+    estDB:estDB};
+}
+function cloudApply(d){
+  if(!d||typeof d!=='object')return false;
+  _cloudApplying=true;
+  try{
+    if(d.prices&&typeof d.prices==='object'){Object.assign(prices,d.prices);savePrices();}
+    if(d.custom&&typeof replaceCustomConfig==='function')replaceCustomConfig(d.custom);
+    if(Array.isArray(d.laserT)&&d.laserT.length){laserT.length=0;d.laserT.forEach(x=>laserT.push(x));saveLaser();}
+    if(Array.isArray(d.products)&&d.products.length){products.length=0;d.products.forEach(x=>products.push(x));saveProducts();fillProdSelect();}
+    if(d.freight&&typeof d.freight==='object'){frCfg=Object.assign(frCfg,d.freight);frSave();}
+    if(d.mat&&d.mat.t){matTable=d.mat.t;matQuote=d.mat.q||{};matUpdated=d.mat.u||matUpdated;if(d.mat.x)matExtra=normalizeMatExtra(d.mat.x);saveMatTable(false);}
+    if(Array.isArray(d.estDB)){estDB=d.estDB;saveEstDB();}
+    cloudCfg.at=d.updatedAt?new Date(d.updatedAt).toLocaleString('ko-KR'):cloudCfg.at;
+    cloudCfg.by=d.by||'';cloudCfg.localAt=d.updatedAt||Date.now();cloudSaveCfg();
+    renderPosts();syncPriceInputs();renderSetGrid();renderFreightCalc();renderSaveState();renderLaserTbl();renderProdTbl();renderMatPage();estRender();eSyncMatPrice();eCalc();
+    if(typeof renderProcStd==='function')renderProcStd();
+  }catch(e){console.error(e);}
+  _cloudApplying=false;
+  return true;
+}
+async function cloudPull(silent){
+  if(!auValid()){if(!silent)toast('먼저 로그인하세요');return false;}
+  if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('불러오는 중…');
+  try{
+    const u=auUrl()+'?action=get&key='+encodeURIComponent(auKey())+'&token='+encodeURIComponent(AU.token)+'&_t='+Date.now();
+    const r=await xFetch(u,{},40000);const tx=await r.text();let d;
+    try{d=JSON.parse(tx);}catch(e){throw new Error('서버 응답 형식 오류');}
+    if(d&&d.error)throw new Error(d.error);
+    const root=(d&&d.data&&typeof d.data==='object')?d.data:d;
+    const mine=root&&root[CLOUD_NS];
+    if(!mine){if(!silent)toast('서버에 저장된 단가산정 자료가 없습니다');renderCloudBar();return false;}
+    if(silent&&num(mine.updatedAt)<=num(cloudCfg.localAt)){renderCloudBar();return false;}
+    cloudApply(mine);
+    if(!silent)toast('서버에서 단가산정 자료를 받았습니다 ('+(mine.by||'')+' · '+cloudCfg.at+')');
+    renderCloudBar();return true;
+  }catch(e){if(!silent)toast('받기 실패 — '+(e.message||e));renderCloudBar('받기 실패');return false;}
+  finally{_cloudBusy=false;}
+}
+async function cloudPush(silent){
+  if(!auValid()){if(!silent)toast('먼저 로그인하세요');return false;}
+  if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('올리는 중…');
+  try{
+    const payload=cloudPayload();
+    const body={action:'save',key:auKey(),token:AU.token,data:{[CLOUD_NS]:payload},clientId:(AU.name||AU.id||'사용자')};
+    const r=await xFetch(auUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)},40000);
+    const tx=await r.text();let d;
+    try{d=JSON.parse(tx);}catch(e){throw new Error('서버 응답 형식 오류');}
+    if(d&&d.error)throw new Error(d.error);
+    cloudCfg.at=new Date(payload.updatedAt).toLocaleString('ko-KR');cloudCfg.by=payload.by;cloudCfg.localAt=payload.updatedAt;cloudSaveCfg();
+    if(!silent)toast('단가산정 자료를 서버에 저장했습니다');
+    renderCloudBar();return true;
+  }catch(e){if(!silent)toast('올리기 실패 — '+(e.message||e));renderCloudBar('올리기 실패');return false;}
+  finally{_cloudBusy=false;}
+}
+function cloudTouch(){
+  if(_cloudApplying||!cloudCfg.auto||!auValid())return;
+  clearTimeout(_cloudT);_cloudT=setTimeout(()=>cloudPush(true),5000);
+  renderCloudBar('변경됨 · 곧 자동 저장');
+}
+function cloudToggleAuto(){cloudCfg.auto=!cloudCfg.auto;cloudSaveCfg();renderCloudBar();toast('자동 동기화 '+(cloudCfg.auto?'ON':'OFF'));}
+function renderCloudBar(msg){
+  const el=$('cloudBar');if(!el)return;
+  const on=auValid();
+  el.innerHTML=`<div class="cb-l"><b>클라우드 동기화</b>
+      <span>${on?`${esc(AU.name||AU.id)} · ${AU_ROLE[AU.role]||''}`:'로그인 필요'}</span>
+      <span class="cb-at">${msg?esc(msg):(cloudCfg.at?('최근 동기화 '+esc(cloudCfg.at)+(cloudCfg.by?' · '+esc(cloudCfg.by):'')):'동기화 기록 없음')}</span></div>
+    <div class="cb-r">
+      <button class="cb-auto${cloudCfg.auto?' on':''}" onclick="cloudToggleAuto()">자동 ${cloudCfg.auto?'ON':'OFF'}</button>
+      <button onclick="cloudPush()">⤒ 서버에 올리기</button>
+      <button onclick="cloudPull()">⤓ 서버에서 받기</button>
+      ${on?'<button onclick="auLogout()">로그아웃</button>':'<button class="pri" onclick="auShowGate()">🔐 로그인</button>'}
+    </div>`;
+}
+/* 저장 함수에 자동 동기화 훅 */
+(function(){
+  ['savePrices','saveMatTable','saveEstDB','saveLaser','saveProducts','saveCustom','frSave'].forEach(fn=>{
+    const o=window[fn];if(typeof o!=='function')return;
+    window[fn]=function(){const r=o.apply(this,arguments);try{cloudTouch();}catch(e){}return r;};
+  });
+})();
+(async function(){
+  try{
+    await xTimeout(auRestore(),2500,null);
+    auApply();
+    if(!auValid()){
+      const ok=await xTimeout(auTryAuto(),12000,false);
+      if(!ok)auShowGate(); else auApply();
+    }
+    if(auValid()){auApply();setTimeout(()=>{try{cloudPull(true);}catch(e){}},600);}
+  }catch(e){console.warn('auth init',e);try{auShowGate();}catch(_e){}}
+})();
+setTimeout(()=>{try{if(!auValid()&&!document.getElementById('auGate')&&!window.__auSkipped)auShowGate();}catch(e){}},14000);
+
 /* ================= 초기화 ================= */
 document.body.className='tab-est';
 loadMatTable();syncPurchaseMaterialPrices(false,true);renderMatPage();renderSetGrid();renderFreightCalc();
 fillProdSelect();renderLaserTbl();renderProdTbl();
 $('prod').addEventListener('change',estCalc);
 setProc('');
+renderProcStd();
 syncPriceInputs();
 $('cID').value='508';
 selectTon('160');
 loadEstDB();estRender();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-12 · v59';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-12 · v67';})();
 formatAllNums();
 estCalc();
 </script>
