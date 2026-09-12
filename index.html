@@ -1024,6 +1024,7 @@
   .cloudbar .cb-l{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--sub)}
   .cloudbar .cb-l b{font-size:13px;color:var(--navy)}
   .cloudbar .cb-at{color:var(--accent);font-weight:700}
+  .cloudbar .cb-err{color:#b91c1c;font-weight:700;max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .cloudbar .cb-r{display:flex;gap:6px;flex-wrap:wrap}
   .cloudbar button{padding:8px 11px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
   .cloudbar button.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
@@ -4096,6 +4097,24 @@ function auApply(){
 
 /* ===== 단가산정 클라우드 동기화 (서버 공용 문서의 pressEstV1 영역) ===== */
 var CLOUD_NS='pressEstV1';
+/* 동기화 서버는 기본적으로 로그인 서버와 같지만, 다르게 쓰는 경우를 위해 따로 지정할 수 있다 */
+function syncUrl(){try{return String(localStorage.getItem('dpt_sync_url')||'').trim()||auUrl();}catch(e){return auUrl();}}
+function syncKey(){try{return String(localStorage.getItem('dpt_sync_key')||'').trim()||auKey();}catch(e){return auKey();}}
+function cloudSetServer(){
+  const cur=(function(){try{return localStorage.getItem('dpt_sync_url')||'';}catch(e){return '';}})();
+  const u=prompt('동기화 서버 주소 (…/exec)\n비워 두면 로그인 서버와 동일하게 사용합니다.\n\n현재 로그인 서버: '+(auUrl()||'(없음)'),cur);
+  if(u===null)return;
+  const k=prompt('동기화 비밀키 (비우면 로그인 비밀키 사용)',(function(){try{return localStorage.getItem('dpt_sync_key')||'';}catch(e){return '';}})());
+  if(k===null)return;
+  try{
+    const uu=String(u||'').trim();
+    if(uu&&!/\/exec\s*$/.test(uu)){toast('주소는 …/exec 로 끝나야 합니다');return;}
+    if(uu)localStorage.setItem('dpt_sync_url',uu);else localStorage.removeItem('dpt_sync_url');
+    const kk=String(k||'').trim();
+    if(kk)localStorage.setItem('dpt_sync_key',kk);else localStorage.removeItem('dpt_sync_key');
+  }catch(e){}
+  cloudCfg.lastErr='';renderCloudBar();toast('동기화 서버 설정을 저장했습니다');
+}
 async function xFetch(url,opt,ms){
   const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
   const t=ctl?setTimeout(()=>{try{ctl.abort();}catch(e){}},ms||30000):null;
@@ -4134,38 +4153,89 @@ function cloudApply(d){
   _cloudApplying=false;
   return true;
 }
+async function cloudTry(list){
+  /* 서버 구현 차이를 흡수: GET(action=get) → POST(action=get) → POST(action=load) 순서로 시도 */
+  let lastErr='';
+  for(const mk of list){
+    try{
+      const r=await mk();
+      const tx=await r.text();
+      let d=null;
+      try{d=JSON.parse(tx);}catch(e){
+        lastErr='JSON이 아닌 응답 (HTTP '+r.status+')';
+        continue;
+      }
+      if(d&&d.error){lastErr=String(d.error);continue;}
+      if(d&&d.ok===false){lastErr=String(d.message||d.msg||'서버가 요청을 거부했습니다');continue;}
+      return {d};
+    }catch(e){lastErr=(e&&e.message)||String(e);}
+  }
+  return {err:lastErr||'알 수 없는 오류'};
+}
+function cloudPost(body){
+  return ()=>xFetch(syncUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)},40000);
+}
 async function cloudPull(silent){
   if(!auValid()){if(!silent)toast('먼저 로그인하세요');return false;}
+  if(!syncUrl()){if(!silent)toast('서버 주소가 설정되지 않았습니다');renderCloudBar('서버 주소 없음');return false;}
   if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('불러오는 중…');
   try{
-    const u=auUrl()+'?action=get&key='+encodeURIComponent(auKey())+'&token='+encodeURIComponent(AU.token)+'&_t='+Date.now();
-    const r=await xFetch(u,{},40000);const tx=await r.text();let d;
-    try{d=JSON.parse(tx);}catch(e){throw new Error('서버 응답 형식 오류');}
-    if(d&&d.error)throw new Error(d.error);
+    const K=encodeURIComponent(syncKey()),T=encodeURIComponent(AU.token);
+    const res=await cloudTry([
+      ()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&key='+K+'&token='+T+'&_t='+Date.now(),{},40000),
+      cloudPost({action:'get',key:syncKey(),token:AU.token}),
+      cloudPost({action:'load',key:syncKey(),token:AU.token})
+    ]);
+    if(res.err){
+      cloudCfg.lastErr=res.err;
+      if(!silent)toast('받기 실패 — '+res.err);
+      renderCloudBar('받기 실패 · '+String(res.err).slice(0,60));
+      return false;
+    }
+    const d=res.d;
     const root=(d&&d.data&&typeof d.data==='object')?d.data:d;
     const mine=root&&root[CLOUD_NS];
-    if(!mine){if(!silent)toast('서버에 저장된 단가산정 자료가 없습니다');renderCloudBar();return false;}
+    if(!mine){
+      cloudCfg.lastErr='';
+      if(!silent)toast('서버에 저장된 단가산정 자료가 없습니다 · [서버에 올리기]로 먼저 저장하세요');
+      renderCloudBar('서버에 단가산정 자료 없음');return false;
+    }
     if(silent&&num(mine.updatedAt)<=num(cloudCfg.localAt)){renderCloudBar();return false;}
     cloudApply(mine);
+    cloudCfg.lastErr='';
     if(!silent)toast('서버에서 단가산정 자료를 받았습니다 ('+(mine.by||'')+' · '+cloudCfg.at+')');
     renderCloudBar();return true;
-  }catch(e){if(!silent)toast('받기 실패 — '+(e.message||e));renderCloudBar('받기 실패');return false;}
+  }catch(e){
+    cloudCfg.lastErr=(e&&e.message)||String(e);
+    if(!silent)toast('받기 실패 — '+cloudCfg.lastErr);
+    renderCloudBar('받기 실패 · '+String(cloudCfg.lastErr).slice(0,60));return false;
+  }
   finally{_cloudBusy=false;}
 }
 async function cloudPush(silent){
   if(!auValid()){if(!silent)toast('먼저 로그인하세요');return false;}
+  if(!syncUrl()){if(!silent)toast('서버 주소가 설정되지 않았습니다');renderCloudBar('서버 주소 없음');return false;}
   if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('올리는 중…');
   try{
     const payload=cloudPayload();
-    const body={action:'save',key:auKey(),token:AU.token,data:{[CLOUD_NS]:payload},clientId:(AU.name||AU.id||'사용자')};
-    const r=await xFetch(auUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)},40000);
-    const tx=await r.text();let d;
-    try{d=JSON.parse(tx);}catch(e){throw new Error('서버 응답 형식 오류');}
-    if(d&&d.error)throw new Error(d.error);
-    cloudCfg.at=new Date(payload.updatedAt).toLocaleString('ko-KR');cloudCfg.by=payload.by;cloudCfg.localAt=payload.updatedAt;cloudSaveCfg();
+    const data={};data[CLOUD_NS]=payload;
+    const res=await cloudTry([
+      cloudPost({action:'save',key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')}),
+      cloudPost({action:'set',key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')})
+    ]);
+    if(res.err){
+      cloudCfg.lastErr=res.err;
+      if(!silent)toast('올리기 실패 — '+res.err);
+      renderCloudBar('올리기 실패 · '+String(res.err).slice(0,60));return false;
+    }
+    cloudCfg.at=new Date(payload.updatedAt).toLocaleString('ko-KR');cloudCfg.by=payload.by;cloudCfg.localAt=payload.updatedAt;cloudCfg.lastErr='';cloudSaveCfg();
     if(!silent)toast('단가산정 자료를 서버에 저장했습니다');
     renderCloudBar();return true;
-  }catch(e){if(!silent)toast('올리기 실패 — '+(e.message||e));renderCloudBar('올리기 실패');return false;}
+  }catch(e){
+    cloudCfg.lastErr=(e&&e.message)||String(e);
+    if(!silent)toast('올리기 실패 — '+cloudCfg.lastErr);
+    renderCloudBar('올리기 실패 · '+String(cloudCfg.lastErr).slice(0,60));return false;
+  }
   finally{_cloudBusy=false;}
 }
 function cloudTouch(){
@@ -4173,17 +4243,40 @@ function cloudTouch(){
   clearTimeout(_cloudT);_cloudT=setTimeout(()=>cloudPush(true),5000);
   renderCloudBar('변경됨 · 곧 자동 저장');
 }
+async function cloudDiag(){
+  if(!syncUrl()){toast('서버 주소가 설정되지 않았습니다');return;}
+  renderCloudBar('진단 중…');
+  const K=encodeURIComponent(syncKey()),T=encodeURIComponent(AU.token||'');
+  const out=[];
+  const probe=async(name,mk)=>{
+    try{
+      const r=await mk();const tx=await r.text();
+      let d=null;try{d=JSON.parse(tx);}catch(e){}
+      out.push(name+' → HTTP '+r.status+' · '+(d?(d.error?('오류: '+d.error):(d.ok===false?'ok:false':'정상 JSON'+(d.data?' (data 있음)':''))):'JSON 아님: '+String(tx).replace(/\s+/g,' ').slice(0,60)));
+    }catch(e){out.push(name+' → 실패: '+((e&&e.message)||e));}
+  };
+  await probe('GET action=get',()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&key='+K+'&token='+T+'&_t='+Date.now(),{},25000));
+  await probe('POST action=get',cloudPost({action:'get',key:syncKey(),token:AU.token}));
+  await probe('POST action=load',cloudPost({action:'load',key:syncKey(),token:AU.token}));
+  const txt=('서버: '+syncUrl()+'\n키: '+syncKey()+'\n계정: '+(AU.name||AU.id)+' ('+(AU.role||'')+')\n\n')+out.join('\n');
+  cloudCfg.lastErr='';renderCloudBar();
+  try{await navigator.clipboard.writeText(txt);}catch(e){}
+  askConfirm('클라우드 동기화 진단 결과 (클립보드 복사됨)\n\n'+txt,()=>{});
+}
 function cloudToggleAuto(){cloudCfg.auto=!cloudCfg.auto;cloudSaveCfg();renderCloudBar();toast('자동 동기화 '+(cloudCfg.auto?'ON':'OFF'));}
 function renderCloudBar(msg){
   const el=$('cloudBar');if(!el)return;
   const on=auValid();
   el.innerHTML=`<div class="cb-l"><b>클라우드 동기화</b>
       <span>${on?`${esc(AU.name||AU.id)} · ${AU_ROLE[AU.role]||''}`:'로그인 필요'}</span>
-      <span class="cb-at">${msg?esc(msg):(cloudCfg.at?('최근 동기화 '+esc(cloudCfg.at)+(cloudCfg.by?' · '+esc(cloudCfg.by):'')):'동기화 기록 없음')}</span></div>
+      <span class="cb-at">${msg?esc(msg):(cloudCfg.at?('최근 동기화 '+esc(cloudCfg.at)+(cloudCfg.by?' · '+esc(cloudCfg.by):'')):'동기화 기록 없음')}</span>
+      ${cloudCfg.lastErr?`<span class="cb-err" title="${esc(cloudCfg.lastErr)}">오류: ${esc(String(cloudCfg.lastErr).slice(0,90))}</span>`:''}</div>
     <div class="cb-r">
       <button class="cb-auto${cloudCfg.auto?' on':''}" onclick="cloudToggleAuto()">자동 ${cloudCfg.auto?'ON':'OFF'}</button>
       <button onclick="cloudPush()">⤒ 서버에 올리기</button>
       <button onclick="cloudPull()">⤓ 서버에서 받기</button>
+      <button onclick="cloudDiag()">진단</button>
+      <button onclick="cloudSetServer()">⚙ 서버</button>
       ${on?'<button onclick="auLogout()">로그아웃</button>':'<button class="pri" onclick="auShowGate()">🔐 로그인</button>'}
     </div>`;
 }
@@ -4220,7 +4313,7 @@ selectTon('160');
 loadEstDB();estRender();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-12 · v67';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-12 · v68';})();
 formatAllNums();
 estCalc();
 </script>
