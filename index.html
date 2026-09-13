@@ -1865,12 +1865,8 @@ function syncPurchaseMaterialPrices(notify=true,force=false){
   });
   Y_LIST=[...new Set(Y_LIST)].sort();
   if(!Y_LIST.includes(matYear))matYear=Y_LIST.includes(String(new Date().getFullYear()))?String(new Date().getFullYear()):Y_LIST[Y_LIST.length-1];
-  const markets=db.marketPrices&&db.marketPrices[matYear];
-  if(markets&&typeof markets==='object')MATERIALS.forEach(m=>{
-    const v=String(markets[m.k]==null?'':markets[m.k]).replace(/,/g,'').trim();
-    const cur=String(matQuote[m.k]==null?'':matQuote[m.k]).replace(/,/g,'').trim();
-    if(cur!==v){matQuote[m.k]=v;updatedQuotes++;}
-  });
+  /* v74 : 견적 적용가는 사용자가 직접 입력한 값(비우면 마지막 매입월 최고가 자동)만 사용한다.
+     매입분석도구의 시장단가로 덮어쓰지 않는다. */
   if(Array.isArray(db.egiExtras)){
     db.egiExtras.forEach(se=>{
       if(!se)return;const n=String(se.name!=null?se.name:(se.n||'')).trim();if(!n)return;
@@ -1951,7 +1947,9 @@ function renderMatPage(){const el=$('mpBody');if(!el)return;
 function quoteAuto(k){const r=(typeof lastMatRange==='function')?lastMatRange(k):null;return r?r.max:0;}
 function quoteAutoTag(k){const r=(typeof lastMatRange==='function')?lastMatRange(k):null;if(!r)return '';const cur=num(matQuote[k]);return `<em class="auto">${r.month}월 입고 최고가 ${cf(r.max)}${cur>0&&cur!==r.max?' (직접입력 적용중)':''}</em>`;}
 function quoteShown(k){const v=num(matQuote[k]);return v>0?v:(quoteAuto(k)||'');}
-function applyMat(k){const q=num(matQuote[k])||quoteAuto(k);let v,src;if(q>0){v=q;src=num(matQuote[k])>0?'견적 적용가':'마지막 매입월 최고가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();renderSetGrid();renderEMatRange();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
+function applyMat(k){
+  if(!(num(matQuote[k])>0))matQuote[k]='';          /* 빈 값이면 자동(최고가) 상태 유지 */
+  const q=num(matQuote[k])||quoteAuto(k);let v,src;if(q>0){v=q;src=num(matQuote[k])>0?'견적 적용가':'마지막 매입월 최고가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();renderSetGrid();renderEMatRange();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
 function addVendor(k){if(!matTable[matYear][k])matTable[matYear][k]=[];matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function delVendor(k,ri){matTable[matYear][k].splice(ri,1);if(!matTable[matYear][k].length)matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){return;}if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}
@@ -1968,7 +1966,18 @@ function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){retur
 }
 function avgMonth(rows,mi){let s=0,c=0;(rows||[]).forEach(r=>{const v=num(r.m[mi]);if(v>0){s+=v;c++;}});return c?s/c:null;}
 function mpExport(){if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}const head=['연도','강종','업체명',...MONTHS.map(m=>m+'월')];const rows=[head];Y_LIST.forEach(y=>{['고철',...MATERIALS.map(m=>m.k)].forEach(k=>{(matTable[y][k]||[]).forEach(r=>rows.push([y,k,r.v,...r.m.map(v=>num(v)||'')]));});});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'자재단가');const xrows=[['항목','추가금액','비고'],...matExtra.map(r=>[r.n,num(r.amt)||'',r.note||''])];const xws=XLSX.utils.aoa_to_sheet(xrows);xws['!cols']=[{wch:16},{wch:12},{wch:32}];XLSX.utils.book_append_sheet(wb,xws,'추가금액');xlsxSave(wb,`material_price_${new Date().toISOString().slice(0,10)}.xlsx`);toast('자재단가를 엑셀로 저장했습니다');}
-document.addEventListener('input',e=>{const t=e.target;if(!t.classList)return;if(t.classList.contains('mpv')){matTable[matYear][t.dataset.k][+t.dataset.ri].v=t.value;saveMatTable(true);}else if(t.classList.contains('mpm')){matTable[matYear][t.dataset.k][+t.dataset.ri].m[+t.dataset.mi]=t.value.replace(/,/g,'');saveMatTable(true);const w=document.getElementById('mpchart_'+t.dataset.k);if(w)w.innerHTML=sparkline(t.dataset.k);}else if(t.classList.contains('mpq')){matQuote[t.dataset.k]=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexamt')){matExtra[+t.dataset.ri].amt=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexnote')){matExtra[+t.dataset.ri].note=t.value;saveMatTable(true);}});
+document.addEventListener('change',e=>{
+  const t=e.target;if(!t||!t.classList||!t.classList.contains('mpq'))return;
+  const k=t.dataset.k;
+  if(!(num(t.value)>0)){                 /* 비우면 마지막 매입월 최고가 자동 적용 */
+    matQuote[k]='';saveMatTable(true);
+    const a=quoteAuto(k);
+    t.value=a?cf(a):'';
+    renderMatPage();
+    toast(a?(k+' 견적 적용가 : 마지막 매입월 최고가 '+cf(a)+'원 자동 적용'):(k+' : 매입이력이 없어 자동값을 계산할 수 없습니다'));
+  }else{renderMatPage();}
+});
+document.addEventListener('input',e=>{const t=e.target;if(!t.classList)return;if(t.classList.contains('mpv')){matTable[matYear][t.dataset.k][+t.dataset.ri].v=t.value;saveMatTable(true);}else if(t.classList.contains('mpm')){matTable[matYear][t.dataset.k][+t.dataset.ri].m[+t.dataset.mi]=t.value.replace(/,/g,'');saveMatTable(true);const w=document.getElementById('mpchart_'+t.dataset.k);if(w)w.innerHTML=sparkline(t.dataset.k);}else if(t.classList.contains('mpq')){matQuote[t.dataset.k]=t.value.replace(/,/g,'');saveMatTable(true);if(typeof renderEMatRange==='function')renderEMatRange();}else if(t.classList.contains('mpexamt')){matExtra[+t.dataset.ri].amt=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexnote')){matExtra[+t.dataset.ri].note=t.value;saveMatTable(true);}});
 
 /* ================= 후공정 카드 ================= */
 function togglePostSection(){state.postOpen=!state.postOpen;$('postBody').classList.toggle('open',state.postOpen);$('postToggle').classList.toggle('open',state.postOpen);}
@@ -4450,7 +4459,7 @@ selectTon('160');
 loadEstDB();estRender();estToggleFold(estFoldOpen);
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-13 · v73';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-13 · v74';})();
 formatAllNums();
 estCalc();
 </script>
