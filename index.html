@@ -27,8 +27,8 @@
   header.app .bar .meta{margin-left:6px;text-align:left;line-height:1.2}
   header.app .bar .meta .t{font-size:23px;font-weight:400;color:var(--ink);letter-spacing:-.4px;line-height:1}
   header.app .bar .meta .s{font-size:10.5px;font-weight:700;color:var(--ci)}
-  header.app .tabs{display:flex;gap:2px;max-width:1560px;margin:0 auto;padding:0 12px;border-top:1px solid var(--line)}
-  header.app .tabs button{flex:1;background:transparent;border:none;color:var(--sub);font-family:inherit;font-size:15.5px;font-weight:700;padding:13px 0 12px;cursor:pointer;position:relative;transition:color .15s}
+  header.app .tabs{display:flex;align-items:center;gap:2px;max-width:1560px;margin:0 auto;padding:0 12px;border-top:1px solid var(--line)}
+  header.app .tabs>button{flex:1;background:transparent;border:none;color:var(--sub);font-family:inherit;font-size:15.5px;font-weight:700;padding:13px 0 12px;cursor:pointer;position:relative;transition:color .15s}
   header.app .tabs button.on{color:var(--ci)}
   header.app .tabs button.on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--ci)}
 
@@ -45,8 +45,10 @@
   .inp:focus,select.inp:focus{outline:none;border-color:var(--navy);box-shadow:0 0 0 3px rgba(31,42,68,.08)}
   select.inp{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%236b7280' d='M6 8 0 0h12z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;padding-right:34px}
   .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-  .mat-price-row{display:grid;grid-template-columns:minmax(0,1fr) 155px;gap:10px;align-items:start}
-  @media(max-width:430px){.mat-price-row{grid-template-columns:1fr}}
+  .mat-price-row{display:grid;grid-template-columns:minmax(0,1fr) minmax(250px,max-content);gap:10px;align-items:start}
+  .matprice-fld .lab{white-space:nowrap}
+  .matprice-fld .suffix{width:100%}
+  @media(max-width:700px){.mat-price-row{grid-template-columns:1fr}}
   .suffix{position:relative}
   .suffix .u{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sub);pointer-events:none}
   .suffix .inp{padding-right:42px}
@@ -146,6 +148,9 @@
   .applybtn{width:100%;border:1.5px solid var(--blue);border-radius:12px;padding:13px 0;font-family:inherit;font-size:14px;font-weight:800;cursor:pointer;color:var(--blue);background:#eef4ff;margin-bottom:6px}
 
   .rec-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:11px}
+  .rec-head.recfold{cursor:pointer;gap:8px;user-select:none}
+  .rec-head.recfold .chev{margin-left:auto;color:var(--sub);font-size:12px;transition:transform .18s}
+  .rec-head.recfold.open .chev{transform:rotate(180deg)}
   .rec-head .t{font-size:14px;font-weight:700}
   .rec-head .cnt{font-size:12px;color:var(--navy);background:var(--chip);padding:2px 10px;border-radius:20px;font-weight:700}
   .rec-sum{font-size:12.5px;font-weight:700;color:var(--ok);background:var(--okbg);border:1px solid #cfe9da;border-radius:10px;padding:9px 12px;margin-bottom:11px;display:none}
@@ -305,9 +310,11 @@
   .mp-title-actions button{flex:none;min-height:0;padding:7px 18px;border:1px solid #cfe9da;border-radius:8px;background:var(--okbg);color:var(--ok);font-family:inherit;font-size:13px;font-weight:700;line-height:1.2;white-space:nowrap;cursor:pointer}
   .mp-title-actions .mp-sync{background:#0f766e;color:#fff;border-color:#0f766e}
   .mp-title-actions .mp-import{background:#fff;color:var(--navy);border-color:var(--navy)}
-  @media(max-width:760px){
+  .sec-h h2{white-space:nowrap}
+  @media(max-width:1180px){
     #page-mp .sec-h{flex-wrap:wrap}
-    .mp-title-actions{width:100%;justify-content:flex-end;overflow-x:auto;padding-bottom:1px}
+    .mp-title-actions{width:100%;justify-content:flex-start;flex-wrap:wrap;margin-left:0;overflow-x:visible;padding-bottom:1px}
+    .mp-title-actions button{padding:7px 11px;font-size:12px}
   }
   .mp-quote{font-size:11px;color:var(--sub);font-weight:600;display:flex;align-items:center;gap:5px;margin-left:24px}
   .mp-quote input{width:80px;padding:6px 8px;border:1px solid #efc4c8;border-radius:8px;font-family:inherit;font-size:12.5px;font-weight:400;text-align:right;color:var(--ink);background:#fff3f4}
@@ -965,6 +972,8 @@
 
 
   /* ===== v55 : 강종 최근 매입 최저/최고 · 물류비 산정 ===== */
+  .mm-inline{font-style:normal;font-size:11px;font-weight:400;color:var(--accent);white-space:nowrap;line-height:1.35}
+  .mm-inline.none{color:var(--sub)}
   .setcell .k em.mm{display:block;font-style:normal;font-size:11.5px;font-weight:400;color:var(--accent);margin:3px 0 0;white-space:nowrap}
   .setcell.matcell .k b{font-size:13px}
   .setcell .ref{display:block;margin-top:5px;font-size:11px;line-height:1.45;color:var(--sub);font-weight:600}
@@ -999,6 +1008,8 @@
   .fw-tbl td.sel input{background:#fff0f1;color:var(--accent)}
 
   /* ===== v63 : 로그인 게이트 · 클라우드 동기화 ===== */
+  #printExitBtn{position:fixed;right:14px;bottom:14px;z-index:100000;padding:12px 16px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-family:inherit;font-size:14px;font-weight:900;box-shadow:0 8px 22px rgba(15,23,42,.28);cursor:pointer}
+  @media print{#printExitBtn{display:none!important}}
   #auGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#f8fafc,#eef2f8);display:flex;align-items:center;justify-content:center;padding:20px}
   #auForm{width:100%;max-width:360px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.10);padding:26px 24px 20px}
   #auForm .au-h{text-align:center;margin-bottom:16px}
@@ -1016,10 +1027,11 @@
   #auForm .au-b2{flex:1;padding:8px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:11.5px;font-weight:800;color:var(--navy);cursor:pointer}
   #auForm .au-srv-b .au-i{font-size:12px;padding:8px 9px}
   #auForm .au-f{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:11px;color:var(--sub);line-height:1.6}
-  #auChip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--sub)}
-  #auChip b{color:var(--ink)}
-  #auChip small{color:var(--accent);font-weight:800}
-  #auChip button{padding:3px 8px;border:1px solid var(--line);background:#fff;border-radius:7px;font-family:inherit;font-size:10.5px;font-weight:800;color:var(--navy);cursor:pointer}
+  #auChip{display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding-left:14px;flex:0 0 auto;font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
+  #auChip b{color:var(--ink);font-size:12px}
+  #auChip small{color:var(--accent);font-weight:800;font-size:12px}
+  #auChip button{padding:3px 9px;border:1px solid var(--line);background:#fff;border-radius:7px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
+  @media(max-width:760px){#auChip{font-size:11px}#auChip button,#auChip b,#auChip small{font-size:11px}}
   .cloudbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}
   .cloudbar .cb-l{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--sub)}
   .cloudbar .cb-l b{font-size:13px;color:var(--navy)}
@@ -1113,7 +1125,7 @@
   <div class="bar">
     <img class="ci" onclick="showPage('est')" style="cursor:pointer" src="data:image/jpeg;base64,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" alt="(주)동방파스텍 DONGBANG PASTEC CO., LTD.">
     <div class="meta"><div class="t">가공비 견적 <span class="bsep">|</span> 방화문부자재사업부</div></div>
-    <div class="bar-right"><span id="auChip"></span><span class="bd-date" id="barDate"></span><span class="bd-ver" id="barVersion"></span></div>
+    <div class="bar-right"><span class="bd-date" id="barDate"></span><span class="bd-ver" id="barVersion"></span></div>
   </div>
   <div class="tabs">
     <button id="tab-est" class="on" onclick="showPage('est')">단가산정</button>
@@ -1121,6 +1133,7 @@
     <button id="tab-mat" onclick="showPage('mat')">재료비 계산</button>
     <button id="tab-mp" onclick="showPage('mp')">원자재 단가</button>
     <button id="tab-set" onclick="showPage('set')">단가산정 기준</button>
+    <span id="auChip"></span>
   </div>
 </header>
 
@@ -1147,7 +1160,7 @@
       <div class="seg sm" id="eSeg" style="margin-bottom:10px"><button class="on" data-em="plate" onclick="eSetMode('plate')">판재 <span style="font-size:11px;opacity:.6;font-weight:600;margin-left:4px">sheet</span></button><button data-em="coil" onclick="eSetMode('coil')">코일 <span style="font-size:11px;opacity:.6;font-weight:600;margin-left:4px">coil</span></button></div>
       <div class="mat-price-row">
         <label class="fld"><span class="lab">강종 <span class="pill2" id="eDensP">비중 7.89</span></span><select class="inp" id="eMat" onchange="eMatChange()"><option value="7.89" data-mk="EGI">EGI (전기아연도금) · 7.89</option><option value="7.85" data-mk="PO">PO (산세강판) · 7.85</option><option value="7.85" data-mk="HGI">HGI (용융아연도금) · 7.85</option><option value="7.85" data-mk="CR">CR (냉연) · 7.85</option><option value="7.93" data-mk="STS201">STS201 · 7.93</option><option value="7.93" data-mk="STS304">STS304 · 7.93</option><option value="7.7" data-mk="STS430">STS430 · 7.7</option></select></label>
-        <label class="fld"><span class="lab">철판단가</span><div class="suffix"><input class="inp num" id="eUnitPrice" type="text" inputmode="numeric" value="1,100" oninput="eUnitPriceInput(this)"><span class="u">원/kg</span></div></label>
+        <label class="fld matprice-fld"><span class="lab">철판단가 <em class="mm-inline" id="eMatRange"></em></span><div class="suffix"><input class="inp num" id="eUnitPrice" type="text" inputmode="numeric" value="1,100" oninput="eUnitPriceInput(this)"><span class="u">원/kg</span></div></label>
       </div>
       <div id="ePlateF">
         <div class="row4">
@@ -1414,6 +1427,7 @@
       <div class="savestate" id="saveState"></div>
       <div class="notice">※ 입력한 단가는 <b>이 기기(브라우저)에 자동 저장</b>되어 다음에도 그대로 유지됩니다. 단, 브라우저 청소(캐시·쿠키·사이트데이터 삭제)·시크릿 모드·다른 기기에서는 <b>기본값으로 초기화</b>될 수 있습니다. 중요한 단가는 아래 [설정값 백업]·[단가산정 엑셀 내보내기]로 보관하세요.</div>
       <div class="cloudbar" id="cloudBar"></div>
+      <input type="file" id="syncFileInput" accept=".json,application/json" style="display:none" onchange="syncFileOpen(this)">
       <div class="setgrid" id="setgrid"></div>
       <div id="freightPanel"></div>
       <div id="laserTbl"></div>
@@ -1481,9 +1495,11 @@
   </div>
   <section class="card">
     <div class="sec-b">
-      <div class="rec-head"><span class="t">저장된 견적 <small style="color:var(--sub);font-weight:600">· 클릭하면 상세보기 팝업</small></span><span class="cnt" id="estCnt">0건</span></div>
-      <div class="rec-sum" id="estSum"></div>
-      <div class="rec-list" id="estList"></div>
+      <div class="rec-head recfold" id="estFoldHead" onclick="estToggleFold()"><span class="t">저장된 견적 <small style="color:var(--sub);font-weight:600">· 클릭하면 펼치기 / 항목 클릭 시 상세보기</small></span><span class="cnt" id="estCnt">0건</span><span class="chev" id="estFoldChev">▼</span></div>
+      <div id="estFoldBody" style="display:none">
+        <div class="rec-sum" id="estSum"></div>
+        <div class="rec-list" id="estList"></div>
+      </div>
     </div>
   </section>
   </div>
@@ -1701,7 +1717,12 @@ function renderLaserTbl(){const el=$('laserTbl');if(!el)return;
    laserT.map((r,i)=>`<div class="mtrow"><input class="inp mt num" data-li="${i}" data-f="t" type="text" inputmode="decimal" value="${cf(r.t)}"><span class="mtx">T →</span><input class="inp mt num" data-li="${i}" data-f="p" type="text" inputmode="decimal" value="${cf(r.p)}"><span class="mtu">원</span><button class="mtdel" onclick="delLaser(${i})">×</button></div>`).join('')+
    '<button class="mtadd" onclick="addLaser()">＋ 두께 추가</button></div>';}
 function addLaser(){laserT.push({t:0,p:0});saveLaser();renderLaserTbl();}
-function delLaser(i){laserT.splice(i,1);saveLaser();renderLaserTbl();estCalc();}
+function delLaser(i){
+  const r=laserT[i];if(!r)return;
+  askConfirm(`레이저 두께단가를 삭제할까요?\n\n${cf(r.t)}T · ${cf(r.p)}원/mm`,()=>{
+    laserT.splice(i,1);saveLaser();renderLaserTbl();if(typeof renderProcStd==='function')renderProcStd();estCalc();toast('두께단가를 삭제했습니다');
+  });
+}
 
 /* 제품 가공시간 표 */
 function renderProdTbl(){const el=$('prodTbl');if(!el)return;
@@ -1709,7 +1730,12 @@ function renderProdTbl(){const el=$('prodTbl');if(!el)return;
    products.map((p,i)=>`<div class="mtrow"><input class="inp pt ptname" data-pi="${i}" data-f="n" value="${p.n}"><input class="inp pt num" data-pi="${i}" data-f="u" type="text" inputmode="numeric" value="${cf(p.u)}" style="max-width:70px"><input class="inp pt num" data-pi="${i}" data-f="pk" type="text" inputmode="numeric" value="${cf(p.pk)}" style="max-width:70px"><button class="mtdel" onclick="delProd(${i})">×</button></div>`).join('')+
    '<button class="mtadd" onclick="addProd()">＋ 제품 추가</button></div>';}
 function addProd(){products.push({n:'신규제품',u:500,pk:300});saveProducts();renderProdTbl();fillProdSelect();}
-function delProd(i){products.splice(i,1);saveProducts();renderProdTbl();fillProdSelect();estCalc();}
+function delProd(i){
+  const p=products[i];if(!p)return;
+  askConfirm(`레이저 제품을 삭제할까요?\n\n${esc(p.n||'')} · 시간당 ${cf(p.u)}개 · 포장 ${cf(p.pk)}개`,()=>{
+    products.splice(i,1);saveProducts();renderProdTbl();fillProdSelect();if(typeof renderProcStd==='function')renderProcStd();estCalc();toast('제품을 삭제했습니다');
+  });
+}
 
 /* ================= 자재단가 관리 ================= */
 const MONTHS=['1','2','3','4','5','6','7','8','9','10','11','12'];
@@ -1862,6 +1888,7 @@ function syncPurchaseMaterialPrices(notify=true,force=false){
     saveMatTable(false);
     renderMatPage();
     if(typeof renderSetGrid==='function')renderSetGrid();
+    if(typeof renderEMatRange==='function')renderEMatRange();
     estCalc();
   }else if($('mpUpdated'))$('mpUpdated').textContent='업데이트 일시 : '+(matUpdated||'-');
   if(notify){
@@ -1918,13 +1945,13 @@ function renderMatPage(){const el=$('mpBody');if(!el)return;
       ${rows.map((r,ri)=>`<tr><td><input class="mpi mpv" data-k="${k}" data-ri="${ri}" value="${r.v||''}"></td>${r.m.map((v,mi)=>`<td><input class="mpi mpm num${(colMin[mi]!=null&&num(v)===colMin[mi])?' mn':''}" data-k="${k}" data-ri="${ri}" data-mi="${mi}" inputmode="numeric" value="${cf(v)}"></td>`).join('')}</tr>`).join('')}
       </tbody></table></div>
       <div id="mpchart_${k}">${sparkline(k)}</div>
-      <button class="mtadd" onclick="addVendor('${k}')">＋ 업체 추가</button>
+
     </div>`;}).join('');
 }
 function quoteAuto(k){const r=(typeof lastMatRange==='function')?lastMatRange(k):null;return r?r.max:0;}
 function quoteAutoTag(k){const r=(typeof lastMatRange==='function')?lastMatRange(k):null;if(!r)return '';const cur=num(matQuote[k]);return `<em class="auto">${r.month}월 입고 최고가 ${cf(r.max)}${cur>0&&cur!==r.max?' (직접입력 적용중)':''}</em>`;}
 function quoteShown(k){const v=num(matQuote[k]);return v>0?v:(quoteAuto(k)||'');}
-function applyMat(k){const q=num(matQuote[k])||quoteAuto(k);let v,src;if(q>0){v=q;src=num(matQuote[k])>0?'견적 적용가':'마지막 매입월 최고가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();renderSetGrid();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
+function applyMat(k){const q=num(matQuote[k])||quoteAuto(k);let v,src;if(q>0){v=q;src=num(matQuote[k])>0?'견적 적용가':'마지막 매입월 최고가';}else{const lt=latestMat(k);if(!lt){toast(k+' : 견적 적용가 또는 월 단가를 입력하세요');return;}v=lt.v;src=lt.month+'월 단가';}prices['mat'+k]=v;savePrices();syncPriceInputs();renderSetGrid();renderSaveState();if(eMatKey()===k)eSyncMatPrice();if(scMatKey('pMat')===k)scSyncPlatePrice();saveMatTable(true);renderMatPage();renderSetGrid();renderEMatRange();eCalc();toast(k+' 자재단가 '+cf(v)+'원 적용 ('+src+')');}
 function addVendor(k){if(!matTable[matYear][k])matTable[matYear][k]=[];matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function delVendor(k,ri){matTable[matYear][k].splice(ri,1);if(!matTable[matYear][k].length)matTable[matYear][k].push({v:'',m:Array(12).fill('')});saveMatTable(true);renderMatPage();}
 function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){return;}if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}
@@ -1940,7 +1967,7 @@ function mpImport(input){const f=input&&input.files&&input.files[0];if(!f){retur
   r.readAsArrayBuffer(f);
 }
 function avgMonth(rows,mi){let s=0,c=0;(rows||[]).forEach(r=>{const v=num(r.m[mi]);if(v>0){s+=v;c++;}});return c?s/c:null;}
-function mpExport(){if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}const head=['연도','강종','업체명',...MONTHS.map(m=>m+'월')];const rows=[head];Y_LIST.forEach(y=>{['고철',...MATERIALS.map(m=>m.k)].forEach(k=>{(matTable[y][k]||[]).forEach(r=>rows.push([y,k,r.v,...r.m.map(v=>num(v)||'')]));});});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'자재단가');const xrows=[['항목','추가금액','비고'],...matExtra.map(r=>[r.n,num(r.amt)||'',r.note||''])];const xws=XLSX.utils.aoa_to_sheet(xrows);xws['!cols']=[{wch:16},{wch:12},{wch:32}];XLSX.utils.book_append_sheet(wb,xws,'추가금액');XLSX.writeFile(wb,`자재단가_${new Date().toISOString().slice(0,10)}.xlsx`);toast('자재단가를 엑셀로 저장했습니다');}
+function mpExport(){if(!window.XLSX){toast('엑셀 모듈 로드 실패');return;}const head=['연도','강종','업체명',...MONTHS.map(m=>m+'월')];const rows=[head];Y_LIST.forEach(y=>{['고철',...MATERIALS.map(m=>m.k)].forEach(k=>{(matTable[y][k]||[]).forEach(r=>rows.push([y,k,r.v,...r.m.map(v=>num(v)||'')]));});});const ws=XLSX.utils.aoa_to_sheet(rows);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'자재단가');const xrows=[['항목','추가금액','비고'],...matExtra.map(r=>[r.n,num(r.amt)||'',r.note||''])];const xws=XLSX.utils.aoa_to_sheet(xrows);xws['!cols']=[{wch:16},{wch:12},{wch:32}];XLSX.utils.book_append_sheet(wb,xws,'추가금액');xlsxSave(wb,`material_price_${new Date().toISOString().slice(0,10)}.xlsx`);toast('자재단가를 엑셀로 저장했습니다');}
 document.addEventListener('input',e=>{const t=e.target;if(!t.classList)return;if(t.classList.contains('mpv')){matTable[matYear][t.dataset.k][+t.dataset.ri].v=t.value;saveMatTable(true);}else if(t.classList.contains('mpm')){matTable[matYear][t.dataset.k][+t.dataset.ri].m[+t.dataset.mi]=t.value.replace(/,/g,'');saveMatTable(true);const w=document.getElementById('mpchart_'+t.dataset.k);if(w)w.innerHTML=sparkline(t.dataset.k);}else if(t.classList.contains('mpq')){matQuote[t.dataset.k]=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexamt')){matExtra[+t.dataset.ri].amt=t.value.replace(/,/g,'');saveMatTable(true);}else if(t.classList.contains('mpexnote')){matExtra[+t.dataset.ri].note=t.value;saveMatTable(true);}});
 
 /* ================= 후공정 카드 ================= */
@@ -2020,9 +2047,22 @@ function renderSetGrid(){const g=$('setgrid');g.innerHTML='';
   TRUCKS.filter(t=>t.custom).forEach(t=>{const c=document.createElement('div');c.className='setcell';c.innerHTML=`<span class="k"><b>${t.label}</b> · 편도</span><div class="suffix"><input class="inp num" data-price="freight_${t.t}" type="text" inputmode="decimal" value="${cf(prices['freight_'+t.t]||0)}"><span class="u">원</span></div><button class="mtdel" onclick="delCustomFreight('${t.t}')" style="margin-left:6px">×</button>`;g.appendChild(c);});
 }
 function addCustomPost(){const nm=(prompt('추가할 후공정명을 입력하세요')||'').trim();if(!nm)return;const pr=num(prompt('개당 단가(원)','0'));const k='cust'+(++custSeq);prices[k]=pr;POSTS.push({k,nm,sub:'개당 단가',mode:'piece',rate:k,rateLab:'개당 단가',custom:true});state.posts[k]={on:false,cnt:1,w:0,inn:100,truck:'5',load:5000};savePrices();saveCustom();renderPosts();renderSetGrid();renderSaveState();estCalc();toast('후공정 ['+nm+'] 추가 · 견적 후공정에 비활성 상태로 등록되었습니다');}
-function delCustomPost(k){const i=POSTS.findIndex(p=>p.k===k);if(i<0)return;POSTS.splice(i,1);delete state.posts[k];delete prices[k];savePrices();saveCustom();renderPosts();renderSetGrid();estCalc();}
+function delCustomPost(k){
+  const i=POSTS.findIndex(p=>p.k===k);if(i<0)return;
+  const nm=POSTS[i].nm||'';
+  askConfirm(`추가한 후공정을 삭제할까요?\n\n${esc(nm)} · 개당 ${cf(prices[POSTS[i].rate]||0)}원\n\n견적의 해당 후공정도 함께 사라집니다.`,()=>{
+    POSTS.splice(i,1);delete state.posts[k];delete prices[k];savePrices();saveCustom();renderPosts();renderSetGrid();estCalc();toast('후공정 ['+nm+']을 삭제했습니다');
+  });
+}
 function addCustomFreight(){const label=(prompt('추가할 차종/운임명 (예: 2.5톤)')||'').trim();if(!label)return;const fare=num(prompt('편도 운임(원)','0'));const t='fc'+(++custSeq);prices['freight_'+t]=fare;TRUCKS.push({t,label,custom:true});savePrices();saveCustom();renderPosts();renderSetGrid();renderSaveState();estCalc();toast('물류 운임 ['+label+'] 추가 (후공정 물류비에 연동)');}
-function delCustomFreight(t){const i=TRUCKS.findIndex(x=>x.t===t);if(i<0)return;TRUCKS.splice(i,1);delete prices['freight_'+t];if(state.posts.freight.truck===t)state.posts.freight.truck='5';savePrices();saveCustom();renderPosts();renderSetGrid();estCalc();}
+function delCustomFreight(t){
+  const i=TRUCKS.findIndex(x=>x.t===t);if(i<0)return;
+  const lb=TRUCKS[i].label||'';
+  askConfirm(`추가한 물류 운임을 삭제할까요?\n\n${esc(lb)} · ${cf(prices['freight_'+t]||0)}원`,()=>{
+    TRUCKS.splice(i,1);delete prices['freight_'+t];if(state.posts.freight.truck===t)state.posts.freight.truck='5';
+    savePrices();saveCustom();renderPosts();renderSetGrid();renderFreightCalc();estCalc();toast('물류 운임 ['+lb+']을 삭제했습니다');
+  });
+}
 
 /* ================= v55 : 강종 최근 매입 최저/최고 ================= */
 function lastMatRange(k){
@@ -2162,7 +2202,7 @@ renderSetGrid();renderFreightCalc();
 function backupSettings(){
   const data={v:2,exportedAt:new Date().toISOString(),prices:prices,matTable:matTable,matQuote:matQuote,matUpdated:matUpdated,laserT:(typeof laserT!=='undefined'?laserT:null),products:(typeof products!=='undefined'?products:null),custom:{posts:POSTS.filter(p=>p.custom),trucks:TRUCKS.filter(t=>t.custom),seq:custSeq},freight:frCfg};
   const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
-  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=`동방_단가설정_${new Date().toISOString().slice(0,10)}.json`;a.click();URL.revokeObjectURL(a.href);
+  saveBlobFile(blob,`dongbang_price_settings_${new Date().toISOString().slice(0,10)}.json`,'application/json');
   toast('설정값(원자재단가+단가산정)을 백업했습니다');
 }
 function restoreSettings(input){const f=input.files&&input.files[0];if(!f)return;const r=new FileReader();
@@ -2179,7 +2219,7 @@ function restoreSettings(input){const f=input.files&&input.files[0];if(!f)return
   }catch(e){console.error(e);toast('불러오기 실패: 올바른 백업 파일이 아닙니다');}input.value='';};
   r.readAsText(f);
 }
-function exportPrices(){const head=['항목','단가','단위'];const rows=SET_ROWS.concat(FREIGHT_ROWS).filter(r=>r.key).map(r=>[r.nm+(r.sub?' ('+r.sub+')':''),num(prices[r.key]),r.u]);POSTS.filter(p=>p.custom).forEach(p=>rows.push([p.nm+' (사용자 추가)',num(prices[p.rate]),'원/개']));TRUCKS.filter(t=>t.custom).forEach(t=>rows.push(['물류 운임 '+t.label+' (사용자 추가)',num(prices['freight_'+t.t]),'원']));FR_REGIONS.forEach(g=>FR_TRUCKS.forEach(t=>rows.push(['운임표 '+g.n+' · '+t.label,num((frCfg.tbl[g.k]||{})[t.t]),'원'])));const stamp=new Date().toISOString().slice(0,10);if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=[{wch:24},{wch:12},{wch:8}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'단가표');XLSX.writeFile(wb,`프레스단가표_${stamp}.xlsx`);toast('단가표를 엑셀로 저장했습니다');}else toast('엑셀 모듈 로드 실패');}
+function exportPrices(){const head=['항목','단가','단위'];const rows=SET_ROWS.concat(FREIGHT_ROWS).filter(r=>r.key).map(r=>[r.nm+(r.sub?' ('+r.sub+')':''),num(prices[r.key]),r.u]);POSTS.filter(p=>p.custom).forEach(p=>rows.push([p.nm+' (사용자 추가)',num(prices[p.rate]),'원/개']));TRUCKS.filter(t=>t.custom).forEach(t=>rows.push(['물류 운임 '+t.label+' (사용자 추가)',num(prices['freight_'+t.t]),'원']));FR_REGIONS.forEach(g=>FR_TRUCKS.forEach(t=>rows.push(['운임표 '+g.n+' · '+t.label,num((frCfg.tbl[g.k]||{})[t.t]),'원'])));const stamp=new Date().toISOString().slice(0,10);if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=[{wch:24},{wch:12},{wch:8}];const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'단가표');xlsxSave(wb,`price_table_${stamp}.xlsx`);toast('단가표를 엑셀로 저장했습니다');}else toast('엑셀 모듈 로드 실패');}
 
 /* ================= 계산 ================= */
 function postCost(p,ctx){
@@ -2466,7 +2506,21 @@ function updateEstEditButtons(){
   if(bNew)bNew.innerHTML=editingEstId?'＋ 수정하여<br>새로 저장':'＋ 견적 저장';
   if(bUpd)bUpd.style.display=editingEstId?'block':'none';
 }
-function estDelete(id){estDB=estDB.filter(r=>r.id!==id);saveEstDB();estRender();}
+var estFoldOpen=(function(){try{return localStorage.getItem('dptEstFold')==='1';}catch(e){return false;}})();
+function estToggleFold(force){
+  estFoldOpen=(force===undefined)?!estFoldOpen:!!force;
+  try{localStorage.setItem('dptEstFold',estFoldOpen?'1':'0');}catch(e){}
+  const b=$('estFoldBody'),h=$('estFoldHead');
+  if(b)b.style.display=estFoldOpen?'':'none';
+  if(h)h.classList.toggle('open',estFoldOpen);
+}
+function estDelete(id){
+  const r=estDB.find(x=>x.id===id);
+  const nm=r?((r.pname||'')+((r.product&&r.product!=='-'&&r.product!==r.pname)?(' / '+r.product):'')):'';
+  askConfirm(`저장된 견적을 삭제할까요?\n\n${nm}${r?('\n개당 '+won(r.unit)+'원 · '+won(r.qty)+'개 · 총 '+won(r.total)+'원'):''}\n\n삭제하면 되돌릴 수 없습니다.`,()=>{
+    estDB=estDB.filter(x=>x.id!==id);saveEstDB();estRender();toast('견적을 삭제했습니다');
+  });
+}
 function estRender(){
   if($('estCnt'))$('estCnt').textContent=estDB.length+'건';
   const sumEl=$('estSum'),list=$('estList');
@@ -2522,8 +2576,38 @@ function estRows(){
 function estExport(){
   if(!estDB.length){toast('저장된 견적이 없습니다');return;}
   const {head,rows}=estRows(),stamp=new Date().toISOString().slice(0,10);
-  if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map(h=>({wch:Math.max(9,h.length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'견적');XLSX.writeFile(wb,`프레스견적_${stamp}.xlsx`);toast('엑셀로 저장했습니다');}
-  else{const csv=[head,...rows].map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}));a.download=`프레스견적_${stamp}.csv`;document.body.appendChild(a);a.click();a.remove();toast('CSV로 저장했습니다');}
+  if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map(h=>({wch:Math.max(9,h.length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,'견적');xlsxSave(wb,`quote_list_${stamp}.xlsx`);toast('엑셀로 저장했습니다');}
+  else{const csv=[head,...rows].map(r=>r.map(v=>{const s=String(v??'');return /[",\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s;}).join(',')).join('\r\n');saveBlobFile(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}),`quote_list_${stamp}.csv`,'text/csv');toast('CSV로 저장했습니다');}
+}
+
+/* ================= 파일 저장 공통 (PC·태블릿·모바일) ================= */
+function isTouchOS(){return /iPad|iPhone|iPod|Android/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);}
+async function saveBlobFile(blob,filename,mime){
+  const type=mime||blob.type||'application/octet-stream';
+  try{
+    if(isTouchOS()&&navigator.share&&typeof File!=='undefined'){
+      const file=new File([blob],filename,{type});
+      if(!navigator.canShare||navigator.canShare({files:[file]})){
+        await navigator.share({files:[file],title:filename});
+        toast('공유 시트에서 "파일에 저장"을 선택하세요');
+        return 'share';
+      }
+    }
+  }catch(e){ if(e&&e.name==='AbortError')return 'abort'; }
+  try{
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');a.href=url;a.download=filename;a.rel='noopener';
+    document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),5000);
+    return 'download';
+  }catch(e){
+    try{const url=URL.createObjectURL(blob);window.open(url,'_blank');return 'open';}catch(e2){toast('파일 저장에 실패했습니다');return 'fail';}
+  }
+}
+function xlsxSave(wb,filename){
+  if(!window.XLSX){toast('엑셀 모듈을 불러오지 못했습니다 (인터넷 연결 확인)');return Promise.resolve('fail');}
+  const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+  return saveBlobFile(new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),filename,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 }
 
 /* ================= 현재 견적 → 전체 항목·선택목록·조건부서식 포함 엑셀 (v67) ================= */
@@ -2882,13 +2966,12 @@ async function estExportCalcSheet(){
         xml=(at>=0)?(xml.slice(0,at)+blk+xml.slice(at)):xml.replace('</worksheet>',blk+'</worksheet>');
         zip.file(path,xml);
         const blob=await zip.generateAsync({type:'blob',mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
-        const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fname;document.body.appendChild(a);a.click();
-        setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1500);
+        await saveBlobFile(blob,fname,'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
         done=true;
       }
     }catch(e){console.warn('선택목록/조건부서식 적용 실패',e);}
   }
-  if(!done)XLSX.writeFile(wb,fname);
+  if(!done)await xlsxSave(wb,fname);
   toast('견적 산정 내역을 엑셀로 저장했습니다'+(done?' (선택목록·조건부서식 포함)':'')+(styled?'':' · 색상 제외'));
 }
 function estText(){let s=`[프레스 가공비 견적] ${estDB.length}건\n`;estDB.forEach((r,i)=>{const d=normalizeEstDetail(r);s+=`\n${i+1}. ${r.pname} / 제품 ${d.product}${d.spec?' / 규격·비고 '+d.spec:''} / ${won(r.qty)}개 → 개당 ${won(r.unit)}원 / 총 ${won(r.total)}원`;});return s;}
@@ -2912,7 +2995,16 @@ function scMatName(id){const s=$(id);const t=s.options[s.selectedIndex].text;ret
 let eMode='plate',EM={one:0,unit:0,cost:0,t:0,w:0,l:0,key:'EGI'};
 function eMatKey(){const o=$('eMat').options[$('eMat').selectedIndex];return o?(o.dataset.mk||''):'';}
 function eDens(){const o=$('eMat').options[$('eMat').selectedIndex];return o?(parseFloat(o.value)||0):0;}
-function eSyncMatPrice(){const el=$('eUnitPrice'),k=eMatKey();if(el)el.value=cf(k?matPrice(k):num(prices.matkg));}
+function eSyncMatPrice(){const el=$('eUnitPrice'),k=eMatKey();if(el)el.value=cf(k?matPrice(k):num(prices.matkg));renderEMatRange();}
+function renderEMatRange(){
+  const el=$('eMatRange');if(!el)return;
+  const k=eMatKey();let r=null;
+  try{r=(typeof lastMatRange==='function'&&k)?lastMatRange(k):null;}catch(e){}
+  if(!r){el.className='mm-inline none';el.textContent=k?'매입이력 없음':'';el.title='';return;}
+  el.className='mm-inline';
+  el.textContent=`${r.month}월 최저 ${cf(r.min)} · 최고 ${cf(r.max)}`;
+  el.title=`${r.year}년 ${r.month}월 매입 · 업체 ${r.n}곳 · 최저 ${cf(r.min)}(${r.minVen||'-'}) / 최고 ${cf(r.max)}(${r.maxVen||'-'})`;
+}
 function eMatChange(){eSyncMatPrice();eCalc();}
 function eUnitPriceInput(el){const k=eMatKey(),v=num(el.value);if(k){prices['mat'+k]=v;savePrices();renderSetGrid();renderSaveState();}eCalc();}
 function eSetMode(m){eMode=m;$('ePlateF').classList.toggle('hidden',m!=='plate');$('eCoilF').classList.toggle('hidden',m!=='coil');$('eSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.em===m));eCalc();}
@@ -3022,7 +3114,7 @@ function scRows(type){
     return {head,rows,name:'철판중량_판재'};}
   else{const recs=scDB.coil,head=['일시','강종','비중','계산방식','두께(t,mm)','폭(mm)','외경OD(mm)','내경ID(mm)','길이(m)','중량(kg)','톤(ton)'];const rows=recs.map(r=>[r.time,r.mat,r.dens,r.method==='od'?'외경/내경':'길이',r.t,r.w,r.od,r.id,Math.round(r.lengthM*10)/10,Math.round(r.weight*10)/10,Math.round(r.ton*1000)/1000]);return {head,rows,name:'철판중량_코일'};}
 }
-function scExport(){const type=scMode;if(!scDB[type].length){toast('저장된 데이터가 없습니다');return;}const {head,rows,name}=scRows(type),stamp=new Date().toISOString().slice(0,10);if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map(h=>({wch:Math.max(10,h.length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==='plate'?'판재':'코일');XLSX.writeFile(wb,`${name}_${stamp}.xlsx`);toast('엑셀로 저장했습니다');}else{const csv=[head,...rows].map(r=>r.join(',')).join('\r\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv'}));a.download=`${name}_${stamp}.csv`;a.click();toast('CSV로 저장했습니다');}}
+function scExport(){const type=scMode;if(!scDB[type].length){toast('저장된 데이터가 없습니다');return;}const {head,rows,name}=scRows(type),stamp=new Date().toISOString().slice(0,10);if(window.XLSX){const ws=XLSX.utils.aoa_to_sheet([head,...rows]);ws['!cols']=head.map(h=>({wch:Math.max(10,h.length+2)}));const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==='plate'?'판재':'코일');xlsxSave(wb,`weight_calc_${stamp}.xlsx`);toast('엑셀로 저장했습니다');}else{const csv=[head,...rows].map(r=>r.join(',')).join('\r\n');saveBlobFile(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'}),`weight_calc_${stamp}.csv`,'text/csv');toast('CSV로 저장했습니다');}}
 function scTextOut(type){let s=`[철판 중량] ${type==='plate'?'판재':'코일'} ${scDB[type].length}건\n`;scDB[type].forEach((r,i)=>{if(type==='plate')s+=`\n${i+1}. ${r.mat} ${r.t}t ${fmt(r.w,0)}×${fmt(r.l,0)} ×${r.qty}매 → ${fmt(r.total,1)}kg`;else s+=`\n${i+1}. ${r.mat} ${r.t}t → ${fmt(r.weight,1)}kg`;});return s;}
 async function scShare(){const type=scMode;if(!scDB[type].length){toast('저장된 데이터가 없습니다');return;}try{if(window.XLSX){const {head,rows,name}=scRows(type);const ws=XLSX.utils.aoa_to_sheet([head,...rows]);const wb=XLSX.utils.book_new();XLSX.utils.book_append_sheet(wb,ws,type==='plate'?'판재':'코일');const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});const file=new File([new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'})],`${name}_${new Date().toISOString().slice(0,10)}.xlsx`);if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'철판 중량',text:scTextOut(type)});return;}}}catch(e){if(e&&e.name==='AbortError')return;}try{if(navigator.share){await navigator.share({title:'철판 중량',text:scTextOut(type)});return;}}catch(e){if(e&&e.name==='AbortError')return;}try{await navigator.clipboard.writeText(scTextOut(type));toast('클립보드에 복사했습니다');}catch(e){toast('공유 미지원 환경입니다');}}
 function scClear(){const type=scMode;if(!scDB[type].length){toast('저장된 데이터가 없습니다');return;}askConfirm((type==='plate'?'판재':'코일')+' 저장 데이터 '+scDB[type].length+'건을 모두 삭제할까요?',()=>{scDB[type]=[];scSaveDB();scRender();toast('초기화되었습니다');});}
@@ -3886,20 +3978,35 @@ function reportFileTitle(prefix){
 function launchReportPrint(mode,fileTitle,cleanup){
   const oldTitle=document.title;
   let finished=false;
+  const onVis=()=>{if(!document.hidden)setTimeout(finish,400);};
+  const onFocus=()=>setTimeout(finish,600);
   const finish=()=>{
     if(finished)return;
     finished=true;
     document.title=oldTitle;
     window.removeEventListener('afterprint',finish);
+    document.removeEventListener('visibilitychange',onVis);
+    window.removeEventListener('focus',onFocus);
+    const ex=$('printExitBtn');if(ex)ex.remove();
     if(cleanup)cleanup();
   };
+  window.__printFinish=finish;
   if(mode==='pdf'){
     document.title=fileTitle;
-    toast('인쇄 창에서 대상을 “PDF로 저장” · 여백 기본 · 배경 그래픽 체크');
+    toast(isTouchOS()?'인쇄 화면에서 “PDF로 저장/공유”를 선택하세요':'인쇄 창에서 대상을 “PDF로 저장” · 여백 기본 · 배경 그래픽 체크');
+  }
+  /* 태블릿·모바일은 afterprint 가 오지 않는 경우가 있어 되돌아오기 버튼과 복귀 감지를 함께 둔다 */
+  if(!$('printExitBtn')){
+    const b=document.createElement('button');
+    b.id='printExitBtn';b.className='noprint';b.textContent='✕ 인쇄 화면 닫기';
+    b.onclick=()=>finish();
+    document.body.appendChild(b);
   }
   window.addEventListener('afterprint',finish);
-  setTimeout(()=>window.print(),100);
-  setTimeout(finish,120000);
+  document.addEventListener('visibilitychange',onVis);
+  window.addEventListener('focus',onFocus);
+  setTimeout(()=>{try{window.print();}catch(e){toast('인쇄를 시작하지 못했습니다');finish();}},120);
+  setTimeout(finish,180000);
 }
 function fitReportToOnePage(area){
   const fit=area.querySelector('.rpt-fit');
@@ -4182,9 +4289,9 @@ async function cloudPull(silent){
   try{
     const K=encodeURIComponent(syncKey()),T=encodeURIComponent(AU.token);
     const res=await cloudTry([
-      ()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&key='+K+'&token='+T+'&_t='+Date.now(),{},40000),
-      cloudPost({action:'get',key:syncKey(),token:AU.token}),
-      cloudPost({action:'load',key:syncKey(),token:AU.token})
+      ()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&ns='+encodeURIComponent(CLOUD_NS)+'&key='+K+'&token='+T+'&_t='+Date.now(),{},40000),
+      cloudPost({action:'get',ns:CLOUD_NS,key:syncKey(),token:AU.token}),
+      cloudPost({action:'load',ns:CLOUD_NS,key:syncKey(),token:AU.token})
     ]);
     if(res.err){
       cloudCfg.lastErr=res.err;
@@ -4194,7 +4301,8 @@ async function cloudPull(silent){
     }
     const d=res.d;
     const root=(d&&d.data&&typeof d.data==='object')?d.data:d;
-    const mine=root&&root[CLOUD_NS];
+    /* 전용 백엔드는 data 가 곧 pressEstV1 내용, 공용 문서는 data[pressEstV1] */
+    const mine=(root&&root[CLOUD_NS])?root[CLOUD_NS]:((root&&(root.prices||root.mat||root.estDB))?root:null);
     if(!mine){
       cloudCfg.lastErr='';
       if(!silent)toast('서버에 저장된 단가산정 자료가 없습니다 · [서버에 올리기]로 먼저 저장하세요');
@@ -4220,8 +4328,8 @@ async function cloudPush(silent){
     const payload=cloudPayload();
     const data={};data[CLOUD_NS]=payload;
     const res=await cloudTry([
-      cloudPost({action:'save',key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')}),
-      cloudPost({action:'set',key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')})
+      cloudPost({action:'save',ns:CLOUD_NS,key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')}),
+      cloudPost({action:'set',ns:CLOUD_NS,key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')})
     ]);
     if(res.err){
       cloudCfg.lastErr=res.err;
@@ -4255,13 +4363,40 @@ async function cloudDiag(){
       out.push(name+' → HTTP '+r.status+' · '+(d?(d.error?('오류: '+d.error):(d.ok===false?'ok:false':'정상 JSON'+(d.data?' (data 있음)':''))):'JSON 아님: '+String(tx).replace(/\s+/g,' ').slice(0,60)));
     }catch(e){out.push(name+' → 실패: '+((e&&e.message)||e));}
   };
-  await probe('GET action=get',()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&key='+K+'&token='+T+'&_t='+Date.now(),{},25000));
-  await probe('POST action=get',cloudPost({action:'get',key:syncKey(),token:AU.token}));
-  await probe('POST action=load',cloudPost({action:'load',key:syncKey(),token:AU.token}));
+  await probe('GET action=ping',()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=ping&ns='+encodeURIComponent(CLOUD_NS)+'&key='+K+'&_t='+Date.now(),{},20000));
+  await probe('GET action=get',()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&ns='+encodeURIComponent(CLOUD_NS)+'&key='+K+'&token='+T+'&_t='+Date.now(),{},25000));
+  await probe('POST action=get',cloudPost({action:'get',ns:CLOUD_NS,key:syncKey(),token:AU.token}));
+  await probe('POST action=load',cloudPost({action:'load',ns:CLOUD_NS,key:syncKey(),token:AU.token}));
   const txt=('서버: '+syncUrl()+'\n키: '+syncKey()+'\n계정: '+(AU.name||AU.id)+' ('+(AU.role||'')+')\n\n')+out.join('\n');
   cloudCfg.lastErr='';renderCloudBar();
   try{await navigator.clipboard.writeText(txt);}catch(e){}
   askConfirm('클라우드 동기화 진단 결과 (클립보드 복사됨)\n\n'+txt,()=>{});
+}
+/* ===== 서버 없이도 되는 파일 동기화 (PC ↔ 태블릿) ===== */
+function syncFileSave(){
+  try{
+    const payload=cloudPayload();
+    payload.by=(AU&&AU.name)||(AU&&AU.id)||'사용자';
+    const blob=new Blob([JSON.stringify(payload)],{type:'application/json'});
+    const d=new Date(),p=n=>String(n).padStart(2,'0');
+    saveBlobFile(blob,`press_est_sync_${d.getFullYear()}${p(d.getMonth()+1)}${p(d.getDate())}.json`,'application/json');
+    toast('동기화 파일을 저장했습니다 · 태블릿에서 [📥 동기화 파일 열기]로 불러오세요');
+  }catch(e){toast('동기화 파일 저장 실패 — '+((e&&e.message)||e));}
+}
+function syncFilePick(){const el=$('syncFileInput');if(el)el.click();}
+function syncFileOpen(input){
+  const f=input&&input.files&&input.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const d=JSON.parse(r.result);
+      if(!d||typeof d!=='object'||!(d.prices||d.mat||d.estDB))throw new Error('동기화 파일 형식이 아닙니다');
+      cloudApply(d);
+      toast('동기화 파일을 적용했습니다'+(d.by?(' · '+d.by):'')+(d.updatedAt?(' · '+new Date(d.updatedAt).toLocaleString('ko-KR')):''));
+    }catch(e){toast('불러오기 실패 — '+((e&&e.message)||e));}
+    input.value='';
+  };
+  r.readAsText(f);
 }
 function cloudToggleAuto(){cloudCfg.auto=!cloudCfg.auto;cloudSaveCfg();renderCloudBar();toast('자동 동기화 '+(cloudCfg.auto?'ON':'OFF'));}
 function renderCloudBar(msg){
@@ -4277,6 +4412,8 @@ function renderCloudBar(msg){
       <button onclick="cloudPull()">⤓ 서버에서 받기</button>
       <button onclick="cloudDiag()">진단</button>
       <button onclick="cloudSetServer()">⚙ 서버</button>
+      <button onclick="syncFileSave()">📤 동기화 파일 저장</button>
+      <button onclick="syncFilePick()">📥 동기화 파일 열기</button>
       ${on?'<button onclick="auLogout()">로그아웃</button>':'<button class="pri" onclick="auShowGate()">🔐 로그인</button>'}
     </div>`;
 }
@@ -4310,10 +4447,10 @@ renderProcStd();
 syncPriceInputs();
 $('cID').value='508';
 selectTon('160');
-loadEstDB();estRender();
+loadEstDB();estRender();estToggleFold(estFoldOpen);
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-12 · v68';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-13 · v73';})();
 formatAllNums();
 estCalc();
 </script>
