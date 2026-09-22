@@ -101,6 +101,13 @@
   .post-inline .suffix .inp{padding:11px 12px;font-size:14.5px}
   .post-inline .cfld input:not(.seg button){max-width:135px}
   .post-inline .seg.sm{margin:0}
+  .pack-brk{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;padding:8px 11px;border:1px dashed var(--line);border-radius:9px;background:#f7f9fc;font-size:12px}
+  .pack-brk span{display:inline-flex;gap:5px;align-items:baseline}
+  .pack-brk em{font-style:normal;color:var(--sub);font-weight:600}
+  .pack-brk b{color:var(--ink);font-weight:800}
+  .pack-brk .pb-tot b{color:var(--accent)}
+  .pack-brk .pb-note{color:var(--sub);font-size:11px;margin-left:auto}
+  .pack-brk .pb-warn{color:var(--accent);font-weight:700}
   .post-inline .seg.sm{align-items:stretch}
   .post-inline .seg.sm button{min-height:46px;padding:0 18px;font-size:13.5px;white-space:nowrap;display:flex;align-items:center;justify-content:center}
   .post-inline .cfld>span{font-size:11px}
@@ -1620,7 +1627,7 @@ function showPage(p){
 const TON=[{key:'300',label:'300톤',charge:24000,spm:25},{key:'250',label:'250톤',charge:21000,spm:30},{key:'200',label:'200톤',charge:18000,spm:35},{key:'160',label:'160톤',charge:15000,spm:40},{key:'80',label:'80톤',charge:11000,spm:50},{key:'45',label:'45톤↓',charge:8000,spm:60}];
 const DEFAULT_PRICES={margin:15,wage:37000,matkg:1100,
  matEGI:1100,matHGI:1100,matPO:1030,matCR:1300,matSTS201:1400,matSTS304:3800,matSTS430:1600,
- band:100,punch:100,bend:200,tap:50,csk:100,spot:100,plate:400,asm:80,pack_mat:1500,pack_pallet:35000,pack_wrap:5,freight_5:220000,freight_35:160000,freight_12:90000,'freight_2.5':120000,freight_11:350000,freight_25:500000,
+ band:100,punch:100,bend:200,tap:50,csk:100,spot:100,plate:400,asm:80,pack_mat:1500,pack_pallet:35000,pack_wrap:5,pack_reuse:30,pack_label:0,pack_rust:0,freight_5:220000,freight_35:160000,freight_12:90000,'freight_2.5':120000,freight_11:350000,freight_25:500000,
  defect:0.2,scrap:400,insp:20,
  formBase:100,form10:1.5,gas:137,cut:100,pScrapW:0,pScrapL:4,lScrapW:10,lScrapL:10};
 const MATERIALS=[{k:'EGI',d:7.89},{k:'HGI',d:7.85},{k:'PO',d:7.85},{k:'CR',d:7.85},{k:'STS201',d:7.93},{k:'STS304',d:7.93},{k:'STS430',d:7.7}];
@@ -1641,13 +1648,36 @@ function postFormula(p){const s=state.posts[p.k];
     case'count':return `${p.cntLab}(${cf(s.cnt)}${p.cntU}) × ${p.rateLab}(${won(prices[p.rate])}원)`;
     case'kg':return `중량(${cf(s.w)}kg) × ${p.rateLab}(${won(prices[p.rate])}원)`;
     case'piece':return `${p.rateLab}(${won(prices[p.rate])}원)`;
-    case'pack':{const pk=currentPack()||0;return `(파렛트(${won(prices.pack_pallet)}원) ÷ 30 + 포장자재(${won(prices.pack_mat)}원)) ÷ 포장수량(${cf(pk)}개) + 랩(${won(prices.pack_wrap)}원)`;}
+    case'pack':{const b=packBreakdown();return `포장자재·라벨 ${won2(b.mat)} + 파렛트 ${won2(b.pallet)} + 랩 ${won2(b.wrap)}`+(b.rust?` + 방청 ${won2(b.rust)}`:'')+(b.labor?` + 작업 ${won2(b.labor)}`:'')+` (입수 ${cf(b.inn)}개 · 파렛트당 ${cf(b.perPallet)}개)`;}
     case'freight':return `운임(${won(prices['freight_'+s.truck])}원) ÷ 적재(${cf(s.load)}개)`;
     case'defect':return `가공원가 × 불량률(${cf(prices.defect)}%)`;
     case'scrap':return `발생중량(${cf(s.w)}kg) × 단가(${won(prices.scrap)}원) 차감`;
   }return p.sub;
 }
 function currentPack(){if(state.proc==='laser'){const p=products.find(x=>x.n===($('prod')&&$('prod').value));if(p)return num(p.pk);}return num($('packInn')?$('packInn').value:0)||state.posts.pack.inn;}
+function won2(v){v=Number(v)||0;return (Math.abs(v)<10&&v!==0?(Math.round(v*100)/100).toLocaleString():won(v))+'원';}
+/* 포장비 (제품 1개당) = (포장자재+라벨)÷입수 + 파렛트÷사용횟수÷(입수×적재단위) + 랩·밴딩 + 방청×중량 + 임율×작업초÷3600÷입수 */
+function packBreakdown(){
+  const s=(state.posts&&state.posts.pack)||{};
+  const inn=num(currentPack())||0, upp=Math.max(1,num(s.upp)||1), reuse=Math.max(1,num(prices.pack_reuse)||1);
+  const perPallet=inn*upp;
+  if(inn<=0)return {inn:0,upp,perPallet:0,mat:0,pallet:0,wrap:0,rust:0,labor:0,total:0};
+  const mat=(num(prices.pack_mat)+num(prices.pack_label))/inn;
+  const pallet=num(prices.pack_pallet)/reuse/perPallet;
+  const wrap=num(prices.pack_wrap);
+  const kg=num(typeof EM!=='undefined'&&EM?EM.one:0);
+  const rust=num(prices.pack_rust)*kg;
+  const labor=num(prices.wage)*(num(s.sec)||0)/3600/inn;
+  return {inn,upp,perPallet,reuse,mat,pallet,wrap,rust,labor,kg,total:mat+pallet+wrap+rust+labor};
+}
+function renderPackBrk(){
+  const el=$('packBrk');if(!el)return;
+  const b=packBreakdown();
+  if(!b.inn){el.innerHTML='<span class="pb-warn">입수량을 입력하세요</span>';return;}
+  const it=(k,v)=>`<span><em>${k}</em><b>${won2(v)}</b></span>`;
+  el.innerHTML=it('포장자재·라벨',b.mat)+it('파렛트',b.pallet)+it('랩·밴딩',b.wrap)+(b.rust?it('방청',b.rust):'')+(b.labor?it('포장작업',b.labor):'')+
+    `<span class="pb-tot"><em>개당 포장비</em><b>${won2(b.total)}</b></span><span class="pb-note">파렛트당 ${cf(b.perPallet)}개 · 파렛트 ${cf(b.reuse)}회 사용</span>`;
+}
 let prices, usingSaved=false;
 function loadPrices(){try{const s=localStorage.getItem('dptPressPrices');if(s){usingSaved=true;return Object.assign({},DEFAULT_PRICES,JSON.parse(s));}}catch(e){}usingSaved=false;return Object.assign({},DEFAULT_PRICES);}
 function savePrices(){try{prices._savedAt=Date.now();localStorage.setItem('dptPressPrices',JSON.stringify(prices));usingSaved=true;}catch(e){}}
@@ -1673,7 +1703,7 @@ const POSTS=[
   {k:'spot',nm:'스폿용접',sub:'타점수 × 점당단가',mode:'count',cntLab:'타점 수',cntU:'점',dft:2,rate:'spot',rateLab:'점당 단가'},
   {k:'plate',nm:'도금비',sub:'중량 × kg당단가',mode:'kg',wDft:0.3,rate:'plate',rateLab:'kg당 단가'},
   {k:'asm',nm:'조립',sub:'개당 단가',mode:'piece',rate:'asm',rateLab:'개당 단가'},
-  {k:'pack',nm:'포장비',sub:'파렛트 ÷ 포장수량 ÷30 + 랩',mode:'pack',inDft:100,rate:'pack_mat',rateLab:'박스당 자재비'},
+  {k:'pack',nm:'포장비',sub:'포장자재·파렛트·랩·라벨·방청·포장작업',mode:'pack',inDft:100,rate:'pack_mat',rateLab:'포장자재'},
   {k:'freight',nm:'물류비',sub:'화물차 운임 ÷ 적재수량',mode:'freight',loadDft:5000},
   {k:'defect',nm:'불량비용',sub:'가공원가 × 불량률',mode:'defect',rate:'defect',rateLab:'불량률'},
   {k:'scrap',nm:'스크랩(회수)',sub:'발생중량 × 단가 (차감)',mode:'scrap',wDft:0.05,rate:'scrap',rateLab:'kg당 단가'},
@@ -1698,12 +1728,12 @@ function replaceCustomConfig(custom){
   (custom.posts||[]).forEach(cp=>{if(cp&&cp.k&&!POSTS.find(p=>p.k===cp.k))POSTS.push(cp);});
   (custom.trucks||[]).forEach(tk=>{if(tk&&tk.t&&!TRUCKS.find(t=>t.t===tk.t))TRUCKS.push(tk);});
   custSeq=num(custom.seq)||custSeq;
-  POSTS.forEach(p=>{if(!state.posts[p.k])state.posts[p.k]={on:false,cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,truck:'5',load:p.loadDft||5000};});
+  POSTS.forEach(p=>{if(!state.posts[p.k])state.posts[p.k]={on:false,cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,upp:1,sec:0,truck:'5',load:p.loadDft||5000};});
   ensureDynamicPrices();saveCustom();
 }
 loadCustom();
 ensureDynamicPrices();
-POSTS.forEach(p=>{state.posts[p.k]={on:(p.custom||DEF_ON.includes(p.k)),cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,truck:'5',load:p.loadDft||5000};});
+POSTS.forEach(p=>{state.posts[p.k]={on:(p.custom||DEF_ON.includes(p.k)),cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,upp:1,sec:0,truck:'5',load:p.loadDft||5000};});
 
 /* ================= 톤수 / 모드 ================= */
 const tb=$('tonbtns');
@@ -2069,13 +2099,23 @@ const cF=(lab,inner)=>`<label class="cfld"><span>${lab}</span>${inner}</label>`;
 const cI=(cls,attrs,val,u)=>`<div class="suffix"><input class="inp ${cls}" ${attrs} type="text" value="${val}"><span class="u">${u}</span></div>`;
 function buildPostCard(p){
   const d=document.createElement('div');d.className='post';d.id='post_'+p.k;if(p.k==='scrap')d.classList.add('credit');if(p.custom)d.classList.add('customp');
-  const s=state.posts[p.k]||{on:false,cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,truck:'5',load:p.loadDft||5000};
+  const s=state.posts[p.k]||{on:false,cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,upp:1,sec:0,truck:'5',load:p.loadDft||5000};
   const rateVal=p.rate?cf(prices[p.rate]||0):'';
   let f='';
   if(p.mode==='piece')f=cF(p.rateLab,cI('','data-price="'+p.rate+'" inputmode="numeric"',rateVal,'원/개'));
   else if(p.mode==='count')f=cF(p.cntLab,cI('pi','data-k="'+p.k+'" data-f="cnt" inputmode="numeric"',cf(s.cnt),p.cntU))+cF(p.rateLab,cI('','data-price="'+p.rate+'" inputmode="numeric"',rateVal,'원'));
   else if(p.mode==='kg')f=cF('발생/처리 중량',cI('pi','data-k="'+p.k+'" data-f="w" inputmode="decimal"',cf(s.w),'kg/개'))+cF(p.rateLab,cI('','data-price="'+p.rate+'" inputmode="numeric"',rateVal,'원/kg'));
-  else if(p.mode==='pack')f=cF('포장수량 (레이저=제품표)',cI('pi','data-k="'+p.k+'" data-f="inn" inputmode="numeric"',cf(s.inn),'개/파렛트'));
+  else if(p.mode==='pack')f=
+      cF('입수량 (레이저=제품표)',cI('pi','data-k="'+p.k+'" data-f="inn" inputmode="numeric"',cf(s.inn),'개/포장단위'))
+     +cF('포장단위 적재',cI('pi','data-k="'+p.k+'" data-f="upp" inputmode="numeric"',cf(s.upp||1),'단위/파렛트'))
+     +cF('포장자재 · 포장단위당',cI('','data-price="pack_mat" inputmode="numeric"',cf(prices.pack_mat||0),'원'))
+     +cF('파렛트 · 개당',cI('','data-price="pack_pallet" inputmode="numeric"',cf(prices.pack_pallet||0),'원'))
+     +cF('파렛트 사용횟수',cI('','data-price="pack_reuse" inputmode="numeric"',cf(prices.pack_reuse||1),'회'))
+     +cF('랩·밴딩 · 제품 개당',cI('','data-price="pack_wrap" inputmode="decimal"',cf(prices.pack_wrap||0),'원'))
+     +cF('라벨·표기 · 포장단위당',cI('','data-price="pack_label" inputmode="numeric"',cf(prices.pack_label||0),'원'))
+     +cF('방청처리 · kg당',cI('','data-price="pack_rust" inputmode="decimal"',cf(prices.pack_rust||0),'원'))
+     +cF('포장 작업시간 · 포장단위당',cI('pi','data-k="'+p.k+'" data-f="sec" inputmode="numeric"',cf(s.sec||0),'초'))
+     +'<div class="pack-brk" id="packBrk"></div>';
   else if(p.mode==='freight')f='<div class="cfld"><span>차종</span><div class="seg sm" id="truckSeg">'+TRUCKS.map(t=>`<button data-t="${t.t}">${t.label}</button>`).join('')+'</div></div>'+cF('적용 운임(1회)','<div class="suffix"><input class="inp" id="freightFare" type="text" inputmode="numeric"><span class="u">원</span></div>')+cF('적재수량',cI('pi','data-k="freight" data-f="load" inputmode="numeric"',cf(s.load),'개'));
   else if(p.mode==='defect')f=cF(p.rateLab,cI('','data-price="'+p.rate+'" inputmode="decimal"',rateVal,'%'));
   else if(p.mode==='scrap')f=cF('스크랩 발생중량',cI('pi','data-k="'+p.k+'" data-f="w" inputmode="decimal"',cf(s.w),'kg/개'))+cF(p.rateLab,cI('','data-price="'+p.rate+'" inputmode="numeric"',rateVal,'원/kg'));
@@ -2114,7 +2154,12 @@ const SET_ROWS=[{t:'기준 단가'},{key:'margin',nm:'관리비·이윤율',u:'%
   {st:'레이저 기준'},{key:'lScrapW',nm:'레이저 스크랩 폭',u:'mm'},{key:'lScrapL',nm:'레이저 스크랩 길이',u:'mm'},{key:'gas',nm:'레이저 가스비',sub:'kg당',u:'원'},
   {st:'포밍 기준'},{key:'formBase',nm:'포밍 기준(850mm)',u:'원'},{key:'form10',nm:'포밍 10mm당 가산',u:'원'},
   {st:'절단 기준'},{key:'cut',nm:'절단',sub:'회당',u:'원'},
-  {t:'후공정 단가'},{key:'band',nm:'밴딩(프레스)',sub:'변당',u:'원'},{key:'punch',nm:'타공(프레스)',sub:'타공 단가',u:'원'},{key:'bend',nm:'절곡(절곡기)',sub:'변당',u:'원'},{key:'tap',nm:'탭핑',sub:'홀당',u:'원'},{key:'csk',nm:'접시가공(카운터싱크)',sub:'개소당',u:'원'},{key:'spot',nm:'스폿용접',sub:'점당',u:'원'},{key:'plate',nm:'도금비 (도금·표면처리)',sub:'kg당',u:'원'},{key:'asm',nm:'조립',sub:'개당',u:'원'},{key:'pack_mat',nm:'포장자재',sub:'포장단위당',u:'원'},{key:'pack_pallet',nm:'파렛트',sub:'대당',u:'원'},{key:'pack_wrap',nm:'포장 랩',sub:'개당',u:'원'},{key:'insp',nm:'검사·포장',sub:'개당',u:'원'},
+  {t:'후공정 단가'},
+  {st:'프레스 부가'},{key:'band',nm:'밴딩',sub:'변당',u:'원'},{key:'punch',nm:'타공',sub:'개소당',u:'원'},
+  {st:'절곡·홀가공'},{key:'bend',nm:'절곡',sub:'변당',u:'원'},{key:'tap',nm:'탭핑',sub:'홀당',u:'원'},{key:'csk',nm:'접시가공',sub:'개소당',u:'원'},
+  {st:'용접·조립'},{key:'spot',nm:'스폿용접',sub:'점당',u:'원'},{key:'asm',nm:'조립',sub:'개당',u:'원'},
+  {st:'표면처리'},{key:'plate',nm:'도금',sub:'kg당',u:'원'},{key:'pack_rust',nm:'방청',sub:'kg당',u:'원'},
+  {st:'검사·포장'},{key:'insp',nm:'검사·포장',sub:'개당',u:'원'},{key:'pack_mat',nm:'포장자재',sub:'포장단위당',u:'원'},{key:'pack_label',nm:'라벨',sub:'포장단위당',u:'원'},{key:'pack_wrap',nm:'랩·밴딩',sub:'개당',u:'원'},{key:'pack_pallet',nm:'파렛트',sub:'개당',u:'원'},{key:'pack_reuse',nm:'파렛트 사용횟수',u:'회'}
   ]
 const FREIGHT_ROWS=[{t:'물류 (현재 적용 운임)'},{key:'freight_12',nm:'물류 운임 1.2톤',sub:'1회 적용운임',u:'원'},{key:'freight_2.5',nm:'물류 운임 2.5톤',sub:'1회 적용운임',u:'원'},{key:'freight_35',nm:'물류 운임 3.5톤',sub:'1회 적용운임',u:'원'},{key:'freight_5',nm:'물류 운임 5톤',sub:'1회 적용운임',u:'원'},{key:'freight_11',nm:'물류 운임 11톤',sub:'1회 적용운임',u:'원'},{key:'freight_25',nm:'물류 운임 25톤',sub:'1회 적용운임',u:'원'}];
 function renderSetGrid(){const g=$('setgrid');g.innerHTML='';
@@ -2128,8 +2173,9 @@ function renderSetGrid(){const g=$('setgrid');g.innerHTML='';
   };
   SET_ROWS.forEach(addRow);
   const mk=(txt,fn)=>{const b=document.createElement('button');b.className='mtadd';b.style.gridColumn='1/-1';b.textContent=txt;b.onclick=fn;return b;};
-  g.appendChild(mk('＋ 후공정 추가',addCustomPost));
+  if(POSTS.some(p=>p.custom)){const e=document.createElement('div');e.className='set-sub-t';e.textContent='사용자 추가';g.appendChild(e);}
   POSTS.filter(p=>p.custom).forEach(p=>{const c=document.createElement('div');c.className='setcell';c.innerHTML=`<span class="k"><b>${p.nm}</b> · 개당</span><div class="suffix"><input class="inp num" data-price="${p.rate}" type="text" inputmode="decimal" value="${cf(prices[p.rate]||0)}"><span class="u">원</span></div><button class="mtdel" onclick="delCustomPost('${p.k}')" style="margin-left:6px">×</button>`;g.appendChild(c);});
+  g.appendChild(mk('＋ 후공정 추가',addCustomPost));
   FREIGHT_ROWS.forEach(addRow);
   g.appendChild(mk('＋ 물류 운임 추가',addCustomFreight));
   TRUCKS.filter(t=>t.custom).forEach(t=>{const c=document.createElement('div');c.className='setcell';c.innerHTML=`<span class="k"><b>${t.label}</b> · 편도</span><div class="suffix"><input class="inp num" data-price="freight_${t.t}" type="text" inputmode="decimal" value="${cf(prices['freight_'+t.t]||0)}"><span class="u">원</span></div><button class="mtdel" onclick="delCustomFreight('${t.t}')" style="margin-left:6px">×</button>`;g.appendChild(c);});
@@ -2317,7 +2363,7 @@ function postCost(p,ctx){
     case'piece':return rate(p.rate);
     case'count':return num(s.cnt)*rate(p.rate);
     case'kg':return num(s.w)*rate(p.rate);
-    case'pack':{const pk=currentPack();return pk>0?((rate('pack_pallet')/30+rate('pack_mat'))/pk)+rate('pack_wrap'):0;}
+    case'pack':{const b=packBreakdown();return b.total;}
     case'freight':return num(s.load)>0?rate('freight_'+s.truck)/num(s.load):0;
     case'defect':return num(ctx.base)*rate('defect')/100;
     case'scrap':return -(num(s.w)*rate('scrap'));
@@ -2364,6 +2410,7 @@ function estCalc(){
   const postSum=normalSum+defectC+scrapC;
   $('postHeadSum').textContent=(postSum<0?'−':'')+won(Math.abs(postSum))+'원';
   POSTS.forEach(p=>{const el=document.querySelector('#post_'+p.k+' .nm span');if(el)el.textContent=postFormula(p);});
+  try{renderPackBrk();}catch(e){}
   const moldCost=num($('moldCost').value),mQpm=num($('moldQpm').value),mY=num($('moldY').value),mM=num($('moldM').value),mMonths=mY*12+mM,mQty=mQpm*mMonths,mUnit=mQty>0?moldCost/mQty:0;
   $('mold_period').textContent=(mMonths>0?mMonths+' 개월':'- 개월');$('mold_qty').textContent=won(mQty)+' 개';$('mold_unit').textContent=(mUnit>0?(Math.round(mUnit*100)/100).toLocaleString():'0')+' 원';
   let mj='-',mjc='y';if(mMonths>0){if(mMonths<=3){mj='매우 양호';mjc='g';}else if(mMonths<=6){mj='투자 가능';mjc='g';}else if(mMonths<=12){mj='조건부 가능';mjc='y';}else{mj='신중 검토';mjc='r';}}
@@ -2521,7 +2568,7 @@ function estNew(keepTitle=false){
   if($('eff'))$('eff').value='80';if($('hits'))$('hits').value='1';if($('cyc'))$('cyc').value='6';if($('cutn'))$('cutn').value='1';if($('workersL'))$('workersL').value='1';if($('workersC'))$('workersC').value='1';
   if($('prod'))$('prod').selectedIndex=0;if($('eMat')){$('eMat').selectedIndex=0;eSyncMatPrice();}eSetMode('plate');
   setProc('');const mb=document.querySelector('#modeSeg button[data-mode=auto]');if(mb)mb.click();selectTon('160');
-  POSTS.forEach(p=>{state.posts[p.k]={on:DEF_ON.includes(p.k),cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,truck:'5',load:p.loadDft||5000};});
+  POSTS.forEach(p=>{state.posts[p.k]={on:DEF_ON.includes(p.k),cnt:p.dft||1,w:p.wDft||0,inn:p.inDft||100,upp:1,sec:0,truck:'5',load:p.loadDft||5000};});
   renderPosts();
   if(typeof formatAllNums==='function')formatAllNums();eCalc();estCalc();
   toast(keepTitle?'제목/거래처를 유지하고 추가견적을 시작합니다':'새 견적을 시작합니다');
@@ -2585,7 +2632,7 @@ function estLoadRecord(id,quiet){
   try{estCalc();}catch(e){}
   editingEstId=id;updateEstEditButtons();
   if(typeof refreshPnamePick==='function'){refreshPnamePick();refreshAsmNamePick();}
-  if(!quiet)toast('견적 내용을 불러왔습니다. [✓ 수정 저장] 또는 [＋ 수정하여 새로 저장]을 선택하세요');
+  if(!quiet)toast('견적 내용을 불러왔습니다. [✓ 수정 저장] 또는 [＋ 새로 저장]을 선택하세요');
   return true;
 }
 function estBuildRecord(id){
@@ -2601,7 +2648,8 @@ function estSave(){return estSaveNew();}
 function estSaveNew(){
   const rec=estBuildRecord(Date.now());
   if(!rec)return;
-  estDB.unshift(rec);saveEstDB();editingEstId=null;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('견적을 새로 저장했습니다 ('+estDB.length+'건)');
+  estDB.unshift(rec);saveEstDB();editingEstId=rec.id;updateEstEditButtons();   /* 저장 후 그 견적을 계속 수정할 수 있도록 수정 모드 유지 */
+  estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('견적을 저장했습니다 ('+estDB.length+'건) · 이어서 고치면 [✓ 수정 저장] 또는 [＋ 새로 저장]');
 }
 function estUpdateSave(){
   if(!editingEstId){toast('수정할 견적을 먼저 불러오세요');return;}
@@ -2609,11 +2657,11 @@ function estUpdateSave(){
   if(idx<0){toast('수정 대상 견적을 찾을 수 없습니다');editingEstId=null;updateEstEditButtons();return;}
   const rec=estBuildRecord(editingEstId);
   if(!rec)return;
-  estDB[idx]=rec;saveEstDB();editingEstId=null;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('기존 견적을 수정 저장했습니다');
+  estDB[idx]=rec;saveEstDB();editingEstId=rec.id;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('기존 견적을 수정 저장했습니다');
 }
 function updateEstEditButtons(){
   const bNew=$('btnSaveNew'),bUpd=$('btnSaveUpdate');
-  if(bNew)bNew.innerHTML=editingEstId?'＋ 수정하여<br>새로 저장':'＋ 견적 저장';
+  if(bNew)bNew.innerHTML=editingEstId?'＋ 새로 저장':'＋ 견적 저장';
   if(bUpd)bUpd.style.display=editingEstId?'block':'none';
 }
 var estFoldOpen=(function(){try{return localStorage.getItem('dptEstFold')==='1';}catch(e){return false;}})();
@@ -2970,7 +3018,10 @@ async function estExportCalcSheet(){
     if(p.mode==='count'){qv=mn(num(st.cnt)||num(p.dft)||1,M2);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`B${rn}*C${rn}`;fx='=수량×단가';}
     else if(p.mode==='kg'){qv=mn(num(st.w)||num(p.wDft)||0,M3);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`B${rn}*C${rn}`;fx='=중량×kg당 단가';}
     else if(p.mode==='piece'){qv=mn(1);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`C${rn}`;fx='=개당 단가';}
-    else if(p.mode==='pack'){qv=mn(num(currentPack())||num(p.inDft)||100);cv='';inner=`(${PREF('pack_pallet')}/30+${PREF('pack_mat')})/B${rn}+${PREF('pack_wrap')}`;fx='=(파렛트÷30+포장자재)÷포장수량+랩';}
+    else if(p.mode==='pack'){const ps=state.posts.pack||{};const upp=Math.max(1,num(ps.upp)||1),sec=num(ps.sec)||0;
+      qv=mn(num(currentPack())||num(p.inDft)||100);cv=mn(upp);
+      inner=`IF(B${rn}>0,(${PREF('pack_mat')}+${PREF('pack_label')})/B${rn}+${PREF('pack_pallet')}/MAX(1,${PREF('pack_reuse')})/(B${rn}*MAX(1,C${rn}))+${PREF('pack_wrap')}+${PREF('pack_rust')}*B${rWeight}+${PREF('wage')}*${sec}/3600/B${rn},0)`;
+      fx='=(자재+라벨)÷입수 + 파렛트÷사용횟수÷(입수×적재) + 랩 + 방청×중량 + 포장작업';}
     else if(p.mode==='freight'){qv=mn(num(st.load)||num(p.loadDft)||5000);cv='';inner=`IF(B${rn}>0,B${rFare}/B${rn},0)`;fx='=적용 운임÷적재수량';}
     else {qv=mn(1);cv={t:'n',f:PREF(p.rate),v:PV(p.rate),z:M2};inner=`B${rn}*C${rn}`;fx='=수량×단가';}
     S[rn-1][1]=qv;S[rn-1][2]=cv;S[rn-1][5]=fx;
@@ -5176,7 +5227,7 @@ selectTon('160');
 loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNamePick();refreshPnamePick();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-20 · v80';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-22 · v84';})();
 formatAllNums();
 estCalc();
 </script>
