@@ -171,6 +171,12 @@
   .rec-top .wt .saved-mat-cost-label{font-size:11px;font-weight:700;color:var(--accent)}
   .rec-top .wt .saved-mat-cost-amount{font-size:16px;font-weight:900;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
   .rec-top .wt .saved-steel-unit{margin-left:6px;font-size:11px;font-weight:700;color:var(--sub);font-variant-numeric:tabular-nums}
+  .rec-top .syncb{flex:none;width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#b4bccb;font-size:14px;cursor:pointer;line-height:1;margin-right:4px}
+  .rec-top .syncb.on{background:#e7f0ff;border-color:#9dbcf5;color:#1f5fd1}
+  .est-sync-g{flex:0 0 auto;margin-right:8px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:#6b7483;cursor:pointer;white-space:nowrap}
+  .est-sync-g.on{background:#e7f0ff;border-color:#9dbcf5;color:#1f5fd1}
+  .est-sync-g.part{background:#f3f7ff;border-color:#c9daf8;color:#3a6fc9}
+  .cb-sync{display:inline-block;align-self:flex-start;width:auto;padding:2px 8px;border-radius:999px;background:#e7f0ff;color:#1f5fd1;font-size:11px;font-weight:800}
   .rec-top .del{flex:none;width:26px;height:26px;border-radius:8px;border:none;background:#fdecec;color:var(--accent);font-size:16px;font-weight:700;cursor:pointer;line-height:1}
   .rec-row .l2{font-size:11.5px;color:var(--sub);margin-top:5px;white-space:nowrap;overflow-x:auto}
   .empty{text-align:center;color:var(--sub);font-size:13px;padding:20px 0}
@@ -2642,7 +2648,7 @@ function estBuildRecord(id){
   const onPosts=POSTS.filter(p=>state.posts[p.k].on).map(p=>({nm:p.nm,v:document.querySelector('#post_'+p.k+' .pv').textContent}));
   return {id:id||Date.now(),time:nowStr(),pname:title,product:(($('productName')&&$('productName').value)||title).trim(),spec:(($('specNote')&&$('specNote').value)||'').trim(),mode:state.mode==='auto'?'자동':'단발',ton:TON.find(t=>t.key===state.ton).label,qty:num($('qty').value),
     asm:{name:(($('asmName')&&$('asmName').value)||'').trim(),per:num($('asmPer')&&$('asmPer').value)||1},
-    mc:LAST.mc,lc:LAST.lc,postSum:LAST.postSum,mat:LAST.mat,subtotal:LAST.subtotal,marginPct:LAST.marginPct,addmargin:LAST.addmargin,adj:LAST.adj,unit:LAST.unit,total:LAST.total,sale:LAST.sale,saleRate:LAST.saleRate,posts:onPosts,proc:state.proc,detail:buildEstDetail(title),snap:captureState()};
+    mc:LAST.mc,lc:LAST.lc,postSum:LAST.postSum,mat:LAST.mat,subtotal:LAST.subtotal,marginPct:LAST.marginPct,addmargin:LAST.addmargin,adj:LAST.adj,unit:LAST.unit,total:LAST.total,sale:LAST.sale,saleRate:LAST.saleRate,posts:onPosts,proc:state.proc,detail:buildEstDetail(title),snap:captureState(),savedAt:Date.now()};
 }
 function estSave(){return estSaveNew();}
 function estSaveNew(){
@@ -2657,6 +2663,7 @@ function estUpdateSave(){
   if(idx<0){toast('수정 대상 견적을 찾을 수 없습니다');editingEstId=null;updateEstEditButtons();return;}
   const rec=estBuildRecord(editingEstId);
   if(!rec)return;
+  if(estDB[idx].sync)rec.sync=true;if(estDB[idx].syncAt)rec.syncAt=estDB[idx].syncAt;
   estDB[idx]=rec;saveEstDB();editingEstId=rec.id;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('기존 견적을 수정 저장했습니다');
 }
 function updateEstEditButtons(){
@@ -2688,7 +2695,7 @@ function estRender(){
     sumEl.textContent=`견적 ${estDB.length}건 · 총액 합계 ${won(tot)}원`;sumEl.classList.add('show');
     list.innerHTML=estDB.map(r=>{
       const sale=r.sale>0?` · 판매 ${won(r.sale)}`:'';
-      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.asm&&r.asm.name?`<b style="color:#0a7d4b">🧩 ${esc(r.asm.name)} × ${cf(num(r.asm.per)||1)}</b> · `:''}<b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
+      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="syncb${r.sync?' on':''}" title="${r.sync?'클라우드 동기화 선택됨 (클릭하면 해제)':'클릭하면 클라우드 동기화 대상에 포함'}" onclick="event.stopPropagation();estSyncToggle(${r.id})">☁</button><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.asm&&r.asm.name?`<b style="color:#0a7d4b">🧩 ${esc(r.asm.name)} × ${cf(num(r.asm.per)||1)}</b> · `:''}<b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
     }).join('');
   }
   estListRender();
@@ -3988,7 +3995,7 @@ function estTitleLineHtml(records,groupNo,title){
       asmChip=`<i class="est-asm-chip">🧩 어셈블리 ${keys.length}종</i>`;
     }
   }catch(e){}
-  return `<div class="est-list-titleline"><b>제목/거래처</b><span title="${esc(label)}">${esc(label)}</span>${asmChip}<em>${groupNo?groupNo+'번 견적서 · ':''}저장 ${records.length}건 · ${esc(timeText)}</em><button type="button" class="est-zero-toggle noprint${estZeroHidden?' on':''}" onclick="event.stopPropagation();estToggleZeroCols()">${btnLabel}</button></div>`;
+  return `<div class="est-list-titleline"><b>제목/거래처</b><span title="${esc(label)}">${esc(label)}</span>${asmChip}<em>${groupNo?groupNo+'번 견적서 · ':''}저장 ${records.length}건 · ${esc(timeText)}</em>${(function(){const n=records.filter(r=>r.sync).length,m=records.length;const cls=n===0?'':(n===m?' on':' part');return `<button type="button" class="est-sync-g noprint${cls}" title="이 견적서의 저장 견적을 클라우드 동기화 대상으로 선택/해제" onclick="event.stopPropagation();estSyncGroup('${records.map(r=>r.id).join(',')}')">☁ 동기화 ${n}/${m}</button>`;})()}<button type="button" class="est-zero-toggle noprint${estZeroHidden?' on':''}" onclick="event.stopPropagation();estToggleZeroCols()">${btnLabel}</button></div>`;
 }
 
 
@@ -4398,15 +4405,67 @@ async function xFetch(url,opt,ms){
 var cloudCfg=(()=>{try{return Object.assign({auto:false,at:'',by:'',localAt:0},JSON.parse(localStorage.getItem('dptCloudCfg')||'{}'));}catch(e){return {auto:false,at:'',by:'',localAt:0};}})();
 function cloudSaveCfg(){try{localStorage.setItem('dptCloudCfg',JSON.stringify(cloudCfg));}catch(e){}}
 var _cloudBusy=false,_cloudT=null,_cloudApplying=false;
-function cloudPayload(){
-  return {updatedAt:Date.now(),by:(AU.name||AU.id||'사용자'),
+/* 동기화 대상 선택 */
+function estSyncToggle(id){
+  const r=estDB.find(x=>x.id===id);if(!r)return;
+  r.sync=!r.sync;if(!r.sync)r.unsharedAt=Date.now();
+  saveEstDB();estRender();renderCloudBar();
+  toast(r.sync?'클라우드 동기화 대상에 포함했습니다 · [⤒ 서버에 올리기]로 반영':'동기화 대상에서 뺐습니다 · 올리면 서버에서도 제외됩니다');
+}
+function estSyncGroup(idsCsv){
+  const ids=String(idsCsv).split(',').map(Number);
+  const rows=estDB.filter(r=>ids.indexOf(r.id)>=0);if(!rows.length)return;
+  const allOn=rows.every(r=>r.sync);
+  rows.forEach(r=>{r.sync=!allOn;if(allOn)r.unsharedAt=Date.now();});
+  saveEstDB();estRender();renderCloudBar();
+  toast(allOn?`${rows.length}건을 동기화 대상에서 뺐습니다`:`${rows.length}건을 동기화 대상에 포함했습니다 · [⤒ 서버에 올리기]로 반영`);
+}
+function estSyncCount(){return estDB.filter(r=>r.sync).length;}
+/* 서버 공유 견적 + 로컬 선택 견적 병합 (선택 해제한 건은 서버에서 제외) */
+function estMergeShared(serverList){
+  const map=new Map();
+  (Array.isArray(serverList)?serverList:[]).forEach(r=>{if(r&&r.id!=null)map.set(r.id,r);});
+  estDB.forEach(r=>{
+    if(r.sync){
+      const sv=map.get(r.id);
+      if(!sv||num(r.savedAt)>=num(sv.savedAt))map.set(r.id,r);
+    }else if(r.sync===false&&map.has(r.id)){
+      map.delete(r.id);
+    }
+  });
+  return Array.from(map.values()).map(r=>{const c=Object.assign({},r);delete c.syncAt;delete c.unsharedAt;c.sync=true;return c;});
+}
+function cloudPayload(serverShared){
+  return {updatedAt:Date.now(),by:(AU.name||AU.id||'사용자'),v:85,
     prices:prices,
     laserT:laserT,products:products,
     custom:{posts:POSTS.filter(p=>p.custom),trucks:TRUCKS.filter(t=>t.custom),seq:custSeq},
     freight:frCfg,
     mat:{t:matTable,q:matQuote,u:matUpdated,x:matExtra},
-    estDB:estDB};
+    asmCfg:(typeof asmCfg==='object'?asmCfg:{}),
+    estShared:estMergeShared(serverShared)};
 }
+/* 서버의 공유 견적을 로컬에 병합 (로컬 전용 견적은 절대 삭제하지 않음) */
+function estApplyShared(list){
+  if(!Array.isArray(list))return {add:0,upd:0,off:0};
+  const now=Date.now(),seen=new Set();let add=0,upd=0,off=0;
+  list.forEach(sv=>{
+    if(!sv||sv.id==null)return;seen.add(sv.id);
+    const i=estDB.findIndex(r=>r.id===sv.id);
+    if(i<0){estDB.push(Object.assign({},sv,{sync:true,syncAt:now}));add++;}
+    else{
+      const lr=estDB[i];
+      if(lr.sync===false&&num(lr.unsharedAt)>num(sv.savedAt))return;   /* 여기서 해제한 건은 유지 */
+      if(num(sv.savedAt)>num(lr.savedAt)){estDB[i]=Object.assign({},sv,{sync:true,syncAt:now});upd++;}
+      else{lr.sync=true;lr.syncAt=now;}
+    }
+  });
+  /* 다른 컴퓨터에서 공유 해제된 건: 이 컴퓨터에서 그 뒤로 수정하지 않았다면 선택만 해제 */
+  estDB.forEach(r=>{if(r.sync&&r.syncAt&&!seen.has(r.id)&&num(r.savedAt)<=num(r.syncAt)){r.sync=false;off++;}});
+  estDB.sort((a,b)=>num(b.id)-num(a.id));
+  return {add,upd,off};
+}
+var _lastShareRes=null;
 function cloudApply(d){
   if(!d||typeof d!=='object')return false;
   _cloudApplying=true;
@@ -4417,11 +4476,15 @@ function cloudApply(d){
     if(Array.isArray(d.products)&&d.products.length){products.length=0;d.products.forEach(x=>products.push(x));saveProducts();fillProdSelect();}
     if(d.freight&&typeof d.freight==='object'){frCfg=Object.assign(frCfg,d.freight);frSave();}
     if(d.mat&&d.mat.t){matTable=d.mat.t;matQuote=d.mat.q||{};matUpdated=d.mat.u||matUpdated;if(d.mat.x)matExtra=normalizeMatExtra(d.mat.x);saveMatTable(false);}
-    if(Array.isArray(d.estDB)){estDB=d.estDB;saveEstDB();}
+    if(d.asmCfg&&typeof d.asmCfg==='object'&&typeof asmCfg==='object'){Object.keys(d.asmCfg).forEach(k=>{if(!asmCfg[k])asmCfg[k]=d.asmCfg[k];else asmCfg[k]=Object.assign({},asmCfg[k],d.asmCfg[k]);});asmSaveCfg();}
+    /* 견적: 선택 공유분만 병합 (구버전 전체 estDB 는 로컬을 덮어쓰지 않음) */
+    _lastShareRes=Array.isArray(d.estShared)?estApplyShared(d.estShared):null;
+    saveEstDB();
     cloudCfg.at=d.updatedAt?new Date(d.updatedAt).toLocaleString('ko-KR'):cloudCfg.at;
     cloudCfg.by=d.by||'';cloudCfg.localAt=d.updatedAt||Date.now();cloudSaveCfg();
     renderPosts();syncPriceInputs();renderSetGrid();renderFreightCalc();renderSaveState();renderLaserTbl();renderProdTbl();renderMatPage();estRender();eSyncMatPrice();eCalc();
     if(typeof renderProcStd==='function')renderProcStd();
+    if(typeof renderAsmPage==='function'){renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}}
   }catch(e){console.error(e);}
   _cloudApplying=false;
   return true;
@@ -4448,27 +4511,33 @@ async function cloudTry(list){
 function cloudPost(body){
   return ()=>xFetch(syncUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)},40000);
 }
+async function cloudFetchMine(){
+  const K=encodeURIComponent(syncKey()),T=encodeURIComponent(AU.token);
+  const res=await cloudTry([
+    ()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&ns='+encodeURIComponent(CLOUD_NS)+'&key='+K+'&token='+T+'&_t='+Date.now(),{},40000),
+    cloudPost({action:'get',ns:CLOUD_NS,key:syncKey(),token:AU.token}),
+    cloudPost({action:'load',ns:CLOUD_NS,key:syncKey(),token:AU.token})
+  ]);
+  if(res.err)return {err:res.err};
+  const d=res.d;
+  const root=(d&&d.data&&typeof d.data==='object')?d.data:d;
+  /* 전용 백엔드는 data 가 곧 pressEstV1 내용, 공용 문서는 data[pressEstV1] */
+  const mine=(root&&root[CLOUD_NS])?root[CLOUD_NS]:((root&&(root.prices||root.mat||root.estDB||root.estShared))?root:null);
+  return {mine};
+}
 async function cloudPull(silent){
   if(!auValid()){if(!silent)toast('먼저 로그인하세요');return false;}
   if(!syncUrl()){if(!silent)toast('서버 주소가 설정되지 않았습니다');renderCloudBar('서버 주소 없음');return false;}
   if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('불러오는 중…');
   try{
-    const K=encodeURIComponent(syncKey()),T=encodeURIComponent(AU.token);
-    const res=await cloudTry([
-      ()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&ns='+encodeURIComponent(CLOUD_NS)+'&key='+K+'&token='+T+'&_t='+Date.now(),{},40000),
-      cloudPost({action:'get',ns:CLOUD_NS,key:syncKey(),token:AU.token}),
-      cloudPost({action:'load',ns:CLOUD_NS,key:syncKey(),token:AU.token})
-    ]);
+    const res=await cloudFetchMine();
     if(res.err){
       cloudCfg.lastErr=res.err;
       if(!silent)toast('받기 실패 — '+res.err);
       renderCloudBar('받기 실패 · '+String(res.err).slice(0,60));
       return false;
     }
-    const d=res.d;
-    const root=(d&&d.data&&typeof d.data==='object')?d.data:d;
-    /* 전용 백엔드는 data 가 곧 pressEstV1 내용, 공용 문서는 data[pressEstV1] */
-    const mine=(root&&root[CLOUD_NS])?root[CLOUD_NS]:((root&&(root.prices||root.mat||root.estDB))?root:null);
+    const mine=res.mine;
     if(!mine){
       cloudCfg.lastErr='';
       if(!silent)toast('서버에 저장된 단가산정 자료가 없습니다 · [서버에 올리기]로 먼저 저장하세요');
@@ -4477,7 +4546,8 @@ async function cloudPull(silent){
     if(silent&&num(mine.updatedAt)<=num(cloudCfg.localAt)){renderCloudBar();return false;}
     cloudApply(mine);
     cloudCfg.lastErr='';
-    if(!silent)toast('서버에서 단가산정 자료를 받았습니다 ('+(mine.by||'')+' · '+cloudCfg.at+')');
+    const sr=_lastShareRes;
+    if(!silent)toast('서버에서 받았습니다 · 단가산정 기준'+(sr?` · 공유 견적 신규 ${sr.add}건 / 갱신 ${sr.upd}건`:'')+' ('+(mine.by||'')+' · '+cloudCfg.at+')');
     renderCloudBar();return true;
   }catch(e){
     cloudCfg.lastErr=(e&&e.message)||String(e);
@@ -4491,7 +4561,9 @@ async function cloudPush(silent){
   if(!syncUrl()){if(!silent)toast('서버 주소가 설정되지 않았습니다');renderCloudBar('서버 주소 없음');return false;}
   if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('올리는 중…');
   try{
-    const payload=cloudPayload();
+    let serverShared=[];
+    try{const cur=await cloudFetchMine();if(cur&&cur.mine&&Array.isArray(cur.mine.estShared))serverShared=cur.mine.estShared;}catch(e){}
+    const payload=cloudPayload(serverShared);
     const data={};data[CLOUD_NS]=payload;
     const res=await cloudTry([
       cloudPost({action:'save',ns:CLOUD_NS,key:syncKey(),token:AU.token,data:data,clientId:(AU.name||AU.id||'사용자')}),
@@ -4503,7 +4575,11 @@ async function cloudPush(silent){
       renderCloudBar('올리기 실패 · '+String(res.err).slice(0,60));return false;
     }
     cloudCfg.at=new Date(payload.updatedAt).toLocaleString('ko-KR');cloudCfg.by=payload.by;cloudCfg.localAt=payload.updatedAt;cloudCfg.lastErr='';cloudSaveCfg();
-    if(!silent)toast('단가산정 자료를 서버에 저장했습니다');
+    { const now=Date.now(),sharedIds=new Set(payload.estShared.map(r=>r.id));
+      estDB.forEach(r=>{if(r.sync&&sharedIds.has(r.id))r.syncAt=now;});
+      /* 다른 컴퓨터가 공유한 견적 중 이 컴퓨터에 없는 것도 받아 둔다 */
+      estApplyShared(payload.estShared);saveEstDB();estRender(); }
+    if(!silent)toast(`서버에 올렸습니다 · 단가산정 기준 + 공유 견적 ${payload.estShared.length}건`);
     renderCloudBar();return true;
   }catch(e){
     cloudCfg.lastErr=(e&&e.message)||String(e);
@@ -4556,7 +4632,7 @@ function syncFileOpen(input){
   r.onload=()=>{
     try{
       const d=JSON.parse(r.result);
-      if(!d||typeof d!=='object'||!(d.prices||d.mat||d.estDB))throw new Error('동기화 파일 형식이 아닙니다');
+      if(!d||typeof d!=='object'||!(d.prices||d.mat||d.estDB||d.estShared))throw new Error('동기화 파일 형식이 아닙니다');
       cloudApply(d);
       toast('동기화 파일을 적용했습니다'+(d.by?(' · '+d.by):'')+(d.updatedAt?(' · '+new Date(d.updatedAt).toLocaleString('ko-KR')):''));
     }catch(e){toast('불러오기 실패 — '+((e&&e.message)||e));}
@@ -4570,6 +4646,7 @@ function renderCloudBar(msg){
   const on=auValid();
   el.innerHTML=`<div class="cb-l"><b>클라우드 동기화</b>
       <span>${on?`${esc(AU.name||AU.id)} · ${AU_ROLE[AU.role]||''}`:'로그인 필요'}</span>
+      <span class="cb-sync" title="저장된 견적의 ☁ 버튼으로 선택한 건만 동기화됩니다">공유 견적 ${estSyncCount()}건 선택</span>
       <span class="cb-at">${msg?esc(msg):(cloudCfg.at?('최근 동기화 '+esc(cloudCfg.at)+(cloudCfg.by?' · '+esc(cloudCfg.by):'')):'동기화 기록 없음')}</span>
       ${cloudCfg.lastErr?`<span class="cb-err" title="${esc(cloudCfg.lastErr)}">오류: ${esc(String(cloudCfg.lastErr).slice(0,90))}</span>`:''}</div>
     <div class="cb-r">
@@ -5227,7 +5304,7 @@ selectTon('160');
 loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNamePick();refreshPnamePick();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-22 · v84';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-22 · v85';})();
 formatAllNums();
 estCalc();
 </script>
