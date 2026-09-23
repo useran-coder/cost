@@ -2606,15 +2606,20 @@ function captureState(){
 }
 function restoreState(s){
   if(!s)return;
-  if(s.proc)setProc(s.proc);
+  /* ① 가공 방식 : setProc 은 같은 값을 다시 넣으면 해제되는 토글이라 값이 다를 때만 호출 */
+  const wantProc=s.proc||'';
+  if(state.proc!==wantProc)setProc(wantProc);
+  /* ② 작업 방식·설비 톤수 먼저 (둘 다 설비차지·SPM 을 표값으로 덮어씀) */
+  const mb=document.querySelector('#modeSeg button[data-mode="'+(s.mode||'auto')+'"]');if(mb)mb.click();
+  if(s.ton)selectTon(s.ton);
+  if(s.emode)eSetMode(s.emode);
+  /* ③ 사용자가 입력·수정한 값은 맨 마지막에 복원해야 덮어쓰이지 않는다 */
   Object.entries(s.ids||{}).forEach(([i,val])=>{const e=$(i);if(e)e.value=val;});
   const mk=document.querySelector('[data-price=matkg]');if(mk&&s.ids&&s.ids.matkg!=null)mk.value=s.ids.matkg;
-  const mb=document.querySelector('#modeSeg button[data-mode="'+s.mode+'"]');if(mb)mb.click();
-  if(s.ton)selectTon(s.ton);
   if($('moldApply'))$('moldApply').checked=!!s.moldApply;
-  if(s.posts)POSTS.forEach(p=>{const on=!!s.posts[p.k];state.posts[p.k].on=on;const el=$('post_'+p.k);if(el)el.classList.toggle('on',on);});
-  if(s.piv)document.querySelectorAll('.pi').forEach(e=>{const key=e.dataset.k+'_'+e.dataset.f;if(s.piv[key]!=null)e.value=s.piv[key];});
-  if(s.emode)eSetMode(s.emode);if(typeof formatAllNums==='function')formatAllNums();
+  if(s.posts)POSTS.forEach(p=>{const on=!!s.posts[p.k];state.posts[p.k].on=on;const el=$('post_'+p.k);if(el)el.classList.toggle('on',on);el&&el.classList.toggle('open',on);});
+  if(s.piv)document.querySelectorAll('.pi').forEach(e=>{const key=e.dataset.k+'_'+e.dataset.f;if(s.piv[key]!=null){e.value=s.piv[key];const st=state.posts[e.dataset.k];if(st)st[e.dataset.f]=num(s.piv[key]);}});
+  if(typeof formatAllNums==='function')formatAllNums();
   eCalc();estCalc();
 }
 let emEditId=null;
@@ -5408,7 +5413,7 @@ selectTon('160');
 loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNamePick();refreshPnamePick();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-23 · v89';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-23 · v90';})();
 formatAllNums();
 estCalc();
 </script>
