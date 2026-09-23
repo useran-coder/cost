@@ -171,6 +171,7 @@
   .rec-top .wt .saved-mat-cost-label{font-size:11px;font-weight:700;color:var(--accent)}
   .rec-top .wt .saved-mat-cost-amount{font-size:16px;font-weight:900;line-height:1;color:var(--accent);font-variant-numeric:tabular-nums}
   .rec-top .wt .saved-steel-unit{margin-left:6px;font-size:11px;font-weight:700;color:var(--sub);font-variant-numeric:tabular-nums}
+  .rec-date{color:#4b5565;font-weight:700;white-space:nowrap}
   .rec-top .syncb{flex:none;width:26px;height:26px;border-radius:8px;border:1px solid var(--line);background:#fff;color:#b4bccb;font-size:14px;cursor:pointer;line-height:1;margin-right:4px}
   .rec-top .syncb.on{background:#e7f0ff;border-color:#9dbcf5;color:#1f5fd1}
   .est-sync-g{flex:0 0 auto;margin-right:8px;padding:5px 10px;border:1px solid var(--line);border-radius:8px;background:#fff;font-family:inherit;font-size:12px;font-weight:700;color:#6b7483;cursor:pointer;white-space:nowrap}
@@ -1099,6 +1100,18 @@
   .cloudbar .cb-l{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--sub)}
   .cloudbar .cb-l b{font-size:13px;color:var(--navy)}
   .cloudbar .cb-at{color:var(--accent);font-weight:700}
+  .cg-back{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px}
+  .cg-box{background:#fff;border-radius:14px;max-width:760px;width:100%;max-height:88vh;overflow:auto;padding:16px 18px;box-shadow:0 20px 60px rgba(0,0,0,.25);font-size:13px;color:#26324a}
+  .cg-h{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+  .cg-h b{font-size:15px;color:var(--navy)}
+  .cg-h button{border:none;background:#f1f3f7;border-radius:8px;width:30px;height:30px;cursor:pointer}
+  .cg-warn{background:#fff4f4;border:1px solid #f3c2c2;color:#a8323a;border-radius:10px;padding:9px 11px;margin-bottom:8px;font-weight:700;line-height:1.5}
+  .cg-ol{margin:6px 0 10px 18px;line-height:1.75}
+  .cg-ol code{background:#f1f3f7;padding:1px 5px;border-radius:5px}
+  .cg-acts{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .cg-acts button{padding:7px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;font-family:inherit;font-weight:700;cursor:pointer}
+  .cg-acts button.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .cg-code{background:#0f172a;color:#e2e8f0;border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.5;max-height:260px;overflow:auto;white-space:pre}
   .cloudbar .cb-err{color:#b91c1c;font-weight:700;max-width:520px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   .cloudbar .cb-r{display:flex;gap:6px;flex-wrap:wrap}
   .cloudbar button{padding:8px 11px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
@@ -2444,7 +2457,10 @@ function estCalc(){
 /* ================= 견적 저장 ================= */
 let estDB=[];
 var editingEstId=null;
-function loadEstDB(){try{const s=localStorage.getItem('dptEstDB');if(s)estDB=JSON.parse(s);}catch(e){}if(!Array.isArray(estDB))estDB=[];}
+function loadEstDB(){try{const s=localStorage.getItem('dptEstDB');if(s)estDB=JSON.parse(s);}catch(e){}if(!Array.isArray(estDB))estDB=[];
+  /* v88: 기존 저장 견적도 기본 동기화 대상으로 (☁ 로 직접 해제한 건은 유지) */
+  let mig=false;estDB.forEach(r=>{if(r&&r.sync===undefined&&r.unsharedAt===undefined){r.sync=true;mig=true;}});
+  if(mig){try{localStorage.setItem('dptEstDB',JSON.stringify(estDB));}catch(e){}}}
 function saveEstDB(){try{localStorage.setItem('dptEstDB',JSON.stringify(estDB));}catch(e){}}
 function nowStr(){const d=new Date(),p=n=>String(n).padStart(2,'0');return `${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
 function esc(v){return String(v??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));}
@@ -2648,14 +2664,14 @@ function estBuildRecord(id){
   const onPosts=POSTS.filter(p=>state.posts[p.k].on).map(p=>({nm:p.nm,v:document.querySelector('#post_'+p.k+' .pv').textContent}));
   return {id:id||Date.now(),time:nowStr(),pname:title,product:(($('productName')&&$('productName').value)||title).trim(),spec:(($('specNote')&&$('specNote').value)||'').trim(),mode:state.mode==='auto'?'자동':'단발',ton:TON.find(t=>t.key===state.ton).label,qty:num($('qty').value),
     asm:{name:(($('asmName')&&$('asmName').value)||'').trim(),per:num($('asmPer')&&$('asmPer').value)||1},
-    mc:LAST.mc,lc:LAST.lc,postSum:LAST.postSum,mat:LAST.mat,subtotal:LAST.subtotal,marginPct:LAST.marginPct,addmargin:LAST.addmargin,adj:LAST.adj,unit:LAST.unit,total:LAST.total,sale:LAST.sale,saleRate:LAST.saleRate,posts:onPosts,proc:state.proc,detail:buildEstDetail(title),snap:captureState(),savedAt:Date.now()};
+    mc:LAST.mc,lc:LAST.lc,postSum:LAST.postSum,mat:LAST.mat,subtotal:LAST.subtotal,marginPct:LAST.marginPct,addmargin:LAST.addmargin,adj:LAST.adj,unit:LAST.unit,total:LAST.total,sale:LAST.sale,saleRate:LAST.saleRate,posts:onPosts,proc:state.proc,detail:buildEstDetail(title),snap:captureState(),savedAt:Date.now(),sync:true};
 }
 function estSave(){return estSaveNew();}
 function estSaveNew(){
   const rec=estBuildRecord(Date.now());
   if(!rec)return;
   estDB.unshift(rec);saveEstDB();editingEstId=rec.id;updateEstEditButtons();   /* 저장 후 그 견적을 계속 수정할 수 있도록 수정 모드 유지 */
-  estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('견적을 저장했습니다 ('+estDB.length+'건) · 이어서 고치면 [✓ 수정 저장] 또는 [＋ 새로 저장]');
+  estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('견적을 저장했습니다 ('+estDB.length+'건) · ☁ 동기화 포함'+(cloudCfg.auto?' · 자동 올리기':'')+' · 이어서 고치면 [✓ 수정 저장] 또는 [＋ 새로 저장]');
 }
 function estUpdateSave(){
   if(!editingEstId){toast('수정할 견적을 먼저 불러오세요');return;}
@@ -2663,7 +2679,7 @@ function estUpdateSave(){
   if(idx<0){toast('수정 대상 견적을 찾을 수 없습니다');editingEstId=null;updateEstEditButtons();return;}
   const rec=estBuildRecord(editingEstId);
   if(!rec)return;
-  if(estDB[idx].sync)rec.sync=true;if(estDB[idx].syncAt)rec.syncAt=estDB[idx].syncAt;
+  rec.sync=(estDB[idx].sync!==false);if(estDB[idx].syncAt)rec.syncAt=estDB[idx].syncAt;
   estDB[idx]=rec;saveEstDB();editingEstId=rec.id;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}toast('기존 견적을 수정 저장했습니다');
 }
 function updateEstEditButtons(){
@@ -2686,6 +2702,12 @@ function estDelete(id){
     estDB=estDB.filter(x=>x.id!==id);saveEstDB();estRender();if(typeof renderAsmPage==='function'){renderAsmPage();refreshAsmNamePick();refreshPnamePick();}toast('견적을 삭제했습니다');
   });
 }
+/* 저장일 표기: 2026.09.22 09:39 (연도 포함) */
+function estDateText(r){
+  const ts=num(r&&r.savedAt)||num(r&&r.id);
+  if(ts>1e12){const d=new Date(ts),p=n=>String(n).padStart(2,'0');return `${d.getFullYear()}.${p(d.getMonth()+1)}.${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;}
+  return (r&&r.time)||'';
+}
 function estRender(){
   if($('estCnt'))$('estCnt').textContent=estDB.length+'건';
   const sumEl=$('estSum'),list=$('estList');
@@ -2695,10 +2717,18 @@ function estRender(){
     sumEl.textContent=`견적 ${estDB.length}건 · 총액 합계 ${won(tot)}원`;sumEl.classList.add('show');
     list.innerHTML=estDB.map(r=>{
       const sale=r.sale>0?` · 판매 ${won(r.sale)}`:'';
-      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="syncb${r.sync?' on':''}" title="${r.sync?'클라우드 동기화 선택됨 (클릭하면 해제)':'클릭하면 클라우드 동기화 대상에 포함'}" onclick="event.stopPropagation();estSyncToggle(${r.id})">☁</button><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.asm&&r.asm.name?`<b style="color:#0a7d4b">🧩 ${esc(r.asm.name)} × ${cf(num(r.asm.per)||1)}</b> · `:''}<b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale} · ${r.time}</div></div>`;
+      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="syncb${r.sync?' on':''}" title="${r.sync?'클라우드 동기화 선택됨 (클릭하면 해제)':'클릭하면 클라우드 동기화 대상에 포함'}" onclick="event.stopPropagation();estSyncToggle(${r.id})">☁</button><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.asm&&r.asm.name?`<b style="color:#0a7d4b">🧩 ${esc(r.asm.name)} × ${cf(num(r.asm.per)||1)}</b> · `:''}<span class="rec-date">${estDateText(r)}</span> · <b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale}</div></div>`;
     }).join('');
   }
   estListRender();
+}
+/* 저장된 견적 상세표: 값이 없어 '-' 로 표시되던 칸을 공백으로 */
+function estBlankDashes(root){
+  if(!root)return;
+  root.querySelectorAll('.est-line-table td').forEach(td=>{
+    const t=td.textContent.replace(/\s+/g,'');
+    if(t==='-'||t==='-원'||t==='-kg'){td.textContent='';td.classList.add('est-blank');}
+  });
 }
 function estListRender(){
   const cards=$('estCards'),sum=$('estListSum');
@@ -3678,6 +3708,7 @@ function estListRender(){
   const groups=estRecordsByTitle();
   if(sum)sum.textContent=`견적 ${estDB.length}건 · 견적서 ${groups.length}개 · 총액 합계 ${won(t.total)}원 · 평균 개당단가 ${won(avg)}원`;
   cards.innerHTML=groups.map((g,i)=>estTableHtml(g.rows,i+1,g.title)).join('');
+  estBlankDashes(cards);
   fitEstLineTable();
 }
 
@@ -4382,7 +4413,7 @@ function syncUrl(){try{return String(localStorage.getItem('dpt_sync_url')||'').t
 function syncKey(){try{return String(localStorage.getItem('dpt_sync_key')||'').trim()||auKey();}catch(e){return auKey();}}
 function cloudSetServer(){
   const cur=(function(){try{return localStorage.getItem('dpt_sync_url')||'';}catch(e){return '';}})();
-  const u=prompt('동기화 서버 주소 (…/exec)\n비워 두면 로그인 서버와 동일하게 사용합니다.\n\n현재 로그인 서버: '+(auUrl()||'(없음)'),cur);
+  const u=prompt('견적기 전용 동기화 서버 주소 (…/exec)\n※ 로그인·매출분석 서버 주소가 아니라 press_est_sync.gs 로 만든 주소를 넣으세요.\n비워 두면 로그인 서버를 사용합니다(동기화 미지원일 수 있음).\n\n현재 로그인 서버: '+(auUrl()||'(없음)'),cur);
   if(u===null)return;
   const k=prompt('동기화 비밀키 (비우면 로그인 비밀키 사용)',(function(){try{return localStorage.getItem('dpt_sync_key')||'';}catch(e){return '';}})());
   if(k===null)return;
@@ -4393,7 +4424,44 @@ function cloudSetServer(){
     const kk=String(k||'').trim();
     if(kk)localStorage.setItem('dpt_sync_key',kk);else localStorage.removeItem('dpt_sync_key');
   }catch(e){}
-  cloudCfg.lastErr='';renderCloudBar();toast('동기화 서버 설정을 저장했습니다');
+  cloudCfg.lastErr='';cloudCfg.unsup=false;cloudSaveCfg();renderCloudBar('연결 확인 중…');
+  cloudPing().then(r=>{
+    if(r.ok){cloudCfg.lastErr='';renderCloudBar();toast('✓ '+r.msg+' · [⤒ 서버에 올리기] 또는 [⤓ 서버에서 받기]를 누르세요');}
+    else{cloudCfg.lastErr='연결 확인: '+r.msg;renderCloudBar();toast('서버 설정은 저장했지만 연결 확인 실패 — '+r.msg);}
+  });
+}
+
+/* ===== 견적기 전용 동기화 서버 안내 ===== */
+const PRESS_SYNC_GS="/**********************************************************************\n * (주)동방파스텍 · 가공비 견적기 동기화 백엔드\n *  - Google Apps Script 새 프로젝트에 이 코드 전체를 붙여넣고\n *    [배포] → [새 배포] → 유형 \"웹 앱\"\n *      · 실행 계정 : 나\n *      · 액세스 권한 : 모든 사용자\n *    로 배포한 뒤, 생성된 주소(.../exec)를 견적기 로그인 화면의\n *    [⚙ 서버 주소 설정] 또는 클라우드 동기화의 [⚙ 서버]에 입력하세요.\n *  - 저장 위치 : 내 구글 드라이브의 press_est_sync.json 파일 1개\n **********************************************************************/\n\nvar SYNC_KEY  = 'dbang2026!';          // 견적기에 입력할 비밀키 (원하면 변경)\nvar FILE_NAME = 'press_est_sync.json'; // 드라이브에 만들어지는 저장 파일\n\nfunction doGet(e)  { return route_(e && e.parameter || {}, null); }\nfunction doPost(e) {\n  var body = {};\n  try { body = JSON.parse((e && e.postData && e.postData.contents) || '{}'); } catch (_) {}\n  return route_(e && e.parameter || {}, body);\n}\n\nfunction route_(p, body) {\n  var q      = body || {};\n  var action = String(q.action || p.action || 'get').toLowerCase();\n  var key    = String(q.key    || p.key    || '');\n  var ns     = String(q.ns     || p.ns     || 'pressEstV1');\n\n  if (key !== SYNC_KEY) return out_({ ok: false, error: '비밀키가 일치하지 않습니다' });\n\n  if (action === 'ping') return out_({ ok: true, alive: true, app: 'press_est_sync', ns: ns });\n\n  var lock = LockService.getScriptLock();\n  try { lock.waitLock(20000); } catch (_) { return out_({ ok: false, error: '서버가 사용 중입니다. 잠시 후 다시 시도하세요' }); }\n\n  try {\n    var db = read_();\n\n    if (action === 'get' || action === 'load' || action === 'read') {\n      return out_({ ok: true, ns: ns, data: db[ns] || null,\n                    updatedAt: (db._meta && db._meta[ns] && db._meta[ns].at) || 0,\n                    by: (db._meta && db._meta[ns] && db._meta[ns].by) || '' });\n    }\n\n    if (action === 'save' || action === 'set') {\n      var data = q.data;\n      if (data && typeof data === 'object' && data[ns] && Object.keys(data).length === 1) data = data[ns];\n      if (!data || typeof data !== 'object') return out_({ ok: false, error: '저장할 data 가 없습니다' });\n      db[ns] = data;\n      db._meta = db._meta || {};\n      db._meta[ns] = { at: Date.now(), by: String(q.clientId || q.by || '') };\n      write_(db);\n      return out_({ ok: true, ns: ns, updatedAt: db._meta[ns].at });\n    }\n\n    return out_({ ok: false, error: '알 수 없는 action: ' + action });\n  } catch (err) {\n    return out_({ ok: false, error: String((err && err.message) || err) });\n  } finally {\n    try { lock.releaseLock(); } catch (_) {}\n  }\n}\n\nfunction out_(o) {\n  return ContentService.createTextOutput(JSON.stringify(o))\n                       .setMimeType(ContentService.MimeType.JSON);\n}\n\nfunction file_() {\n  var it = DriveApp.getFilesByName(FILE_NAME);\n  while (it.hasNext()) { var f = it.next(); if (!f.isTrashed()) return f; }\n  return DriveApp.createFile(FILE_NAME, '{}', 'application/json');\n}\n\nfunction read_() {\n  try { return JSON.parse(file_().getBlob().getDataAsString('UTF-8') || '{}') || {}; }\n  catch (_) { return {}; }\n}\n\nfunction write_(db) {\n  file_().setContent(JSON.stringify(db));\n}\n\n/* 편집기에서 한 번 실행해 권한을 승인하고 저장 파일을 만들어 두려면 아래 함수를 실행하세요 */\nfunction setup() {\n  var f = file_();\n  Logger.log('저장 파일 준비 완료: ' + f.getName() + ' / ' + f.getUrl());\n}\n";
+function cloudServerGuide(auto){
+  let m=$('cloudGuide');
+  if(!m){m=document.createElement('div');m.id='cloudGuide';m.className='cg-back';document.body.appendChild(m);}
+  m.innerHTML=`<div class="cg-box">
+    <div class="cg-h"><b>☁ 견적기 전용 동기화 서버 만들기</b><button onclick="$('cloudGuide').remove()">✕</button></div>
+    ${auto?'<div class="cg-warn">현재 연결된 서버(로그인·매출분석 서버)는 견적기 자료 받기/올리기를 지원하지 않아 동기화를 중단했습니다. 매출분석 자료 보호를 위해 이 서버에는 올리지 않습니다.</div>':''}
+    <ol class="cg-ol">
+      <li><a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com</a> 에서 <b>새 프로젝트</b>를 만듭니다.</li>
+      <li>기본 코드를 모두 지우고 아래 <b>[코드 복사]</b> 내용을 붙여넣고 저장합니다.</li>
+      <li>상단 <b>배포 → 새 배포 → 유형: 웹 앱</b> · 실행 계정 <b>나</b> · 액세스 <b>모든 사용자</b> → 배포 (권한 승인)</li>
+      <li>생성된 <b>…/exec</b> 주소를 복사해 <b>[⚙ 서버]</b>에 붙여넣습니다. 비밀키는 <code>dbang2026!</code> (코드 맨 위 SYNC_KEY 와 같게)</li>
+      <li>PC·태블릿 모두 같은 주소를 넣고 한 번 <b>[⤒ 서버에 올리기]</b> → 다른 기기에서 <b>[⤓ 서버에서 받기]</b></li>
+    </ol>
+    <div class="cg-acts"><button class="pri" onclick="cloudCopyGs()">📋 코드 복사</button><button onclick="cloudSaveGs()">⤓ press_est_sync.gs 저장</button><button onclick="$('cloudGuide').remove();cloudSetServer()">⚙ 서버 주소 입력</button></div>
+    <pre class="cg-code">${esc(PRESS_SYNC_GS)}</pre>
+  </div>`;
+  m.onclick=e=>{if(e.target===m)m.remove();};
+}
+async function cloudCopyGs(){try{await navigator.clipboard.writeText(PRESS_SYNC_GS);toast('서버 코드를 복사했습니다 · Apps Script 편집기에 붙여넣으세요');}catch(e){toast('복사가 막혀 있습니다 · 아래 코드를 직접 선택해 복사하세요');}}
+function cloudSaveGs(){saveBlobFile(new Blob([PRESS_SYNC_GS],{type:'text/plain'}),'press_est_sync.gs','text/plain');}
+async function cloudPing(){
+  if(!syncUrl())return {ok:false,msg:'주소 없음'};
+  try{
+    const r=await xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=ping&ns='+encodeURIComponent(CLOUD_NS)+'&key='+encodeURIComponent(syncKey())+'&_t='+Date.now(),{},20000);
+    const t=await r.text();let d=null;try{d=JSON.parse(t);}catch(e){}
+    if(d&&d.ok&&(d.app==='press_est_sync'||d.alive))return {ok:true,msg:'견적기 전용 서버 연결 정상'};
+    if(d&&(d.error||d.ok===false))return {ok:false,msg:String(d.error||d.message||'거부됨')};
+    return {ok:false,msg:'응답 형식이 다릅니다 (HTTP '+r.status+')'};
+  }catch(e){return {ok:false,msg:(e&&e.message)||String(e)};}
 }
 async function xFetch(url,opt,ms){
   const ctl=(typeof AbortController!=='undefined')?new AbortController():null;
@@ -4402,7 +4470,7 @@ async function xFetch(url,opt,ms){
   catch(e){if(e&&e.name==='AbortError')throw new Error('서버가 응답하지 않았습니다 (시간 초과)');throw e;}
   finally{if(t)clearTimeout(t);}
 }
-var cloudCfg=(()=>{try{return Object.assign({auto:false,at:'',by:'',localAt:0},JSON.parse(localStorage.getItem('dptCloudCfg')||'{}'));}catch(e){return {auto:false,at:'',by:'',localAt:0};}})();
+var cloudCfg=(()=>{try{return Object.assign({auto:true,at:'',by:'',localAt:0},JSON.parse(localStorage.getItem('dptCloudCfg')||'{}'));}catch(e){return {auto:false,at:'',by:'',localAt:0};}})();
 function cloudSaveCfg(){try{localStorage.setItem('dptCloudCfg',JSON.stringify(cloudCfg));}catch(e){}}
 var _cloudBusy=false,_cloudT=null,_cloudApplying=false;
 /* 동기화 대상 선택 */
@@ -4421,6 +4489,12 @@ function estSyncGroup(idsCsv){
   toast(allOn?`${rows.length}건을 동기화 대상에서 뺐습니다`:`${rows.length}건을 동기화 대상에 포함했습니다 · [⤒ 서버에 올리기]로 반영`);
 }
 function estSyncCount(){return estDB.filter(r=>r.sync).length;}
+function estSyncAll(on){
+  if(!estDB.length){toast('저장된 견적이 없습니다');return;}
+  estDB.forEach(r=>{r.sync=!!on;if(!on)r.unsharedAt=Date.now();});
+  saveEstDB();estRender();renderCloudBar();
+  toast(on?`저장 견적 ${estDB.length}건을 모두 동기화 대상으로 지정했습니다`:'모든 견적을 동기화 대상에서 뺐습니다');
+}
 /* 서버 공유 견적 + 로컬 선택 견적 병합 (선택 해제한 건은 서버에서 제외) */
 function estMergeShared(serverList){
   const map=new Map();
@@ -4489,24 +4563,28 @@ function cloudApply(d){
   _cloudApplying=false;
   return true;
 }
+const CLOUD_UNSUP=/지원하지 않는 action|알 수 없는 action|unknown action|unsupported action|invalid action/i;
 async function cloudTry(list){
-  /* 서버 구현 차이를 흡수: GET(action=get) → POST(action=get) → POST(action=load) 순서로 시도 */
-  let lastErr='';
+  /* 서버 구현 차이를 흡수: 여러 방식으로 시도하고, 실패 시 '미지원 action' 이 아닌 오류를 우선 보고 */
+  let lastErr='';const errs=[];
   for(const mk of list){
     try{
       const r=await mk();
       const tx=await r.text();
       let d=null;
       try{d=JSON.parse(tx);}catch(e){
-        lastErr='JSON이 아닌 응답 (HTTP '+r.status+')';
+        lastErr='JSON이 아닌 응답 (HTTP '+r.status+')';errs.push(lastErr);
         continue;
       }
-      if(d&&d.error){lastErr=String(d.error);continue;}
-      if(d&&d.ok===false){lastErr=String(d.message||d.msg||'서버가 요청을 거부했습니다');continue;}
+      if(d&&d.error){lastErr=String(d.error);errs.push(lastErr);lastErr='';continue;}
+      if(d&&d.ok===false){lastErr=String(d.message||d.msg||'서버가 요청을 거부했습니다');errs.push(lastErr);lastErr='';continue;}
       return {d};
-    }catch(e){lastErr=(e&&e.message)||String(e);}
+    }catch(e){errs.push((e&&e.message)||String(e));}
   }
-  return {err:lastErr||'알 수 없는 오류'};
+  const real=errs.filter(e=>!CLOUD_UNSUP.test(e));
+  /* 어느 한 방식이라도 '미지원 action' 이면 이 서버는 견적기 동기화 규약을 모르는 서버 (비밀키 오류는 제외) */
+  const unsup=errs.some(e=>CLOUD_UNSUP.test(e))&&!errs.some(e=>/비밀키|secret|권한|토큰|token/i.test(e));
+  return {err:(real[0]||errs[0]||lastErr||'알 수 없는 오류'),unsup,errs};
 }
 function cloudPost(body){
   return ()=>xFetch(syncUrl(),{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(body)},40000);
@@ -4516,9 +4594,10 @@ async function cloudFetchMine(){
   const res=await cloudTry([
     ()=>xFetch(syncUrl()+(syncUrl().indexOf('?')>=0?'&':'?')+'action=get&ns='+encodeURIComponent(CLOUD_NS)+'&key='+K+'&token='+T+'&_t='+Date.now(),{},40000),
     cloudPost({action:'get',ns:CLOUD_NS,key:syncKey(),token:AU.token}),
-    cloudPost({action:'load',ns:CLOUD_NS,key:syncKey(),token:AU.token})
+    cloudPost({action:'load',ns:CLOUD_NS,key:syncKey(),token:AU.token}),
+    cloudPost({action:'read',ns:CLOUD_NS,key:syncKey(),token:AU.token})
   ]);
-  if(res.err)return {err:res.err};
+  if(res.err)return {err:res.err,unsup:!!res.unsup};
   const d=res.d;
   const root=(d&&d.data&&typeof d.data==='object')?d.data:d;
   /* 전용 백엔드는 data 가 곧 pressEstV1 내용, 공용 문서는 data[pressEstV1] */
@@ -4532,11 +4611,12 @@ async function cloudPull(silent){
   try{
     const res=await cloudFetchMine();
     if(res.err){
-      cloudCfg.lastErr=res.err;
-      if(!silent)toast('받기 실패 — '+res.err);
-      renderCloudBar('받기 실패 · '+String(res.err).slice(0,60));
+      cloudCfg.lastErr=res.unsup?'이 서버는 견적기 동기화를 지원하지 않습니다 (로그인·매출분석 서버). [📄 전용 서버] 안내대로 견적기 전용 서버를 만들고 [⚙ 서버]에 주소를 넣어주세요':res.err;cloudCfg.unsup=!!res.unsup;cloudSaveCfg();
+      if(!silent){if(res.unsup)cloudServerGuide(true);else toast('받기 실패 — '+res.err);}
+      renderCloudBar(res.unsup?'전용 동기화 서버 필요':'받기 실패 · '+String(res.err).slice(0,60));
       return false;
     }
+    cloudCfg.unsup=false;
     const mine=res.mine;
     if(!mine){
       cloudCfg.lastErr='';
@@ -4562,7 +4642,14 @@ async function cloudPush(silent){
   if(_cloudBusy)return false;_cloudBusy=true;renderCloudBar('올리는 중…');
   try{
     let serverShared=[];
-    try{const cur=await cloudFetchMine();if(cur&&cur.mine&&Array.isArray(cur.mine.estShared))serverShared=cur.mine.estShared;}catch(e){}
+    const cur=await cloudFetchMine();
+    if(cur&&cur.err){
+      cloudCfg.lastErr=cur.unsup?'이 서버는 견적기 동기화를 지원하지 않습니다 (로그인·매출분석 서버). [📄 전용 서버] 안내대로 견적기 전용 서버를 만들고 [⚙ 서버]에 주소를 넣어주세요':('서버 조회 실패로 올리지 않았습니다 — '+cur.err);cloudCfg.unsup=!!cur.unsup;cloudSaveCfg();
+      if(!silent){if(cur.unsup)cloudServerGuide(true);else toast('올리기 중단 — 서버 자료를 먼저 확인할 수 없습니다: '+cur.err);}
+      renderCloudBar(cur.unsup?'전용 동기화 서버 필요':'올리기 중단');return false;
+    }
+    cloudCfg.unsup=false;
+    if(cur&&cur.mine&&Array.isArray(cur.mine.estShared))serverShared=cur.mine.estShared;
     const payload=cloudPayload(serverShared);
     const data={};data[CLOUD_NS]=payload;
     const res=await cloudTry([
@@ -4646,7 +4733,7 @@ function renderCloudBar(msg){
   const on=auValid();
   el.innerHTML=`<div class="cb-l"><b>클라우드 동기화</b>
       <span>${on?`${esc(AU.name||AU.id)} · ${AU_ROLE[AU.role]||''}`:'로그인 필요'}</span>
-      <span class="cb-sync" title="저장된 견적의 ☁ 버튼으로 선택한 건만 동기화됩니다">공유 견적 ${estSyncCount()}건 선택</span>
+      <span class="cb-sync" title="저장된 견적의 ☁ 버튼으로 개별 제외할 수 있습니다">공유 견적 ${estSyncCount()} / ${estDB.length}건</span>
       <span class="cb-at">${msg?esc(msg):(cloudCfg.at?('최근 동기화 '+esc(cloudCfg.at)+(cloudCfg.by?' · '+esc(cloudCfg.by):'')):'동기화 기록 없음')}</span>
       ${cloudCfg.lastErr?`<span class="cb-err" title="${esc(cloudCfg.lastErr)}">오류: ${esc(String(cloudCfg.lastErr).slice(0,90))}</span>`:''}</div>
     <div class="cb-r">
@@ -4654,7 +4741,10 @@ function renderCloudBar(msg){
       <button onclick="cloudPush()">⤒ 서버에 올리기</button>
       <button onclick="cloudPull()">⤓ 서버에서 받기</button>
       <button onclick="cloudDiag()">진단</button>
+      <button onclick="estSyncAll(true)">☁ 견적 모두 선택</button>
+      <button onclick="estSyncAll(false)">모두 해제</button>
       <button onclick="cloudSetServer()">⚙ 서버</button>
+      <button onclick="cloudServerGuide(false)">📄 전용 서버</button>
       <button onclick="syncFileSave()">📤 동기화 파일 저장</button>
       <button onclick="syncFilePick()">📥 동기화 파일 열기</button>
       ${on?'<button onclick="auLogout()">로그아웃</button>':'<button class="pri" onclick="auShowGate()">🔐 로그인</button>'}
@@ -5304,7 +5394,7 @@ selectTon('160');
 loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNamePick();refreshPnamePick();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-22 · v85';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-23 · v88';})();
 formatAllNums();
 estCalc();
 </script>
