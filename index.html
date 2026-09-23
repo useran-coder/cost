@@ -897,6 +897,9 @@
   @media print{.est-zero-toggle{display:none!important}}
 
   /* ===== 추가견적·견적리스트 글꼴 요청 반영 ===== */
+  .save-row .bigbtn.dirty{background:var(--accent)!important;color:#fff!important;border:none!important;box-shadow:0 3px 10px rgba(229,32,42,.28)}
+  .save-row .bigbtn.clean{background:#eef0f4!important;color:#9aa3b2!important;border:1.5px solid #e3e7ee!important;box-shadow:none!important;cursor:default}
+  .save-row .bigbtn.clean:active{transform:none}
   .save-row .bigbtn.addq{background:#eef4ff;color:var(--blue);border:1.5px solid #d6e3fb}
   .est-line-table thead tr.grp th .head-sum{font-size:6.2px!important;line-height:1!important;font-weight:400!important}
   .est-line-table thead tr.cols th{font-weight:400!important}
@@ -1577,7 +1580,7 @@
 
   <div class="save-row">
     <button class="bigbtn" id="btnSaveNew" onclick="estSaveNew()">＋ 견적 저장</button>
-    <button class="bigbtn" id="btnSaveUpdate" onclick="estUpdateSave()" style="display:none;background:var(--accent)">✓ 수정 저장</button>
+    <button class="bigbtn clean" id="btnSaveUpdate" onclick="estUpdateSave()" style="display:none">✓ 수정 저장</button>
     <button class="bigbtn addq" onclick="estAdditional()">＋ 추가견적</button>
     <button class="bigbtn newq" onclick="estNew()">🗋 새 견적 만들기</button>
   </div>
@@ -2451,6 +2454,7 @@ function estCalc(){
   }else{$('a_rate').textContent='-';$('a_costrate').textContent='-';$('a_matprofit').textContent='-';}
   $('bb_unit').innerHTML=`${won(unit)}<small> 원</small>`;$('bb_total').textContent=won(total)+'원';
   const postMap={};POSTS.forEach(p=>{postMap[p.k]=(state.posts[p.k]&&state.posts[p.k].on)?(p.k==='defect'?defectC:(p.k==='scrap'?scrapC:postCost(p,{}))):0;});
+  try{if(typeof updateEstEditButtons==='function')updateEstEditButtons();}catch(e){}
   LAST={mc:mc+gasCost,lc,postSum,mat,subtotal,marginPct:Math.round(mr*100),addmargin,adj,unit,total,qty,sale,saleRate:sale>0?diff/sale*100:null,proc,matT:EM.t,matW:EM.w,matL:EM.l,matWeight:EM.one,matUnit:EM.unit,matKey:EM.key,laserWork:proc==='laser'?mc:0,laserGas:proc==='laser'?gasCost:0,laserLabor:proc==='laser'?lc:0,pressMain:(proc==='press'||proc==='form'||proc==='cut')?press:0,postMap};
 }
 
@@ -2576,7 +2580,7 @@ function estCardHtml(r,i){
 }
 function estNew(keepTitle=false){
   const keptTitle=keepTitle&&$('pname')?$('pname').value:'';
-  editingEstId=null;updateEstEditButtons();
+  editingEstId=null;estCleanSig='';updateEstEditButtons();
   if($('pname'))$('pname').value=keptTitle;
   if($('productName'))$('productName').value='';
   if($('specNote'))$('specNote').value='';
@@ -2657,7 +2661,7 @@ function estLoadRecord(id,quiet){
   if($('asmName')&&!String($('asmName').value||'').trim())$('asmName').value=(r.asm&&r.asm.name)||'';
   if($('asmPer'))$('asmPer').value=cf((r.asm&&r.asm.per)||1);
   try{estCalc();}catch(e){}
-  editingEstId=id;updateEstEditButtons();
+  editingEstId=id;estMarkClean();
   if(typeof refreshPnamePick==='function'){refreshPnamePick();refreshAsmNamePick();}
   if(!quiet)toast('견적 내용을 불러왔습니다. [✓ 수정 저장] 또는 [＋ 새로 저장]을 선택하세요');
   return true;
@@ -2676,21 +2680,35 @@ function estSaveNew(){
   const rec=estBuildRecord(Date.now());
   if(!rec)return;
   estDB.unshift(rec);saveEstDB();editingEstId=rec.id;updateEstEditButtons();   /* 저장 후 그 견적을 계속 수정할 수 있도록 수정 모드 유지 */
-  estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}cloudSyncNow('견적 저장');toast('견적을 저장했습니다 ('+estDB.length+'건) · ☁ 동기화 포함'+(cloudCfg.auto?' · 자동 올리기':'')+' · 이어서 고치면 [✓ 수정 저장] 또는 [＋ 새로 저장]');
+  estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}estMarkClean();cloudSyncNow('견적 저장');toast('견적을 저장했습니다 ('+estDB.length+'건) · ☁ 동기화 포함'+(cloudCfg.auto?' · 자동 올리기':'')+' · 이어서 고치면 [✓ 수정 저장] 또는 [＋ 새로 저장]');
 }
 function estUpdateSave(){
   if(!editingEstId){toast('수정할 견적을 먼저 불러오세요');return;}
+  if(!estIsDirty()){toast('변경된 내용이 없습니다');return;}
   const idx=estDB.findIndex(r=>r.id===editingEstId);
   if(idx<0){toast('수정 대상 견적을 찾을 수 없습니다');editingEstId=null;updateEstEditButtons();return;}
   const rec=estBuildRecord(editingEstId);
   if(!rec)return;
   rec.sync=(estDB[idx].sync!==false);if(estDB[idx].syncAt)rec.syncAt=estDB[idx].syncAt;
-  estDB[idx]=rec;saveEstDB();editingEstId=rec.id;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}cloudSyncNow('수정 저장');toast('기존 견적을 수정 저장했습니다');
+  estDB[idx]=rec;saveEstDB();editingEstId=rec.id;updateEstEditButtons();estRender();if(typeof renderAsmPage==='function')renderAsmPage();if(typeof refreshAsmNamePick==='function'){refreshAsmNamePick();refreshPnamePick();}estMarkClean();cloudSyncNow('수정 저장');toast('기존 견적을 수정 저장했습니다');
 }
+var estCleanSig='';
+/* 현재 입력 상태 지문 — 저장 시점과 같으면 '수정 저장' 을 비활성색으로 */
+function estSig(){
+  try{return JSON.stringify(captureState());}catch(e){return '';}
+}
+function estMarkClean(){estCleanSig=estSig();updateEstEditButtons();}
+function estIsDirty(){return !!editingEstId&&estCleanSig!==''&&estSig()!==estCleanSig;}
 function updateEstEditButtons(){
   const bNew=$('btnSaveNew'),bUpd=$('btnSaveUpdate');
   if(bNew)bNew.innerHTML=editingEstId?'＋ 새로 저장':'＋ 견적 저장';
-  if(bUpd)bUpd.style.display=editingEstId?'block':'none';
+  if(bUpd){
+    bUpd.style.display=editingEstId?'block':'none';
+    const dirty=estIsDirty();
+    bUpd.classList.toggle('dirty',dirty);
+    bUpd.classList.toggle('clean',!dirty);
+    bUpd.title=dirty?'변경된 내용을 이 견적에 덮어씁니다':'변경된 내용이 없습니다';
+  }
 }
 var estFoldOpen=(function(){try{return localStorage.getItem('dptEstFold')==='1';}catch(e){return false;}})();
 function estToggleFold(force){
@@ -5413,7 +5431,7 @@ selectTon('160');
 loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNamePick();refreshPnamePick();
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-23 · v90';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-23 · v91';})();
 formatAllNums();
 estCalc();
 </script>
