@@ -67,6 +67,8 @@
   .post-toggle-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);background:#fafbfd;cursor:pointer;user-select:none}
   .post-toggle-h .n{width:22px;height:22px;border-radius:6px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800}
   .post-toggle-h h2{font-size:14.5px;margin:0;font-weight:700;flex:1}
+  .post-toggle-h.hasprocs h2{flex:0 0 auto}
+  .post-toggle-h .head-procs{flex:1 1 auto;text-align:left;margin-right:auto}
   .post-toggle-h .sum{font-size:14px;font-weight:800;color:var(--ok)}
   .post-toggle-h .chev{font-size:12px;color:var(--sub);transition:.15s;margin-left:4px}
   .post-toggle-h.open .chev{transform:rotate(180deg)}
@@ -164,8 +166,10 @@
   .rec-sum.show{display:block}
   .rec-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;margin:0 -2px;padding:0 2px}
   .rec-row{background:#f7f8fb;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+  .head-procs{flex:1 1 auto;min-width:0;font-size:11.5px;font-weight:700;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .rec-top{display:flex;align-items:center;gap:10px}
   .rec-top .l1{flex:1;min-width:0;font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rec-top .l1sub{margin-left:7px;font-size:11.5px;font-weight:600;color:var(--sub)}
   .rec-top .wt{font-size:14px;font-weight:800;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums;text-align:right;line-height:1.25;display:flex;align-items:center;gap:10px}
   .rec-top .wt .saved-mat-cost{display:inline-flex;align-items:baseline;gap:4px;margin:0;font-size:11px;font-weight:700;color:var(--accent);white-space:nowrap}
   .rec-top .wt .saved-mat-cost-label{font-size:11px;font-weight:700;color:var(--accent)}
@@ -1139,6 +1143,7 @@
   #estimateReportArea{display:none}
   #estimateReportArea.measuring{display:block;position:absolute;left:-20000px;top:0;z-index:-1}
   .ag.ag-pdf{background:#fff3f3;color:var(--accent);border-color:#efb9bd}
+  .rec-sync{margin-left:6px;padding:4px 9px;border:1px solid #9dbcf5;background:#eef5ff;color:#1f5fd1;border-radius:8px;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
   .rec-trash{margin-left:6px;padding:4px 9px;border:1px solid #efb9bd;background:#fff3f3;color:var(--accent);border-radius:8px;font-family:inherit;font-size:11.5px;font-weight:800;cursor:pointer;white-space:nowrap}
   .est-list-actions #estTrashBtn{background:#fff3f3;border-color:#efb9bd;color:var(--accent)}
   .trash-box{border:1px solid var(--line);border-radius:12px;background:#fbfcfe;margin:0 0 14px;overflow:hidden}
@@ -1333,7 +1338,7 @@
   </section>
 
   <section class="card">
-    <div class="post-toggle-h" id="procToggle" onclick="toggleProc()"><span class="n">3</span><h2>1차 가공</h2><span class="sum" id="procHeadSum">0원</span><span class="chev">▼</span></div>
+    <div class="post-toggle-h hasprocs" id="procToggle" onclick="toggleProc()"><span class="n">3</span><h2>1차 가공</h2><span class="head-procs" id="procHeadSel"></span><span class="sum" id="procHeadSum">0원</span><span class="chev">▼</span></div>
     <div class="sec-b" id="procBody" style="display:none;padding-top:10px">
       <span class="lab" style="font-size:12px;color:var(--sub);font-weight:600;display:block;margin-bottom:6px">가공 방식</span>
       <div class="seg seg4" id="procSeg"><button data-proc="press">프레스 가공</button><button data-proc="laser">레이저 가공</button><button data-proc="form">포밍</button><button data-proc="cut">절단</button></div>
@@ -1388,7 +1393,7 @@
   </section>
 
   <section class="card">
-    <div class="post-toggle-h" id="postToggle" onclick="togglePostSection()"><span class="n">4</span><h2>후공정</h2><span class="sum" id="postHeadSum">0원</span><span class="chev">▼</span></div>
+    <div class="post-toggle-h hasprocs" id="postToggle" onclick="togglePostSection()"><span class="n">4</span><h2>후공정</h2><span class="head-procs" id="postHeadSel"></span><span class="sum" id="postHeadSum">0원</span><span class="chev">▼</span></div>
     <div class="sec-b" id="postBody" style="padding-top:10px"></div>
   </section>
   <p class="note">기본 단가는 일반적 견적 관행 기준의 참고값입니다. [단가산정] 탭에서 자사 실적값으로 고정해 사용하세요.<br>ⓒ (주)동방파스텍 방화문부자재 사업부</p>
@@ -1416,6 +1421,7 @@
           <button onclick="estExport()">엑셀</button>
           <button onclick="estShare()">공유</button>
           <button onclick="estClear()">전체삭제</button>
+          <button onclick="cloudSyncBoth()">🔄 기기 간 맞추기</button>
           <button id="estTrashBtn" onclick="estTrashToggle()">🗑 휴지통 0</button>
         </div>
       </div>
@@ -1619,7 +1625,7 @@
   </div>
   <section class="card">
     <div class="sec-b">
-      <div class="rec-head recfold" id="estFoldHead" onclick="estToggleFold()"><span class="t">저장된 견적 <small style="color:var(--sub);font-weight:600">· 클릭하면 펼치기 / 항목 클릭 시 상세보기</small></span><span class="cnt" id="estCnt">0건</span><button class="rec-trash" id="estTrashBtn2" onclick="event.stopPropagation();showPage('list');estTrashOpen=true;estTrashRender();setTimeout(()=>{const el=$('estTrashBox');if(el)el.scrollIntoView({block:'center'});},60);" title="삭제한 견적 보기·복원">🗑 휴지통 0</button><span class="chev" id="estFoldChev">▼</span></div>
+      <div class="rec-head recfold" id="estFoldHead" onclick="estToggleFold()"><span class="t">저장된 견적 <small style="color:var(--sub);font-weight:600">· 클릭하면 펼치기 / 항목 클릭 시 상세보기</small></span><span class="cnt" id="estCnt">0건</span><button class="rec-sync" id="estSyncBtn2" onclick="event.stopPropagation();cloudSyncBoth();" title="다른 기기(PC·태블릿)와 저장 견적을 맞춥니다">🔄 맞추기</button><button class="rec-trash" id="estTrashBtn2" onclick="event.stopPropagation();showPage('list');estTrashOpen=true;estTrashRender();setTimeout(()=>{const el=$('estTrashBox');if(el)el.scrollIntoView({block:'center'});},60);" title="삭제한 견적 보기·복원">🗑 휴지통 0</button><span class="chev" id="estFoldChev">▼</span></div>
       <div id="estFoldBody" style="display:none">
         <div class="rec-sum" id="estSum"></div>
         <div class="rec-list" id="estList"></div>
@@ -2486,6 +2492,22 @@ function estCalc(){
   const postSum=normalSum+defectC+scrapC;
   $('postHeadSum').textContent=(postSum<0?'−':'')+won(Math.abs(postSum))+'원';
   POSTS.forEach(p=>{const el=document.querySelector('#post_'+p.k+' .nm span');if(el)el.textContent=postFormula(p);});
+  { const ps=$('procHeadSel');
+    if(ps){
+      const NM={press:'프레스 가공',laser:'레이저 가공',form:'포밍',cut:'절단'};
+      const seq=[];
+      if(state.proc&&NM[state.proc]){
+        seq.push(NM[state.proc]);
+        if(state.proc==='press'){seq.push(state.mode==='auto'?'프로그래시브':'단발');const t=TON.find(x=>x.key===state.ton);if(t)seq.push(t.label);const h=num($('hits')&&$('hits').value);if(state.mode==='auto'&&h>0)seq.push('타발 '+cf(h)+'타');}
+        else if(state.proc==='laser'){const pn=($('prod')&&$('prod').value)||'';if(pn)seq.push(pn);const wk=num($('workersL')&&$('workersL').value);if(wk>1)seq.push('인원 '+cf(wk)+'명');}
+        else if(state.proc==='cut'){const cn=num($('cutn')&&$('cutn').value);if(cn>0)seq.push('절단 '+cf(cn)+'회');const wk=num($('workersC')&&$('workersC').value);if(wk>1)seq.push('인원 '+cf(wk)+'명');}
+      }
+      ps.textContent=seq.join(' › ');ps.title=seq.join(' › ');
+    } }
+  { const hs=$('postHeadSel');
+    if(hs){const on=POSTS.filter(p=>state.posts[p.k]&&state.posts[p.k].on).map(p=>p.nm);
+      const short=on.map(n=>n.replace(/\s*\(.*?\)/g,''));
+      hs.textContent=short.join(' › ');hs.title=on.join(' › ');} }
   try{renderPackBrk();}catch(e){}
   const moldCost=num($('moldCost').value),mQpm=num($('moldQpm').value),mY=num($('moldY').value),mM=num($('moldM').value),mMonths=mY*12+mM,mQty=mQpm*mMonths,mUnit=mQty>0?moldCost/mQty:0;
   $('mold_period').textContent=(mMonths>0?mMonths+' 개월':'- 개월');$('mold_qty').textContent=won(mQty)+' 개';$('mold_unit').textContent=(mUnit>0?(Math.round(mUnit*100)/100).toLocaleString():'0')+' 원';
@@ -2847,10 +2869,11 @@ function estRender(){
   if(list&&sumEl){
     if(!estDB.length){list.innerHTML='<div class="empty">저장된 견적이 없습니다</div>';sumEl.classList.remove('show');estListRender();return;}
     const tot=estDB.reduce((a,r)=>a+r.total,0);
-    sumEl.textContent=`견적 ${estDB.length}건 · 총액 합계 ${won(tot)}원`;sumEl.classList.add('show');
+    const nsy=estDB.filter(r=>r.sync).length;
+    sumEl.innerHTML=`견적 ${estDB.length}건 · 총액 합계 ${won(tot)}원 <span style="color:#1f5fd1;font-weight:700">· ☁ 공유 ${nsy}건</span>${nsy<estDB.length?`<span style="color:var(--sub);font-weight:600"> · 이 기기만 ${estDB.length-nsy}건</span>`:''}`;sumEl.classList.add('show');
     list.innerHTML=estDB.map(r=>{
       const sale=r.sale>0?` · 판매 ${won(r.sale)}`:'';
-      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}</div><div class="wt">${won(r.unit)}원</div><button class="syncb${r.sync?' on':''}" title="${r.sync?'클라우드 동기화 선택됨 (클릭하면 해제)':'클릭하면 클라우드 동기화 대상에 포함'}" onclick="event.stopPropagation();estSyncToggle(${r.id})">☁</button><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.asm&&r.asm.name?`<b style="color:#0a7d4b">🧩 ${esc(r.asm.name)} × ${cf(num(r.asm.per)||1)}</b> · `:''}<span class="rec-date">${estDateText(r)}</span> · <b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale}</div></div>`;
+      return `<div class="rec-row" onclick="estView(${r.id})"><div class="rec-top"><div class="l1">${esc(r.pname)}${(function(){const d=(typeof normalizeEstDetail==='function')?normalizeEstDetail(r):{};const pd=String(d.product||r.product||'').trim(),sp=String(d.spec||r.spec||'').trim();const t=[pd&&pd!==r.pname?pd:'',sp].filter(Boolean).join(' · ');return t?`<span class="l1sub">${esc(t)}</span>`:'';})()}</div><div class="wt">${won(r.unit)}원</div><button class="syncb${r.sync?' on':''}" title="${r.sync?'클라우드 동기화 선택됨 (클릭하면 해제)':'클릭하면 클라우드 동기화 대상에 포함'}" onclick="event.stopPropagation();estSyncToggle(${r.id})">☁</button><button class="del" onclick="event.stopPropagation();estDelete(${r.id})">×</button></div><div class="l2">${r.asm&&r.asm.name?`<b style="color:#0a7d4b">🧩 ${esc(r.asm.name)} × ${cf(num(r.asm.per)||1)}</b> · `:''}<span class="rec-date">${estDateText(r)}</span> · <b style="color:var(--navy)">철판단가 ${estSteelUnitText(r)}</b> · ${won(r.qty)}개 · 총 ${won(r.total)}원${sale}</div></div>`;
     }).join('');
   }
   estListRender();
@@ -4622,6 +4645,26 @@ function estSyncGroup(idsCsv){
   toast(allOn?`${rows.length}건을 동기화 대상에서 뺐습니다`:`${rows.length}건을 동기화 대상에 포함했습니다 · [⤒ 서버에 올리기]로 반영`);
 }
 function estSyncCount(){return estDB.filter(r=>r.sync).length;}
+/* 기기 간 견적 맞추기 : 받기 → (미공유분 포함) 올리기 → 결과 안내 */
+var _syncingBoth=false;
+async function cloudSyncBoth(){
+  if(_syncingBoth)return;
+  if(!auValid()){toast('먼저 로그인하세요');return;}
+  if(!syncUrl()){toast('동기화 서버 주소가 없습니다 · [⚙ 서버]');return;}
+  _syncingBoth=true;
+  try{
+    const n0=estDB.length;
+    toast('서버와 맞추는 중…');
+    const got=await cloudPull(true);
+    const add=estDB.length-n0;
+    const off=estDB.filter(r=>r.sync===false).length;
+    const put=await cloudPush(true);
+    if(!got&&!put){toast('맞추기 실패 — '+(cloudCfg.lastErr||'서버 응답 없음'));}
+    else toast(`기기 간 맞추기 완료 · 받은 견적 ${add}건 · 올린 견적 ${estSyncCount()}건`+(off?` · 공유 제외 ${off}건(☁ 꺼짐)`:''));
+    estRender();estListRender();renderCloudBar();
+  }catch(e){toast('맞추기 실패 — '+((e&&e.message)||e));}
+  finally{_syncingBoth=false;}
+}
 function estSyncAll(on){
   if(!estDB.length){toast('저장된 견적이 없습니다');return;}
   estDB.forEach(r=>{r.sync=!!on;if(!on)r.unsharedAt=Date.now();});
@@ -4889,6 +4932,7 @@ function renderCloudBar(msg){
       ${cloudCfg.lastErr?`<span class="cb-err" title="${esc(cloudCfg.lastErr)}">오류: ${esc(String(cloudCfg.lastErr).slice(0,90))}</span>`:''}</div>
     <div class="cb-r">
       <button class="cb-auto${cloudCfg.auto?' on':''}" onclick="cloudToggleAuto()">자동 ${cloudCfg.auto?'ON':'OFF'}</button>
+      <button class="pri" onclick="cloudSyncBoth()">🔄 기기 간 맞추기</button>
       <button onclick="cloudPush()">⤒ 서버에 올리기</button>
       <button onclick="cloudPull()">⤓ 서버에서 받기</button>
       <button onclick="cloudDiag()">진단</button>
@@ -5546,7 +5590,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-24 · v93';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-24 · v95';})();
 formatAllNums();
 estCalc();
 </script>
