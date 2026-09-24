@@ -1083,6 +1083,8 @@
   /* ===== v63 : 로그인 게이트 · 클라우드 동기화 ===== */
   #printExitBtn{position:fixed;right:14px;bottom:14px;z-index:100000;padding:12px 16px;border:0;border-radius:12px;background:var(--navy);color:#fff;font-family:inherit;font-size:14px;font-weight:900;box-shadow:0 8px 22px rgba(15,23,42,.28);cursor:pointer}
   @media print{#printExitBtn{display:none!important}}
+  #rptPrintFrame{position:fixed!important;right:0;bottom:0;opacity:.001;border:0;pointer-events:none;z-index:-1}
+  @media print{#rptPrintFrame{display:none!important}}
   #auGate{position:fixed;inset:0;z-index:99999;background:linear-gradient(160deg,#f8fafc,#eef2f8);display:flex;align-items:center;justify-content:center;padding:20px}
   #auForm{width:100%;max-width:360px;background:#fff;border:1px solid #e2e8f0;border-radius:16px;box-shadow:0 12px 40px rgba(15,23,42,.10);padding:26px 24px 20px}
   #auForm .au-h{text-align:center;margin-bottom:16px}
@@ -2962,9 +2964,17 @@ function xlLoad(src,test){
   if(test())return Promise.resolve(true);
   return new Promise(res=>{const sc=document.createElement('script');sc.src=src;sc.onload=()=>res(test());sc.onerror=()=>res(false);document.head.appendChild(sc);});
 }
-function xlStyleReady(){return xlLoad('https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js',()=>!!(window.XLSX&&window.__xlStyled))
-  .then(ok=>{if(window.XLSX)window.__xlStyled=window.__xlStyled||ok;return ok;});}
-function xlZipReady(){return xlLoad('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',()=>!!window.JSZip);}
+function xlStyleReady(){
+  const t=()=>!!(window.XLSX&&window.__xlStyled);
+  return xlLoad('https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js',t)
+    .then(ok=>ok?ok:xlLoad('https://cdnjs.cloudflare.com/ajax/libs/xlsx-js-style/1.2.0/xlsx.bundle.js',t))
+    .then(ok=>{if(window.XLSX)window.__xlStyled=window.__xlStyled||ok;return ok;});
+}
+function xlZipReady(){
+  const t=()=>!!window.JSZip;
+  return xlLoad('https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js',t)
+    .then(ok=>ok?ok:xlLoad('https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js',t));
+}
 const XLB={style:'thin',color:{rgb:'C9D0DB'}};
 const XLBORD={top:XLB,bottom:XLB,left:XLB,right:XLB};
 const XLS={
@@ -4386,13 +4396,77 @@ function fitReportToOnePage(area){
   fit.style.height=(h*s)+'px';
   area.classList.remove('measuring');
 }
-function printEstimateReport(mode){
+/* ===== v98 : 어느 기기에서나 같은 결과가 나오도록 전용 인쇄 문서(iframe)로 출력 =====
+   모바일 브라우저는 화면 레이아웃(좁은 폭)에 맞춰 인쇄본을 축소/절단하는 경우가 있어,
+   본문과 완전히 분리된 A4 문서를 만들어 그 문서만 인쇄한다. (PC 결과와 동일) */
+function reportAllCss(){
+  try{return Array.prototype.map.call(document.querySelectorAll('style'),s=>s.textContent).join('\n');}catch(e){return '';}
+}
+function buildReportDoc(inner,title){
+  return '<!doctype html><html lang="ko"><head><meta charset="utf-8">'
+    +'<meta name="viewport" content="width=794">'
+    +'<title>'+esc(title||'견적 산정서')+'</title>'
+    +'<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">'
+    +'<style>'+reportAllCss()+'</style>'
+    +'<style>'
+    +'html,body{margin:0!important;padding:0!important;background:#fff!important;width:auto!important;min-width:0!important;overflow:visible!important}'
+    +'@page{size:A4 portrait;margin:9mm}'
+    +'#estimateReportArea{display:block!important;position:static!important;left:auto!important;top:auto!important;z-index:auto!important}'
+    +'#estimateReportArea .rpt-fit{width:192mm!important}'
+    +'</style></head><body class="print-report"><div id="estimateReportArea">'+inner+'</div>'
+    +'<script>(function(){function fit(){var a=document.getElementById("estimateReportArea");if(!a)return;var f=a.querySelector(".rpt-fit");if(!f)return;'
+    +'f.style.transform="none";f.style.height="";var pb=document.createElement("div");pb.style.cssText="position:absolute;height:100mm;width:1mm;visibility:hidden";document.body.appendChild(pb);'
+    +'var mm=pb.offsetHeight/100||3.78;pb.parentNode.removeChild(pb);var h=f.getBoundingClientRect().height,mx=279*mm;var s=(h>mx&&h>0)?Math.max(0.55,mx/h):1;'
+    +'f.style.transform="scale("+s+")";f.style.height=(h*s)+"px";}window.__rptFit=fit;fit();setTimeout(fit,300);})();<\/script>'
+    +'</body></html>';
+}
+function printReportFrame(inner,mode,fileTitle,onFail){
+  let fr=$('rptPrintFrame');
+  if(fr&&fr.parentNode)fr.parentNode.removeChild(fr);
+  fr=document.createElement('iframe');
+  fr.id='rptPrintFrame';fr.className='noprint';fr.setAttribute('aria-hidden','true');
+  fr.style.cssText='position:fixed;right:0;bottom:0;width:210mm;height:297mm;border:0;opacity:.001;pointer-events:none;z-index:-1';
+  document.body.appendChild(fr);
+  let started=false,cleaned=false;
+  const cleanup=()=>{if(cleaned)return;cleaned=true;setTimeout(()=>{try{fr.parentNode&&fr.parentNode.removeChild(fr);}catch(e){}},400);
+    const ex=$('printExitBtn');if(ex)ex.remove();document.title=window.__rptOldTitle||document.title;};
+  window.__printFinish=cleanup;
+  const go=()=>{
+    if(started)return;started=true;
+    try{
+      const w=fr.contentWindow;
+      if(w.__rptFit)w.__rptFit();
+      window.__rptOldTitle=document.title;
+      if(mode==='pdf'){document.title=fileTitle;try{w.document.title=fileTitle;}catch(e){}}
+      try{w.addEventListener('afterprint',cleanup);}catch(e){}
+      w.focus();w.print();
+      setTimeout(cleanup,120000);
+      return true;
+    }catch(e){cleaned=true;try{fr.parentNode.removeChild(fr);}catch(e2){}if(onFail)onFail();return false;}
+  };
+  try{
+    const d=fr.contentDocument||fr.contentWindow.document;
+    d.open();d.write(buildReportDoc(inner,fileTitle));d.close();
+  }catch(e){try{fr.parentNode.removeChild(fr);}catch(e2){}if(onFail)onFail();return;}
+  if(!$('printExitBtn')){
+    const b=document.createElement('button');
+    b.id='printExitBtn';b.className='noprint';b.textContent='✕ 인쇄 화면 닫기';
+    b.onclick=cleanup;document.body.appendChild(b);
+  }
+  if(mode==='pdf')toast(isTouchOS()?'인쇄 화면에서 “PDF로 저장/공유”를 선택하세요':'인쇄 창에서 대상을 “PDF로 저장” · 여백 기본 · 배경 그래픽 체크');
+  setTimeout(go,450);
+}
+function printReportInPage(html,mode,fileTitle){
   let area=$('estimateReportArea');
   if(!area){area=document.createElement('div');area.id='estimateReportArea';document.body.appendChild(area);}
-  area.innerHTML=estimateReportHtml();
+  area.innerHTML=html;
   fitReportToOnePage(area);
   document.body.classList.add('print-report');
-  launchReportPrint(mode||'print',reportFileTitle('가공비견적산정서'),()=>document.body.classList.remove('print-report'));
+  launchReportPrint(mode||'print',fileTitle,()=>document.body.classList.remove('print-report'));
+}
+function printEstimateReport(mode){
+  const html=estimateReportHtml(),ft=reportFileTitle('가공비견적산정서');
+  printReportFrame(html,mode||'print',ft,()=>printReportInPage(html,mode,ft));
 }
 function saveEstimatePdf(){printEstimateReport('pdf');}
 
@@ -5264,12 +5338,8 @@ function rptLine(label,desc,val,cls){
 }
 function printAsmReport(mode){
   if(!asmSel){toast('어셈블리를 먼저 선택하세요');return;}
-  let area=$('estimateReportArea');
-  if(!area){area=document.createElement('div');area.id='estimateReportArea';document.body.appendChild(area);}
-  area.innerHTML=asmReportHtml();
-  fitReportToOnePage(area);
-  document.body.classList.add('print-report');
-  launchReportPrint(mode||'print',reportFileTitle('assembly_quote'),()=>document.body.classList.remove('print-report'));
+  const html=asmReportHtml(),ft=reportFileTitle('assembly_quote');
+  printReportFrame(html,mode||'print',ft,()=>printReportInPage(html,mode,ft));
 }
 
 /* ── 어셈블리 엑셀 ── */
@@ -5592,7 +5662,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-24 · v95';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-24 · v99';})();
 formatAllNums();
 estCalc();
 </script>
