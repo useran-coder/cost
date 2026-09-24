@@ -49,6 +49,9 @@
   .matprice-fld .lab{white-space:nowrap}
   .matprice-fld .suffix{width:100%}
   @media(max-width:700px){.mat-price-row{grid-template-columns:1fr}}
+  .mp-title-actions .mp-cloud{border-color:#9dbcf5!important;background:#eef5ff!important;color:#1f5fd1!important}
+  .mp-src{font-size:11.5px;font-weight:700;color:var(--sub);margin-left:8px}
+  .mp-src.warn{color:var(--accent)}
   .suffix{position:relative}
   .suffix .u{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sub);pointer-events:none}
   .suffix .inp{padding-right:42px}
@@ -1539,12 +1542,14 @@
   <section class="card">
     <div class="sec-h"><span class="n">📋</span><h2>원자재 단가 관리</h2><div class="mp-title-actions">
       <button class="mp-sync" onclick="syncPurchaseMaterialPrices(true,true)">🔄 매입단가 가져오기</button>
+      <button class="mp-cloud" onclick="matCloudPull()">☁ 서버에서 받기</button>
+      <button class="mp-cloud" onclick="matCloudPush()">⤒ 서버에 올리기</button>
       <button onclick="mpExport()">⤓ 엑셀 내보내기</button>
       <button class="mp-import" onclick="document.getElementById('mpImportFile').click()">⤒ 엑셀 불러오기</button>
       <input type="file" id="mpImportFile" accept=".xlsx,.xls" style="display:none" onchange="mpImport(this)">
     </div></div>
     <div class="sec-b">
-      <div class="mp-top"><span class="mp-upd" id="mpUpdated">업데이트 일시 : -</span><span class="mp-hint">월별 매입단가를 입력하고 강종별 <b>적용</b>을 누르면 견적 자재단가에 반영됩니다.</span></div>
+      <div class="mp-top"><span class="mp-upd" id="mpUpdated">업데이트 일시 : -</span><span class="mp-src" id="mpSource"></span><span class="mp-hint">월별 매입단가를 입력하고 강종별 <b>적용</b>을 누르면 견적 자재단가에 반영됩니다.</span></div>
       <div id="mpBody"></div>
       <div class="rec-actions" style="margin-top:12px">
         <button onclick="showPage('est')" style="flex:1;padding:11px;border:none;background:var(--navy);color:#fff;border-radius:10px;font-weight:700;font-family:inherit;cursor:pointer">견적으로</button>
@@ -2019,14 +2024,49 @@ function matRowsDiffCount(a,b){
   }
   return cells;
 }
-function syncPurchaseMaterialPrices(notify=true,force=false){
+/* v100 : 원본(매입분석도구) 갱신일시를 숫자로 — 이 기기 데이터가 더 오래되면 덮어쓰지 않는다 */
+function matTs(v){
+  if(!v)return 0;
+  const s=String(v).trim();
+  if(/^\d{10,}$/.test(s))return +s;
+  const t=Date.parse(s.replace(/\./g,'-').replace(/(\d)\s+(\d)/,'$1T$2'));
+  if(!isNaN(t))return t;
+  const m=s.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})(?:\D+(\d{1,2})\D+(\d{1,2}))?/);
+  if(m)return new Date(+m[1],+m[2]-1,+m[3],+(m[4]||0),+(m[5]||0)).getTime();
+  return 0;
+}
+function renderMatSourceLine(){
+  const el=$('mpSource');if(!el)return;
+  const src=purchaseMatSource();
+  const mine=src&&src.db?String(src.db.updated||'').trim():'';
+  const held=String(matSourceUpdated||'').trim();
+  if(!mine&&!held){el.textContent='';el.className='mp-src';return;}
+  let t='매입분석도구 원본 : '+(held||'-');
+  let warn=false;
+  if(mine&&held&&matTs(mine)<matTs(held)){t+=' · 이 기기 매입분석도구는 '+mine+' (오래됨 · 자동 적용 안 함)';warn=true;}
+  else if(!mine)t+=' · 이 기기에는 매입분석도구 없음';
+  el.textContent=t;el.className='mp-src'+(warn?' warn':'');
+}
+function syncPurchaseMaterialPrices(notify=true,force=false,over=false){
   const src=purchaseMatSource();
   if(!src){
-    if(notify)toast('매입분석도구의 원자재 단가 저장데이터를 찾지 못했습니다');
+    if(notify)toast('이 기기에는 매입분석도구 데이터가 없습니다 · [☁ 서버에서 받기]로 다른 PC의 원자재 단가를 가져오세요');
+    renderMatSourceLine();
     return {ok:false,reason:'missing'};
   }
   const sig=purchaseSig(src.raw);
   if(!force&&sig===purchaseMatSyncSig)return {ok:true,unchanged:true};
+  /* ── 오래된 원본으로 덮어쓰기 방지 (모바일·태블릿에 옛 매입분석도구 데이터가 남아 있는 경우) ── */
+  const srcU=String(src.db.updated||'').trim(),heldU=String(matSourceUpdated||'').trim();
+  if(!over&&srcU&&heldU&&matTs(srcU)&&matTs(heldU)&&matTs(srcU)<matTs(heldU)){
+    purchaseMatSyncSig=sig;
+    renderMatSourceLine();
+    if(notify){
+      askConfirm('이 기기의 매입분석도구 데이터('+srcU+')가\n현재 원자재 단가('+heldU+')보다 오래되었습니다.\n\n그래도 이 기기 데이터로 덮어쓸까요?\n(취소 후 [☁ 서버에서 받기]를 쓰면 최신 단가를 받습니다)',
+        ()=>syncPurchaseMaterialPrices(true,true,true));
+    }
+    return {ok:true,skipped:'older',sourceUpdatedAt:srcU,heldUpdatedAt:heldU};
+  }
   const db=src.db,grades=['고철',...MATERIALS.map(x=>x.k)];
   const years=Object.keys(db.years||{}).filter(y=>/^\d{4}$/.test(y)).sort();
   let addedRows=0,removedRows=0,updatedCells=0,updatedQuotes=0,updatedExtras=0,sourceRows=0,updatedTables=0;
@@ -2074,12 +2114,25 @@ function syncPurchaseMaterialPrices(notify=true,force=false){
     if(typeof renderEMatRange==='function')renderEMatRange();
     estCalc();
   }else if($('mpUpdated'))$('mpUpdated').textContent='업데이트 일시 : '+(matUpdated||'-');
+  renderMatSourceLine();
   if(notify){
     if(!sourceRows&&!updatedQuotes&&!updatedExtras)toast('매입분석도구에 동기화할 원자재 단가 데이터가 없습니다');
     else if(changed)toast(`매입단가 업데이트 완료 · 표 ${updatedTables}개 · ${updatedCells}칸 반영 · ${matUpdated}`);
     else toast(`현재 매입분석도구 데이터와 동일합니다${matSourceUpdated?' · 원본 '+matSourceUpdated:''}`);
   }
   return {ok:true,changed,addedRows,removedRows,updatedCells,updatedQuotes,updatedExtras,updatedTables,sourceRows,years,updatedAt:matUpdated,sourceUpdatedAt:matSourceUpdated};
+}
+async function matCloudPull(){
+  if(typeof cloudPull!=='function'){toast('클라우드 동기화 기능을 사용할 수 없습니다');return;}
+  toast('서버에서 원자재 단가를 받는 중…');
+  await cloudPull();
+  renderMatPage();renderMatSourceLine();
+}
+async function matCloudPush(){
+  if(typeof cloudPush!=='function'){toast('클라우드 동기화 기능을 사용할 수 없습니다');return;}
+  toast('서버로 원자재 단가를 올리는 중…');
+  await cloudPush();
+  renderMatSourceLine();
 }
 window.addEventListener('storage',e=>{if(e&&e.key===PURCHASE_MAT_KEY)syncPurchaseMaterialPrices(false,true);});
 window.addEventListener('materialPriceChanged',()=>syncPurchaseMaterialPrices(false,true));
@@ -2128,6 +2181,7 @@ function extraFeeCard(){return `<div class="mp-card mp-extra">
 </div>`;}
 function renderMatPage(){const el=$('mpBody');if(!el)return;
   $('mpUpdated').textContent='업데이트 일시 : '+(matUpdated||'-');
+  renderMatSourceLine();
   const yr=`<div class="mp-yr"><span class="mp-yl">연도</span><div class="seg sm" id="mpYrSeg">${Y_LIST.map(y=>`<button class="${y===matYear?'on':''}" onclick="setMatYear('${y}')">${y}년</button>`).join('')}</div></div>`;
   el.innerHTML=yr+scrapCard()+extraFeeCard()+MATERIALS.map(mt=>{const k=mt.k,rows=yRows(k),lt=latestMat(k);const colMin=MONTHS.map((_,mi)=>{const vs=rows.map(r=>num(r.m[mi])).filter(n=>n>0);return vs.length>=2?Math.min(...vs):null;});
     return `<div class="mp-card">
@@ -4769,7 +4823,7 @@ function cloudPayload(serverShared){
     laserT:laserT,products:products,
     custom:{posts:POSTS.filter(p=>p.custom),trucks:TRUCKS.filter(t=>t.custom),seq:custSeq},
     freight:frCfg,
-    mat:{t:matTable,q:matQuote,u:matUpdated,x:matExtra},
+    mat:{t:matTable,q:matQuote,u:matUpdated,su:matSourceUpdated,x:matExtra},
     asmCfg:(typeof asmCfg==='object'?asmCfg:{}),
     estShared:estMergeShared(serverShared)};
 }
@@ -4805,7 +4859,7 @@ function cloudApply(d){
     if(Array.isArray(d.laserT)&&d.laserT.length){laserT.length=0;d.laserT.forEach(x=>laserT.push(x));saveLaser();}
     if(Array.isArray(d.products)&&d.products.length){products.length=0;d.products.forEach(x=>products.push(x));saveProducts();fillProdSelect();}
     if(d.freight&&typeof d.freight==='object'){frCfg=Object.assign(frCfg,d.freight);frSave();}
-    if(d.mat&&d.mat.t){matTable=d.mat.t;matQuote=d.mat.q||{};matUpdated=d.mat.u||matUpdated;if(d.mat.x)matExtra=normalizeMatExtra(d.mat.x);saveMatTable(false);}
+    if(d.mat&&d.mat.t){matTable=d.mat.t;matQuote=d.mat.q||{};matUpdated=d.mat.u||matUpdated;if(d.mat.su)matSourceUpdated=d.mat.su;if(d.mat.x)matExtra=normalizeMatExtra(d.mat.x);saveMatTable(false);purchaseMatSyncSig=(function(){const sc=purchaseMatSource();return sc?purchaseSig(sc.raw):purchaseMatSyncSig;})();}
     if(d.asmCfg&&typeof d.asmCfg==='object'&&typeof asmCfg==='object'){Object.keys(d.asmCfg).forEach(k=>{if(!asmCfg[k])asmCfg[k]=d.asmCfg[k];else asmCfg[k]=Object.assign({},asmCfg[k],d.asmCfg[k]);});asmSaveCfg();}
     /* 견적: 선택 공유분만 병합 (구버전 전체 estDB 는 로컬을 덮어쓰지 않음) */
     _lastShareRes=Array.isArray(d.estShared)?estApplyShared(d.estShared):null;
@@ -5662,7 +5716,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-24 · v99';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-24 · v100';})();
 formatAllNums();
 estCalc();
 </script>
