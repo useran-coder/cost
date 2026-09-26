@@ -5,7 +5,7 @@
 <meta name="viewport" id="vpMeta" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>프레스 가공비 견적기</title>
-<script>window.APP_BUILD='v103';</script>
+<script>window.APP_BUILD='v104';</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1134,6 +1134,29 @@
   #auChip b{color:var(--ink);font-size:12px}
   #auChip small{color:var(--accent);font-weight:800;font-size:12px}
   #auChip button{padding:3px 9px;border:1px solid var(--line);background:#fff;border-radius:7px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
+  #auChip .au-me{display:inline-flex;align-items:center;gap:5px;border-color:transparent;background:transparent;padding:3px 7px;color:var(--sub);font-weight:700}
+  #auChip .au-me:hover{background:#eef2f8;border-color:var(--line)}
+  #auChip .au-me i{font-style:normal;color:var(--sub);font-size:11px}
+  #auChip .au-me.on{background:#eef2f8;border-color:var(--line)}
+  /* v104 : 동기화 · 배포 · 파일 관리 페이지 */
+  .sync-hero{display:flex;align-items:center;gap:12px;flex-wrap:wrap;padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(135deg,#f7f9fc,#eef2f8);margin-bottom:14px}
+  .sync-hero .av{width:44px;height:44px;border-radius:12px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;flex:0 0 auto}
+  .sync-hero .who{display:flex;flex-direction:column;gap:2px;min-width:0}
+  .sync-hero .who b{font-size:15px;color:var(--navy)}
+  .sync-hero .who span{font-size:11.5px;color:var(--sub);font-weight:700}
+  .sync-hero .sp{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
+  .sync-hero .sp button{padding:7px 11px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
+  .sync-sec{border:1px solid var(--line);border-radius:14px;background:#fff;margin-bottom:14px;overflow:hidden}
+  .sync-sec>.sh{display:flex;align-items:center;gap:8px;padding:10px 14px;background:#f7f9fc;border-bottom:1px solid var(--line)}
+  .sync-sec>.sh .ic{width:24px;height:24px;border-radius:7px;background:var(--navy);color:#fff;display:flex;align-items:center;justify-content:center;font-size:12px;flex:0 0 auto}
+  .sync-sec>.sh h3{margin:0;font-size:14px;font-weight:800;color:var(--navy)}
+  .sync-sec>.sh em{font-style:normal;font-size:11.5px;font-weight:700;color:var(--sub);margin-left:2px}
+  .sync-sec>.sb{padding:12px 14px}
+  .sync-sec .cloudbar{margin:0;border:0;background:transparent;padding:0}
+  .sync-files{display:flex;gap:8px;flex-wrap:wrap}
+  .sync-files button{padding:9px 13px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--navy);cursor:pointer}
+  .sync-files button.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
+  .sync-note{margin-top:9px;font-size:11.5px;color:var(--sub);line-height:1.7}
   .desk-toggle{margin-left:auto;padding:5px 10px;border:1px solid var(--line);background:#fff;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;white-space:nowrap}
   .desk-toggle.on{background:#eef5ff;border-color:#9dbcf5;color:#1f5fd1}
   .tabs #auChip{margin-left:8px}
@@ -1590,39 +1613,7 @@
     <div class="sec-b">
       <div class="savestate" id="saveState"></div>
       <div class="notice">※ 입력한 단가는 <b>이 기기(브라우저)에 자동 저장</b>되어 다음에도 그대로 유지됩니다. 단, 브라우저 청소(캐시·쿠키·사이트데이터 삭제)·시크릿 모드·다른 기기에서는 <b>기본값으로 초기화</b>될 수 있습니다. 중요한 단가는 아래 [설정값 백업]·[단가산정 엑셀 내보내기]로 보관하세요.</div>
-      <div class="cloudbar" id="cloudBar"></div>
-      <input type="file" id="syncFileInput" accept=".json,application/json" style="display:none" onchange="syncFileOpen(this)">
 
-      <!-- v103 : GitHub 업로드 (매출분석도구와 동일 방식) -->
-      <details id="ghBox">
-        <summary>🚀 GitHub 업로드 <span class="gh-sub">(이 파일을 저장소에 바로 배포합니다)</span></summary>
-        <div style="margin-top:9px">
-          <div class="gh-grid">
-            <input type="text" id="ghOwner" placeholder="GitHub 계정(owner)" autocomplete="off">
-            <input type="text" id="ghRepo" placeholder="저장소 이름(repo)" autocomplete="off">
-            <input type="text" id="ghPath" placeholder="파일 경로 (예: index.html)" autocomplete="off">
-          </div>
-          <div class="gh-grid" style="margin-top:6px">
-            <input type="text" id="ghBranch" placeholder="브랜치 (기본 main)" autocomplete="off">
-            <input type="password" id="ghToken" placeholder="GitHub 토큰 (이 PC에만 저장)" autocomplete="off">
-            <input type="text" id="ghMsg" placeholder="커밋 메시지(비우면 자동)" autocomplete="off">
-          </div>
-          <div class="gh-acts">
-            <button type="button" id="ghUploadBtn">🚀 지금 올리기</button>
-            <button type="button" id="ghPickBtn">📄 파일 선택해 올리기</button>
-            <input type="file" id="ghFile" accept=".html,.htm,text/html" style="display:none">
-            <button type="button" id="ghCheckBtn">🔍 현재 배포 버전 확인</button>
-            <button type="button" id="ghForgetBtn">🗑 토큰 지우기</button>
-          </div>
-          <div id="ghStatus"></div>
-          <div class="gh-help">
-            토큰은 <b>이 PC의 브라우저에만</b> 저장되며 서버·동기화에는 절대 올라가지 않습니다. 공용 PC에서는 쓰지 마세요.<br>
-            토큰 만들기 — GitHub → Settings → Developer settings → <b>Personal access tokens → Fine-grained tokens</b> → 저장소 <b>이 저장소만</b> 선택 → 권한 <b>Contents: Read and write</b> → 발급.<br>
-            <b>내 컴퓨터의 파일을 직접 연 상태(file://)</b>에서는 브라우저가 자기 원본을 읽지 못합니다 — 이때는 <b>📄 파일 선택해 올리기</b>로 올릴 HTML을 직접 고르세요(「🚀 지금 올리기」를 눌러도 파일 선택창이 열립니다).<br>
-            GitHub Pages 주소로 열었을 때는 <b>지금 보고 있는 페이지</b>가 그대로 올라갑니다.
-          </div>
-        </div>
-      </details>
       <div class="setgrid" id="setgrid"></div>
       <div id="freightPanel"></div>
       <div id="laserTbl"></div>
@@ -1636,6 +1627,56 @@
         <button class="sb sb-navy" onclick="showPage('est')">단가산정으로</button>
         <input type="file" id="restoreFile" accept="application/json" style="display:none" onchange="restoreSettings(this)">
       </div>
+    </div>
+  </section>
+  </div>
+
+  <!-- ============ v104 : 동기화 · 배포 · 파일 관리 ============ -->
+  <div class="subpage hidden" id="page-sync">
+  <section class="card">
+    <div class="sec-h"><span class="n">🔗</span><h2>동기화 · 배포 · 파일 관리</h2></div>
+    <div class="sec-b">
+
+      <div class="sync-hero">
+        <div class="av">👤</div>
+        <div class="who"><b id="syncWho">사용자</b><span id="syncRole">로그인 상태</span></div>
+        <div class="sp">
+          <button type="button" onclick="showPage('est')">← 단가산정으로</button>
+          <button type="button" onclick="showPage('set')">⚙ 단가산정 기준</button>
+          <button type="button" onclick="auLogout()">로그아웃</button>
+        </div>
+      </div>
+
+      <div class="sync-sec">
+        <div class="sh"><span class="ic">☁</span><h3>클라우드 동기화</h3><em>단가기준 · 원자재 단가 · 선택한 저장 견적</em></div>
+        <div class="sb">
+          <div class="cloudbar" id="cloudBar"></div>
+          <input type="file" id="syncFileInput" accept=".json,application/json" style="display:none" onchange="syncFileOpen(this)">
+          <div class="sync-note">다른 기기와 맞출 때는 <b>[🔄 기기 간 맞추기]</b> 한 번이면 받기 → 올리기가 함께 실행됩니다. 저장 견적은 ☁ 표시가 켜진 건만 올라갑니다.</div>
+        </div>
+      </div>
+
+      <div class="sync-sec">
+        <div class="sh"><span class="ic">🚀</span><h3>GitHub 업로드</h3><em>이 파일을 저장소에 바로 배포</em></div>
+        <div class="sb" id="ghHost"></div>
+      </div>
+
+      <div class="sync-sec">
+        <div class="sh"><span class="ic">📁</span><h3>파일 관리</h3><em>백업 · 복원 · 내보내기</em></div>
+        <div class="sb">
+          <div class="sync-files">
+            <button type="button" class="pri" onclick="backupSettings()">⤓ 설정값 백업 (JSON)</button>
+            <button type="button" onclick="document.getElementById('restoreFile').click()">⤒ 설정값 불러오기</button>
+            <button type="button" onclick="exportPrices()">⤓ 단가표 엑셀</button>
+            <button type="button" onclick="mpExport()">⤓ 자재단가 엑셀</button>
+            <button type="button" onclick="estExport()">⤓ 견적리스트 엑셀</button>
+            <button type="button" onclick="syncFileSave()">💾 동기화 파일 저장</button>
+            <button type="button" onclick="syncFilePick()">📂 동기화 파일 열기</button>
+          </div>
+          <div class="sync-note">서버 없이 기기 간에 옮길 때는 <b>동기화 파일 저장</b> → 다른 기기에서 <b>동기화 파일 열기</b>를 쓰세요. 설정값 백업은 단가 기준만, 동기화 파일은 단가 기준 + 저장 견적까지 담습니다.</div>
+        </div>
+      </div>
+
     </div>
   </section>
   </div>
@@ -1750,7 +1791,7 @@ function askConfirm(msg,cb){$('modalMsg').textContent=msg;_modalCb=cb;$('modal')
 function closeModal(){$('modal').classList.remove('show');_modalCb=null;}
 $('modalOk').addEventListener('click',()=>{const cb=_modalCb;closeModal();if(cb)cb();});
 
-var PAGES=['est','asm','list','mat','mp','set'],_curPage='est',_hashLock=false;
+var PAGES=['est','asm','list','mat','mp','set','sync'],_curPage='est',_hashLock=false;
 function showPage(p,fromHash){
   if(PAGES.indexOf(p)<0)p='est';
   if(fromHash&&_curPage===p)return;
@@ -1761,6 +1802,7 @@ function showPage(p,fromHash){
   document.body.className='tab-'+p;
   if(p==='mp')syncPurchaseMaterialPrices(false,true);
   if(p==='set')renderSaveState();
+  if(p==='sync'){renderCloudBar();if(typeof ghMountNow==='function')ghMountNow();}
   if(p==='list'){estListRender();if(typeof estTrashRender==='function')estTrashRender();}
   if(p==='asm')renderAsmPage();
   window.scrollTo(0,0);
@@ -4805,8 +4847,11 @@ async function auLogout(){
 function auApply(){
   const chip=$('auChip');
   if(chip)chip.innerHTML=auValid()
-    ?`👤 <b>${esc(AU.name||AU.id)}</b> <small>${AU_ROLE[AU.role]||AU.role||''}</small> <button onclick="auLogout()">로그아웃</button>`
+    ?`<button type="button" class="au-me" onclick="showPage('sync')" title="동기화 · 배포 · 파일 관리">👤 <b>${esc(AU.name||AU.id)}</b> <small>${AU_ROLE[AU.role]||AU.role||''}</small> <i>⚙</i></button> <button onclick="auLogout()">로그아웃</button>`
     :`<button onclick="auShowGate()">🔐 로그인</button>`;
+  const who=$('syncWho'),rol=$('syncRole');
+  if(who)who.textContent=auValid()?(AU.name||AU.id||'사용자'):'로그인하지 않음';
+  if(rol)rol.textContent=auValid()?((AU_ROLE[AU.role]||AU.role||'사용자')+' · 로그인 중'):'로그인하면 클라우드 동기화를 쓸 수 있습니다';
   renderCloudBar();
 }
 
@@ -5174,8 +5219,9 @@ function cloudToggleAuto(){cloudCfg.auto=!cloudCfg.auto;cloudSaveCfg();renderClo
 function renderCloudBar(msg){
   const el=$('cloudBar');if(!el)return;
   const on=auValid();
-  el.innerHTML=`<div class="cb-l"><b>클라우드 동기화</b>
-      <span>${on?`${esc(AU.name||AU.id)} · ${AU_ROLE[AU.role]||''}`:'로그인 필요'}</span>
+  const inSync=(typeof _curPage!=='undefined'&&_curPage==='sync');   /* v104 : 동기화 페이지에서는 제목·로그인줄·파일버튼 중복 제거 */
+  el.innerHTML=`<div class="cb-l">${inSync?'':'<b>클라우드 동기화</b>'}
+      ${inSync?'':`<span>${on?`${esc(AU.name||AU.id)} · ${AU_ROLE[AU.role]||''}`:'로그인 필요'}</span>`}
       <span class="cb-sync" title="저장된 견적의 ☁ 버튼으로 개별 제외할 수 있습니다">공유 견적 ${estSyncCount()} / ${estDB.length}건</span>
       <span class="cb-at">${msg?esc(msg):(cloudCfg.at?('최근 동기화 '+esc(cloudCfg.at)+(cloudCfg.by?' · '+esc(cloudCfg.by):'')):'동기화 기록 없음')}</span>
       ${cloudCfg.lastErr?`<span class="cb-err" title="${esc(cloudCfg.lastErr)}">오류: ${esc(String(cloudCfg.lastErr).slice(0,90))}</span>`:''}</div>
@@ -5189,9 +5235,8 @@ function renderCloudBar(msg){
       <button onclick="estSyncAll(false)">모두 해제</button>
       <button onclick="cloudSetServer()">⚙ 서버</button>
       <button onclick="cloudServerGuide(false)">📄 전용 서버</button>
-      <button onclick="syncFileSave()">📤 동기화 파일 저장</button>
-      <button onclick="syncFilePick()">📥 동기화 파일 열기</button>
-      ${on?'<button onclick="auLogout()">로그아웃</button>':'<button class="pri" onclick="auShowGate()">🔐 로그인</button>'}
+      ${inSync?'':'<button onclick="syncFileSave()">📤 동기화 파일 저장</button><button onclick="syncFilePick()">📥 동기화 파일 열기</button>'}
+      ${(on&&!inSync)?'<button onclick="auLogout()">로그아웃</button>':(on?'':'<button class="pri" onclick="auShowGate()">🔐 로그인</button>')}
     </div>`;
 }
 /* 저장 함수에 자동 동기화 훅 */
@@ -5835,7 +5880,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-26 · v103';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-26 · v104';})();
 formatAllNums();
 estCalc();
 </script>
@@ -5989,8 +6034,11 @@ estCalc();
         +(there===here?' — 같습니다.':' — 다릅니다. 올리기를 눌러 주세요.'), there===here?'#0f766e':'#b45309');
     }catch(e){ say('🔴 '+ge(String(e.message||e)),'#dc2626'); }
   }
+  var GH_HTML='<div >\n              <div class="gh-grid">\n                <input type="text" id="ghOwner" placeholder="GitHub 계정(owner)" autocomplete="off">\n                <input type="text" id="ghRepo" placeholder="저장소 이름(repo)" autocomplete="off">\n                <input type="text" id="ghPath" placeholder="파일 경로 (예: index.html)" autocomplete="off">\n              </div>\n              <div class="gh-grid" style="margin-top:6px">\n                <input type="text" id="ghBranch" placeholder="브랜치 (기본 main)" autocomplete="off">\n                <input type="password" id="ghToken" placeholder="GitHub 토큰 (이 PC에만 저장)" autocomplete="off">\n                <input type="text" id="ghMsg" placeholder="커밋 메시지(비우면 자동)" autocomplete="off">\n              </div>\n              <div class="gh-acts">\n                <button type="button" id="ghUploadBtn">🚀 지금 올리기</button>\n                <button type="button" id="ghPickBtn">📄 파일 선택해 올리기</button>\n                <input type="file" id="ghFile" accept=".html,.htm,text/html" style="display:none">\n                <button type="button" id="ghCheckBtn">🔍 현재 배포 버전 확인</button>\n                <button type="button" id="ghForgetBtn">🗑 토큰 지우기</button>\n              </div>\n              <div id="ghStatus"></div>\n              <div class="gh-help">\n                토큰은 <b>이 PC의 브라우저에만</b> 저장되며 서버·동기화에는 절대 올라가지 않습니다. 공용 PC에서는 쓰지 마세요.<br>\n                토큰 만들기 — GitHub → Settings → Developer settings → <b>Personal access tokens → Fine-grained tokens</b> → 저장소 <b>이 저장소만</b> 선택 → 권한 <b>Contents: Read and write</b> → 발급.<br>\n                <b>내 컴퓨터의 파일을 직접 연 상태(file://)</b>에서는 브라우저가 자기 원본을 읽지 못합니다 — 이때는 <b>📄 파일 선택해 올리기</b>로 올릴 HTML을 직접 고르세요(「🚀 지금 올리기」를 눌러도 파일 선택창이 열립니다).<br>\n                GitHub Pages 주소로 열었을 때는 <b>지금 보고 있는 페이지</b>가 그대로 올라갑니다.\n              </div>\n            </div>';
   function mount(){
-    var box=el('ghBox'); if(!box||box.__gh)return; box.__gh=1;
+    var host=el('ghHost');
+    if(host&&!host.__gh){ host.innerHTML=GH_HTML; host.__gh=1; }
+    var box=el('ghBox')||host; if(!box||box.__ghm)return; box.__ghm=1;
     var c=cfg();
     if(el('ghOwner'))el('ghOwner').value=c.owner||'';
     if(el('ghRepo'))el('ghRepo').value=c.repo||'';
@@ -6013,6 +6061,7 @@ estCalc();
   }
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);
   else mount();
+  window.ghMountNow=mount;
   window.ghUpload=upload;
   window.ghPickUpload=function(){ return upload(true); };
 })();
