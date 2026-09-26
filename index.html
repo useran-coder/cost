@@ -5,6 +5,7 @@
 <meta name="viewport" id="vpMeta" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>프레스 가공비 견적기</title>
+<script>window.APP_BUILD='v103';</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -51,6 +52,24 @@
   @media(max-width:700px){.mat-price-row{grid-template-columns:1fr}}
   .mp-title-actions .mp-cloud{border-color:#9dbcf5!important;background:#eef5ff!important;color:#1f5fd1!important}
   .mp-src{font-size:11.5px;font-weight:700;color:var(--sub);margin-left:8px}
+  /* v103 : GitHub 업로드 (매출분석도구 v784 방식) */
+  #ghBox{width:100%;margin:12px 0 0;border:1px solid #d8dee9;border-radius:10px;padding:10px 12px;background:#fbfcfe}
+  #ghBox>summary{cursor:pointer;font-weight:800;font-size:13px;color:var(--navy);list-style:none}
+  #ghBox>summary::-webkit-details-marker{display:none}
+  #ghBox>summary::before{content:'▸ ';color:var(--sub)}
+  #ghBox[open]>summary::before{content:'▾ '}
+  #ghBox .gh-sub{font-weight:600;font-size:11.5px;color:var(--sub)}
+  .gh-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin-top:8px}
+  .gh-grid input{width:100%;min-width:0;height:35px;padding:7px 10px;border:1px solid #cfd8e5;border-radius:7px;background:#fff;color:#26364d;font-family:inherit;font-size:12px}
+  .gh-acts{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:9px}
+  .gh-acts button{padding:8px 12px;border-radius:8px;border:1px solid #cfd8e5;background:#fff;color:var(--navy);font-family:inherit;font-size:12px;font-weight:800;cursor:pointer}
+  .gh-acts button:disabled{opacity:.5;cursor:default}
+  #ghUploadBtn{background:var(--navy)!important;color:#fff!important;border-color:var(--navy)!important}
+  #ghPickBtn{background:#eef2ff!important;color:#4338ca!important;border-color:#c7d2fe!important}
+  #ghForgetBtn{color:#b91c1c!important;border-color:#fecaca!important}
+  #ghStatus{width:100%;margin-top:8px;font-size:12px;font-weight:700;color:var(--sub);line-height:1.6}
+  .gh-help{margin-top:7px;font-size:11.5px;color:var(--sub);line-height:1.7}
+  @media(max-width:720px){.gh-grid{grid-template-columns:1fr}}
   .mp-src.warn{color:var(--accent)}
   .suffix{position:relative}
   .suffix .u{position:absolute;right:12px;top:50%;transform:translateY(-50%);font-size:12px;color:var(--sub);pointer-events:none}
@@ -1573,6 +1592,37 @@
       <div class="notice">※ 입력한 단가는 <b>이 기기(브라우저)에 자동 저장</b>되어 다음에도 그대로 유지됩니다. 단, 브라우저 청소(캐시·쿠키·사이트데이터 삭제)·시크릿 모드·다른 기기에서는 <b>기본값으로 초기화</b>될 수 있습니다. 중요한 단가는 아래 [설정값 백업]·[단가산정 엑셀 내보내기]로 보관하세요.</div>
       <div class="cloudbar" id="cloudBar"></div>
       <input type="file" id="syncFileInput" accept=".json,application/json" style="display:none" onchange="syncFileOpen(this)">
+
+      <!-- v103 : GitHub 업로드 (매출분석도구와 동일 방식) -->
+      <details id="ghBox">
+        <summary>🚀 GitHub 업로드 <span class="gh-sub">(이 파일을 저장소에 바로 배포합니다)</span></summary>
+        <div style="margin-top:9px">
+          <div class="gh-grid">
+            <input type="text" id="ghOwner" placeholder="GitHub 계정(owner)" autocomplete="off">
+            <input type="text" id="ghRepo" placeholder="저장소 이름(repo)" autocomplete="off">
+            <input type="text" id="ghPath" placeholder="파일 경로 (예: index.html)" autocomplete="off">
+          </div>
+          <div class="gh-grid" style="margin-top:6px">
+            <input type="text" id="ghBranch" placeholder="브랜치 (기본 main)" autocomplete="off">
+            <input type="password" id="ghToken" placeholder="GitHub 토큰 (이 PC에만 저장)" autocomplete="off">
+            <input type="text" id="ghMsg" placeholder="커밋 메시지(비우면 자동)" autocomplete="off">
+          </div>
+          <div class="gh-acts">
+            <button type="button" id="ghUploadBtn">🚀 지금 올리기</button>
+            <button type="button" id="ghPickBtn">📄 파일 선택해 올리기</button>
+            <input type="file" id="ghFile" accept=".html,.htm,text/html" style="display:none">
+            <button type="button" id="ghCheckBtn">🔍 현재 배포 버전 확인</button>
+            <button type="button" id="ghForgetBtn">🗑 토큰 지우기</button>
+          </div>
+          <div id="ghStatus"></div>
+          <div class="gh-help">
+            토큰은 <b>이 PC의 브라우저에만</b> 저장되며 서버·동기화에는 절대 올라가지 않습니다. 공용 PC에서는 쓰지 마세요.<br>
+            토큰 만들기 — GitHub → Settings → Developer settings → <b>Personal access tokens → Fine-grained tokens</b> → 저장소 <b>이 저장소만</b> 선택 → 권한 <b>Contents: Read and write</b> → 발급.<br>
+            <b>내 컴퓨터의 파일을 직접 연 상태(file://)</b>에서는 브라우저가 자기 원본을 읽지 못합니다 — 이때는 <b>📄 파일 선택해 올리기</b>로 올릴 HTML을 직접 고르세요(「🚀 지금 올리기」를 눌러도 파일 선택창이 열립니다).<br>
+            GitHub Pages 주소로 열었을 때는 <b>지금 보고 있는 페이지</b>가 그대로 올라갑니다.
+          </div>
+        </div>
+      </details>
       <div class="setgrid" id="setgrid"></div>
       <div id="freightPanel"></div>
       <div id="laserTbl"></div>
@@ -5785,9 +5835,187 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-25 · v102';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-26 · v103';})();
 formatAllNums();
 estCalc();
+</script>
+<script id="v103-github-upload">
+/* v103 : 지금 열려 있는 이 파일을 GitHub 저장소에 그대로 올립니다(= GitHub Pages 배포).
+   매출분석도구 v784/v785 와 같은 방식이며, 토큰은 localStorage 에만 두고
+   클라우드 동기화(cloudPayload)에는 절대 포함하지 않습니다. */
+(function(){
+  var LS='ghCfgPressV103';
+  var D={owner:'useran-coder',repo:'',path:'index.html',branch:'main',token:''};
+  function guess(){
+    /* GitHub Pages 주소로 열려 있으면 계정·저장소·경로를 자동으로 채운다 */
+    var g={};
+    try{
+      var h=location.hostname||'';
+      if(/\.github\.io$/i.test(h)){
+        g.owner=h.replace(/\.github\.io$/i,'');
+        var seg=(location.pathname||'/').replace(/^\/+/,'').split('/');
+        var file=seg[seg.length-1]||'';
+        if(seg.length>1&&seg[0]){ g.repo=seg[0]; g.path=seg.slice(1).join('/')||'index.html'; }
+        else { g.repo=h; g.path=file||'index.html'; }
+        if(!/\.html?$/i.test(g.path))g.path=(g.path?g.path.replace(/\/$/,'')+'/':'')+'index.html';
+      }
+    }catch(_e){}
+    return g;
+  }
+  function cfg(){ try{ return Object.assign({},D,guess(),JSON.parse(localStorage.getItem(LS)||'{}')); }catch(_e){ return Object.assign({},D,guess()); } }
+  function save(c){ try{ localStorage.setItem(LS,JSON.stringify(c)); }catch(_e){} }
+  function el(id){ return document.getElementById(id); }
+  function ge(t){ return String(t==null?'':t).replace(/[&<>"]/g,function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[m]; }); }
+  function say(t,col){ var s=el('ghStatus'); if(s){ s.style.color=col||'#64748b'; s.innerHTML=t; } }
+  function readCfg(){
+    var c=cfg();
+    c.owner=(el('ghOwner')&&el('ghOwner').value.trim())||c.owner;
+    c.repo=(el('ghRepo')&&el('ghRepo').value.trim())||c.repo;
+    c.path=(el('ghPath')&&el('ghPath').value.trim())||c.path;
+    c.branch=(el('ghBranch')&&el('ghBranch').value.trim())||c.branch||'main';
+    var t=el('ghToken')&&el('ghToken').value.trim(); if(t)c.token=t;
+    save(c); return c;
+  }
+  function api(c,url,opt){
+    opt=opt||{}; opt.headers=Object.assign({
+      'Accept':'application/vnd.github+json',
+      'Authorization':'Bearer '+c.token,
+      'X-GitHub-Api-Version':'2022-11-28'
+    },opt.headers||{});
+    return fetch('https://api.github.com'+url,opt);
+  }
+  function b64(str){
+    var bytes=new TextEncoder().encode(str), out='', CH=0x8000;
+    for(var i=0;i<bytes.length;i+=CH)out+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));
+    return btoa(out);
+  }
+  /* 큰 파일은 파일 자체를 읽지 못하므로, 폴더 목록에서 sha 를 찾는다 */
+  async function shaOf(c){
+    var dir=c.path.indexOf('/')>=0?c.path.slice(0,c.path.lastIndexOf('/')):'';
+    var name=c.path.indexOf('/')>=0?c.path.slice(c.path.lastIndexOf('/')+1):c.path;
+    var r=await api(c,'/repos/'+c.owner+'/'+c.repo+'/contents/'+encodeURI(dir)+'?ref='+encodeURIComponent(c.branch));
+    if(r.status===404)return '';
+    if(!r.ok)throw new Error('저장소를 읽지 못했습니다 (HTTP '+r.status+')');
+    var list=await r.json();
+    if(!Array.isArray(list))return '';
+    for(var i=0;i<list.length;i++)if(list[i].name===name)return list[i].sha||'';
+    return '';
+  }
+  async function mySource(){
+    if(location.protocol==='file:')throw new Error('내 컴퓨터의 파일을 직접 연 상태에서는 원본을 읽을 수 없습니다. [📄 파일 선택해 올리기]를 쓰세요.');
+    var r=await fetch(location.pathname+'?_gh='+Date.now(),{cache:'no-store'});
+    if(!r.ok)throw new Error('이 페이지의 원본을 읽지 못했습니다 (HTTP '+r.status+')');
+    var t=await r.text();
+    if(!/<html/i.test(t))throw new Error('원본이 HTML 이 아닙니다.');
+    return t;
+  }
+  function pickFile(){
+    return new Promise(function(res,rej){
+      var f=el('ghFile'); if(!f)return rej(new Error('파일 선택칸을 찾지 못했습니다.'));
+      f.value='';
+      f.onchange=function(){
+        var file=f.files&&f.files[0];
+        if(!file)return rej(new Error('파일을 고르지 않았습니다.'));
+        var r=new FileReader();
+        r.onload=function(){
+          var t=String(r.result||'');
+          if(!/<html/i.test(t))return rej(new Error('고르신 파일이 HTML 이 아닙니다.'));
+          res({text:t,name:file.name});
+        };
+        r.onerror=function(){ rej(new Error('파일을 읽지 못했습니다.')); };
+        r.readAsText(file,'utf-8');
+      };
+      f.click();
+    });
+  }
+  function verOf(t){ var m=String(t||'').match(/APP_BUILD='([^']+)'/); return m?m[1]:''; }
+  async function upload(usePick){
+    var c=readCfg();
+    if(!c.token)return say('🟠 GitHub 토큰을 먼저 입력해 주세요.','#b45309');
+    if(!c.owner||!c.repo||!c.path)return say('🟠 계정·저장소·파일 경로를 확인해 주세요.','#b45309');
+    var btn=el('ghUploadBtn'), btn2=el('ghPickBtn');
+    if(btn)btn.disabled=true; if(btn2)btn2.disabled=true;
+    try{
+      var html, ver, from='';
+      if(usePick||location.protocol==='file:'){
+        say('📄 올릴 HTML 파일을 골라 주세요…');
+        var pk=await pickFile();
+        html=pk.text; ver=verOf(html); from=pk.name;
+      }else{
+        say('⏳ 이 페이지의 원본을 읽는 중…');
+        html=await mySource(); ver=(window.APP_BUILD||'').toString();
+      }
+      say('⏳ 저장소 상태 확인 중… (자료 '+(html.length/1048576).toFixed(2)+'MB)');
+      var sha=await shaOf(c);
+      var msg=(el('ghMsg')&&el('ghMsg').value.trim())||('가공비 견적기 '+(ver||'업데이트')+' 배포');
+      say('⏳ 올리는 중… '+(sha?'(기존 파일 교체)':'(새 파일)'));
+      var r=await api(c,'/repos/'+c.owner+'/'+c.repo+'/contents/'+encodeURI(c.path),{
+        method:'PUT',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({message:msg,content:b64(html),branch:c.branch,sha:sha||undefined})
+      });
+      var d=null; try{ d=await r.json(); }catch(_e){}
+      if(!r.ok){
+        var em=(d&&d.message)||('HTTP '+r.status);
+        if(r.status===401)em='토큰이 올바르지 않거나 만료되었습니다.';
+        if(r.status===403)em='토큰에 이 저장소의 «Contents: Read and write» 권한이 없습니다.';
+        if(r.status===404)em='저장소나 경로를 찾을 수 없습니다(계정·저장소 이름·브랜치 확인).';
+        if(r.status===409)em='브랜치가 다른 사람 변경과 충돌했습니다. 잠시 후 다시 눌러 주세요.';
+        throw new Error(em);
+      }
+      var url=(d&&d.commit&&d.commit.html_url)||'';
+      say('🟢 <b>올렸습니다</b> — '+ge(c.owner+'/'+c.repo+'/'+c.path)+' · '+ge(ver||'버전미상')+(from?(' · 보낸 파일 '+ge(from)):'')
+         +'<br><span style="font-weight:600;color:#475569">GitHub Pages 반영까지 1~2분 걸립니다.</span>'
+         +(url?(' <a href="'+url+'" target="_blank" rel="noopener" style="color:#1d4ed8">커밋 보기 ↗</a>'):''),'#0f766e');
+      try{ if(typeof toast==='function')toast('GitHub 에 배포했습니다 · '+(ver||'')); }catch(_t){}
+    }catch(e){ say('🔴 '+ge(String(e.message||e)),'#dc2626'); }
+    finally{ if(btn)btn.disabled=false; if(btn2)btn2.disabled=false; }
+  }
+  async function check(){
+    var c=readCfg();
+    if(!c.owner||!c.repo||!c.path)return say('🟠 계정·저장소·파일 경로를 확인해 주세요.','#b45309');
+    try{
+      say('⏳ 확인 중…');
+      var isUserSite=(String(c.repo).toLowerCase()===String(c.owner).toLowerCase()+'.github.io');
+      var base='https://'+c.owner+'.github.io/'+(isUserSite?'':(c.repo+'/'));
+      var u=base+(c.path==='index.html'?'':c.path)+'?_gh='+Date.now();
+      var r=await fetch(u,{cache:'no-store'});
+      if(!r.ok)throw new Error('페이지를 읽지 못했습니다 (HTTP '+r.status+')');
+      var t=await r.text();
+      var m=t.match(/APP_BUILD='([^']+)'/);
+      var here=(window.APP_BUILD||'?');
+      var there=m?m[1]:'?';
+      say((there===here?'🟢':'🟠')+' 배포된 버전 <b>'+ge(there)+'</b> · 지금 보고 있는 버전 <b>'+ge(here)+'</b>'
+        +(there===here?' — 같습니다.':' — 다릅니다. 올리기를 눌러 주세요.'), there===here?'#0f766e':'#b45309');
+    }catch(e){ say('🔴 '+ge(String(e.message||e)),'#dc2626'); }
+  }
+  function mount(){
+    var box=el('ghBox'); if(!box||box.__gh)return; box.__gh=1;
+    var c=cfg();
+    if(el('ghOwner'))el('ghOwner').value=c.owner||'';
+    if(el('ghRepo'))el('ghRepo').value=c.repo||'';
+    if(el('ghPath'))el('ghPath').value=c.path||'index.html';
+    if(el('ghBranch'))el('ghBranch').value=c.branch||'main';
+    if(el('ghToken'))el('ghToken').value=c.token||'';
+    ['ghOwner','ghRepo','ghPath','ghBranch','ghToken'].forEach(function(id){
+      var e=el(id); if(e)e.addEventListener('change',readCfg);
+    });
+    if(el('ghUploadBtn'))el('ghUploadBtn').addEventListener('click',function(){ upload(false); });
+    if(el('ghPickBtn'))el('ghPickBtn').addEventListener('click',function(){ upload(true); });
+    if(el('ghCheckBtn'))el('ghCheckBtn').addEventListener('click',check);
+    if(el('ghForgetBtn'))el('ghForgetBtn').addEventListener('click',function(){
+      var k=cfg(); k.token=''; save(k); if(el('ghToken'))el('ghToken').value='';
+      say('🗑 토큰을 지웠습니다.','#64748b');
+    });
+    if(c.token)say(location.protocol==='file:'
+      ? '토큰 저장됨 — 내 컴퓨터 파일로 연 상태이므로 [📄 파일 선택해 올리기]로 올려 주세요.'
+      : '토큰 저장됨 — [🚀 지금 올리기]를 누르면 배포됩니다.','#64748b');
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount);
+  else mount();
+  window.ghUpload=upload;
+  window.ghPickUpload=function(){ return upload(true); };
+})();
 </script>
 </body>
 </html>
