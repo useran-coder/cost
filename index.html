@@ -5,7 +5,7 @@
 <meta name="viewport" id="vpMeta" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>프레스 가공비 견적기</title>
-<script>window.APP_BUILD='v104';</script>
+<script>window.APP_BUILD='v105';</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -29,9 +29,9 @@
   header.app .bar .meta .t{font-size:23px;font-weight:400;color:var(--ink);letter-spacing:-.4px;line-height:1}
   header.app .bar .meta .s{font-size:10.5px;font-weight:700;color:var(--ci)}
   header.app .tabs{display:flex;align-items:center;gap:2px;max-width:1560px;margin:0 auto;padding:0 12px;border-top:1px solid var(--line)}
-  header.app .tabs>button{flex:1;background:transparent;border:none;color:var(--sub);font-family:inherit;font-size:15.5px;font-weight:700;padding:13px 0 12px;cursor:pointer;position:relative;transition:color .15s}
-  header.app .tabs button.on{color:var(--ci)}
-  header.app .tabs button.on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--ci)}
+  header.app .tabs>button[id^="tab-"]{flex:1;background:transparent;border:none;color:var(--sub);font-family:inherit;font-size:15.5px;font-weight:700;padding:13px 0 12px;cursor:pointer;position:relative;transition:color .15s}
+  header.app .tabs>button[id^="tab-"].on{color:var(--ci)}
+  header.app .tabs>button[id^="tab-"].on::after{content:"";position:absolute;left:16%;right:16%;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--ci)}
 
   section.card{background:#fff;border:1px solid var(--line);border-radius:14px;margin:14px 0;overflow:hidden}
   .sec-h{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);background:#fafbfd}
@@ -153,6 +153,14 @@
   .res-val{font-size:38px;font-weight:800;color:var(--blue);letter-spacing:-1px;line-height:1;font-variant-numeric:tabular-nums}
   .res-unit{font-size:16px;color:var(--sub);font-weight:600}
   .res-sub{display:flex;flex-wrap:wrap;gap:6px 18px;margin-top:13px;padding-top:12px;border-top:1px solid #d6e3fb}
+  /* v105 : 결과 블록 — 왼쪽 수치 + 오른쪽 산출내용 */
+  .res-top{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);gap:14px;align-items:center}
+  .res-calc{font-size:11.5px;line-height:1.75;color:#4b5565;text-align:right;font-variant-numeric:tabular-nums;min-width:0}
+  .res-calc .rc{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .res-calc .rc b{color:var(--navy);font-weight:800}
+  .res-calc .rc.fin b{color:var(--accent)}
+  .res-calc .rc .op{color:#9aa3b2;font-weight:700;margin:0 3px}
+  @media(max-width:860px){.res-top{grid-template-columns:1fr}.res-calc{text-align:left;margin-top:4px;padding-top:10px;border-top:1px dashed #cbd9f3}.res-calc .rc{white-space:normal}}
   .res-sub .item{font-size:13px}.res-sub .k{color:var(--sub)}.res-sub .v{color:var(--ink);font-weight:700;font-variant-numeric:tabular-nums}
   .pill2{display:inline-block;font-size:11px;color:var(--blue);background:#e6efff;padding:2px 9px;border-radius:20px;font-weight:700;margin-left:6px}
   .cmp{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
@@ -256,7 +264,7 @@
     .estgrid{display:grid;grid-template-columns:minmax(0,1fr) 480px;gap:22px;align-items:start}
     .col-main,.col-side{min-width:0}
     .col-side{position:sticky;top:106px}
-    .tabs button{flex:none!important;padding:12px 32px!important}
+    .tabs>button[id^="tab-"]{flex:none!important;padding:12px 32px!important}
     .tonbtns{grid-template-columns:repeat(6,1fr)}
     .bottombar{display:none}
     body{padding-bottom:28px}
@@ -1130,12 +1138,12 @@
   #auForm .au-b2{flex:1;padding:8px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:11.5px;font-weight:800;color:var(--navy);cursor:pointer}
   #auForm .au-srv-b .au-i{font-size:12px;padding:8px 9px}
   #auForm .au-f{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line);font-size:11px;color:var(--sub);line-height:1.6}
-  #auChip{display:inline-flex;align-items:center;gap:5px;margin-left:auto;padding-left:14px;flex:0 0 auto;font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
+  #auChip{display:inline-flex;align-items:center;gap:8px;margin-left:8px;padding-left:0;flex:0 0 auto;font-size:12px;font-weight:700;color:var(--sub);white-space:nowrap}
   #auChip b{color:var(--ink);font-size:12px}
   #auChip small{color:var(--accent);font-weight:800;font-size:12px}
-  #auChip button{padding:3px 9px;border:1px solid var(--line);background:#fff;border-radius:7px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer}
-  #auChip .au-me{display:inline-flex;align-items:center;gap:5px;border-color:transparent;background:transparent;padding:3px 7px;color:var(--sub);font-weight:700}
-  #auChip .au-me:hover{background:#eef2f8;border-color:var(--line)}
+  #auChip button{padding:6px 10px;border:1px solid var(--line);background:#fff;border-radius:8px;font-family:inherit;font-size:12px;font-weight:800;color:var(--navy);cursor:pointer;line-height:1.35}
+  #auChip .au-me{display:inline-flex;align-items:center;gap:5px;padding:6px 12px;color:var(--sub);font-weight:700}
+  #auChip .au-me:hover{background:#eef2f8}
   #auChip .au-me i{font-style:normal;color:var(--sub);font-size:11px}
   #auChip .au-me.on{background:#eef2f8;border-color:var(--line)}
   /* v104 : 동기화 · 배포 · 파일 관리 페이지 */
@@ -1157,9 +1165,9 @@
   .sync-files button{padding:9px 13px;border:1px solid var(--line);background:#fff;border-radius:9px;font-family:inherit;font-size:12.5px;font-weight:800;color:var(--navy);cursor:pointer}
   .sync-files button.pri{background:var(--navy);color:#fff;border-color:var(--navy)}
   .sync-note{margin-top:9px;font-size:11.5px;color:var(--sub);line-height:1.7}
-  .desk-toggle{margin-left:auto;padding:5px 10px;border:1px solid var(--line);background:#fff;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;white-space:nowrap}
+  .desk-toggle{margin-left:auto;margin-right:0;padding:6px 12px;border:1px solid var(--line);background:#fff;border-radius:8px;font-family:inherit;font-size:12px;font-weight:700;color:var(--sub);cursor:pointer;white-space:nowrap;line-height:1.35}
   .desk-toggle.on{background:#eef5ff;border-color:#9dbcf5;color:#1f5fd1}
-  .tabs #auChip{margin-left:8px}
+  .tabs #auChip{margin-left:6px}
   @media(max-width:760px){#auChip{font-size:11px}#auChip button,#auChip b,#auChip small{font-size:11px}}
   .cloudbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:#f7f9fc}
   .cloudbar .cb-l{display:flex;flex-direction:column;gap:2px;font-size:11.5px;color:var(--sub)}
@@ -1354,11 +1362,14 @@
         </div>
       </div>
       <div class="result">
-        <div class="res-row2">
-          <div><div class="res-label">1매(개) 중량</div><div class="res-main"><span class="res-val" id="eOne">0</span><span class="res-unit">kg</span></div></div>
-          <div class="res-mat"><div class="res-label">재료비 단가</div><div class="res-main"><span class="res-val" id="eMatCost" style="color:var(--accent)">0</span><span class="res-unit">원</span></div><div class="res-mnote" id="eMatNote">중량 × 강종단가</div></div>
+        <div class="res-top">
+          <div class="res-row2">
+            <div><div class="res-label" id="eOneLab">1매(개) 중량</div><div class="res-main"><span class="res-val" id="eOne">0</span><span class="res-unit">kg</span></div></div>
+            <div class="res-mat"><div class="res-label" id="eCostLab">재료비 단가</div><div class="res-main"><span class="res-val" id="eMatCost" style="color:var(--accent)">0</span><span class="res-unit">원</span></div><div class="res-mnote" id="eMatNote">중량 × 강종단가</div></div>
+          </div>
+          <div class="res-calc" id="eFormula"></div>
         </div>
-        <div class="res-sub"><div class="item"><span class="k">합계중량 </span><span class="v" id="eTotal">0</span> kg</div><div class="item"><span class="k">매당 </span><span class="v" id="eG">0</span> g</div></div>
+        <div class="res-sub" id="eSub"></div>
       </div>
     </div>
   </section>
@@ -1514,11 +1525,14 @@
       </div>
     </div></section>
     <div class="result">
-      <div class="res-row2">
-        <div><div class="res-label">1매(개) 중량</div><div class="res-main"><span class="res-val" id="pOne">0</span><span class="res-unit">kg</span></div></div>
-        <div class="res-mat"><div class="res-label">재료비 단가</div><div class="res-main"><span class="res-val" id="pMatCost" style="color:var(--accent)">0</span><span class="res-unit">원</span></div><div class="res-mnote" id="pMatNote">중량 × KG단가</div></div>
+      <div class="res-top">
+        <div class="res-row2">
+          <div><div class="res-label" id="pOneLab">1매(개) 중량</div><div class="res-main"><span class="res-val" id="pOne">0</span><span class="res-unit">kg</span></div></div>
+          <div class="res-mat"><div class="res-label" id="pCostLab">재료비 단가</div><div class="res-main"><span class="res-val" id="pMatCost" style="color:var(--accent)">0</span><span class="res-unit">원</span></div><div class="res-mnote" id="pMatNote">중량 × KG단가</div></div>
+        </div>
+        <div class="res-calc" id="pFormula"></div>
       </div>
-      <div class="res-sub"><div class="item"><span class="k">합계중량 </span><span class="v" id="pTotal">0</span> kg</div><div class="item"><span class="k">매당 </span><span class="v" id="pG">0</span> g</div></div>
+      <div class="res-sub" id="pSub"></div>
     </div>
     <section class="card"><div class="sec-b">
       <div class="toggle-row" onclick="scToggle('pPrice')"><span>단가 계산</span><div class="switch" id="pPriceSw"></div></div>
@@ -3581,6 +3595,39 @@ function renderEMatRange(){
 function eMatChange(){eSyncMatPrice();eCalc();}
 function eUnitPriceInput(el){const k=eMatKey(),v=num(el.value);if(k){prices['mat'+k]=v;savePrices();renderSetGrid();renderSaveState();}eCalc();}
 function eSetMode(m){eMode=m;$('ePlateF').classList.toggle('hidden',m!=='plate');$('eCoilF').classList.toggle('hidden',m!=='coil');$('eSeg').querySelectorAll('button').forEach(b=>b.classList.toggle('on',b.dataset.em===m));eCalc();}
+/* v105 : 결과 블록 공통 — 수량이 2개 이상이면 큰 글자를 합계 기준으로 바꾸고
+   오른쪽에 산출 과정을 표시한다 */
+function resLine(txt,fin){return '<span class="rc'+(fin?' fin':'')+'">'+txt+'</span>';}
+function resOp(t){return '<span class="op">'+t+'</span>';}
+function renderResBlock(o){
+  /* o = {lab,cost,sub,formula 대상 id들, 값들} */
+  const many=o.qty>1;
+  const $$=id=>document.getElementById(id);
+  const set=(id,v)=>{const e=$$(id);if(e)e.textContent=v;};
+  const html=(id,v)=>{const e=$$(id);if(e)e.innerHTML=v;};
+  set(o.idOneLab, many?'합계중량':'1매(개) 중량');
+  set(o.idOne,    many?fmt(o.total,3):fmt(o.one,3));
+  set(o.idCostLab,many?'재료비 합계':'재료비 단가');
+  set(o.idCost,   many?fmt(o.costAll,0):fmt(o.cost,0));
+  set(o.idNote,   (many?'합계중량 × ':'중량 × ')+cf(Math.round(o.unit))+'원/kg'+(o.noteTail||''));
+  /* 아래줄 */
+  let sub='';
+  if(many){
+    sub+='<div class="item"><span class="k">1매(개) 중량 </span><span class="v">'+fmt(o.one,3)+'</span> kg</div>';
+    sub+='<div class="item"><span class="k">개당 재료비 </span><span class="v">'+fmt(o.cost,0)+'</span> 원</div>';
+    sub+='<div class="item"><span class="k">수량 </span><span class="v">'+cf(o.qty)+'</span> 개</div>';
+  }else{
+    sub+='<div class="item"><span class="k">합계중량 </span><span class="v">'+fmt(o.total,3)+'</span> kg</div>';
+  }
+  sub+='<div class="item"><span class="k">매당 </span><span class="v">'+fmt(o.one*1000,1)+'</span> g</div>';
+  html(o.idSub,sub);
+  /* 산출 내용 */
+  let f='';
+  f+=resLine(esc(o.matName||'')+' '+o.dimTxt+resOp('×')+'비중 '+(o.dens||'-')+resOp('÷')+'10⁶ = <b>'+fmt(o.one,3)+' kg</b>'+(many?'/개':''));
+  if(many)f+=resLine('<b>'+fmt(o.one,3)+' kg</b>'+resOp('×')+cf(o.qty)+'개 = <b>'+fmt(o.total,3)+' kg</b>');
+  f+=resLine('<b>'+fmt(many?o.total:o.one,3)+' kg</b>'+resOp('×')+cf(Math.round(o.unit))+'원/kg = <b>'+fmt(many?o.costAll:o.cost,0)+'원</b>',true);
+  html(o.idFormula,f);
+}
 function eCalc(){
   const dens=eDens();$('eDensP').textContent='비중 '+(dens||'-');
   let one=0,t=0,w=0,l=0,total=0,q=num($('eQ').value)||1,calcW=0,calcL=0;
@@ -3593,8 +3640,12 @@ function eCalc(){
   const enteredUnit=num($('eUnitPrice')&&$('eUnitPrice').value);
   const unit=enteredUnit>0?enteredUnit:(eMatKey()?matPrice(eMatKey()):num(prices.matkg)),cost=one*unit;
   const allowance=(eMode==='plate'&&(calcW!==w||calcL!==l))?` · 스크랩 포함 ${cf(calcW)}×${cf(calcL)}mm`:'';
-  $('eOne').textContent=fmt(one,3);$('eMatCost').textContent=fmt(cost,0);$('eMatNote').textContent='중량 × '+cf(Math.round(unit))+'원/kg'+allowance;
-  $('eTotal').textContent=fmt(total,3);$('eG').textContent=fmt(one*1000,1);
+  const dimTxt=(eMode==='plate')
+    ? (cf(t)+'t'+resOp('×')+cf(calcW)+resOp('×')+cf(calcL)+'mm')
+    : ('코일 '+cf(num($('eCT').value))+'t'+resOp('×')+'폭 '+cf(num($('eCW').value))+'mm'+resOp('·')+'OD '+cf(num($('eOD').value))+'/ID '+cf(num($('eID').value)));
+  renderResBlock({qty:q,one,total,cost,costAll:cost*q,unit,dens:dens,
+    matName:(eMode==='plate'?(eMatKey()||''):(eMatKey()||'코일')),dimTxt,noteTail:allowance,
+    idOneLab:'eOneLab',idOne:'eOne',idCostLab:'eCostLab',idCost:'eMatCost',idNote:'eMatNote',idSub:'eSub',idFormula:'eFormula'});
   EM={one,unit,cost,t,w,l,calcW,calcL,key:eMatKey()};
   if(state.proc==='laser'&&typeof renderProcStd==='function'&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#procStd')))renderProcStd();
   if(typeof estCalc==='function')estCalc();
@@ -3620,15 +3671,21 @@ function scCalc(){
   [['pMat','pCustom','pCustomWrap','pDens'],['cMat','cCustom','cCustomWrap','cDens']].forEach(([m,c,w,d])=>{const isC=$(m).value==='custom';$(w).classList.toggle('hidden',!isC);const dn=isC?num($(c).value):parseFloat($(m).value);$(d).textContent='비중 '+(dn||'-');});
   const pd=scDensity('pMat','pCustom'),t=num($('pT').value),w=num($('pW').value),l=num($('pL').value);let q=num($('pQ').value);if(q<=0)q=1;
   const one=(w*l*t)*pd/1e6,total=one*q;
-  $('pOne').textContent=fmt(one,3);$('pTotal').textContent=fmt(total,3);$('pG').textContent=fmt(one*1000,1);
   const kg1=num($('pKg1').value),kg2=num($('pKg2').value),plate=num($('pPlate').value);
   const plateCost=total*plate,mat1=total*kg1,mat2=total*kg2,sum1=mat1+plateCost,sum2=mat2+plateCost;
   $('pMat1').textContent=fmt(mat1,0);$('pMat2').textContent=fmt(mat2,0);$('pPlate1').textContent=fmt(plateCost,0);$('pPlate2').textContent=fmt(plateCost,0);$('pSum1').textContent=fmt(sum1,0)+' 원';$('pSum2').textContent=fmt(sum2,0)+' 원';
   const diff=sum2-sum1,dEl=$('pDiff');
   if(kg1>0&&kg2>0){dEl.textContent=(diff>0?'+':'')+fmt(diff,0)+' 원';dEl.style.color=diff>0?'var(--accent)':(diff<0?'var(--ok)':'var(--sub)');}else{dEl.textContent='-';dEl.style.color='var(--sub)';}
   $('pCol1').classList.remove('best');$('pCol2').classList.remove('best');if(kg1>0&&kg2>0)(sum1<=sum2?$('pCol1'):$('pCol2')).classList.add('best');
-  const enteredPlateUnit=num($('pUnitPrice')&&$('pUnitPrice').value);const basePlateUnit=enteredPlateUnit>0?enteredPlateUnit:matPrice(scMatKey('pMat'));const mkUnit=kg1>0?kg1:basePlateUnit;const matUnitCost=one*mkUnit;
-  $('pMatCost').textContent=fmt(matUnitCost,0);$('pMatNote').textContent='중량 × '+cf(Math.round(mkUnit))+'원/kg'+(kg1>0?' (단가①)':' (강종단가)');
+  /* v105 : 「단가 계산」의 철판단가 ①·②는 아래 비교표(단가①/단가②)에만 적용하고
+     위쪽 큰 글자(재료비)는 항상 철판단가 입력값(또는 강종단가)을 쓴다 */
+  const enteredPlateUnit=num($('pUnitPrice')&&$('pUnitPrice').value);
+  const basePlateUnit=enteredPlateUnit>0?enteredPlateUnit:matPrice(scMatKey('pMat'));
+  const mkUnit=basePlateUnit;const matUnitCost=one*mkUnit;
+  renderResBlock({qty:q,one,total,cost:matUnitCost,costAll:matUnitCost*q,unit:mkUnit,dens:pd,
+    matName:scMatName('pMat'),dimTxt:(cf(t)+'t'+resOp('×')+cf(w)+resOp('×')+cf(l)+'mm'),
+    noteTail:(enteredPlateUnit>0?' (철판단가)':' (강종단가)'),
+    idOneLab:'pOneLab',idOne:'pOne',idCostLab:'pCostLab',idCost:'pMatCost',idNote:'pMatNote',idSub:'pSub',idFormula:'pFormula'});
   scCur.plate={mat:scMatName('pMat'),dens:pd,t,w,l,qty:q,one,total,kg1,kg2,plate,sum1,sum2,mkUnit,matUnitCost};
   const cd=scDensity('cMat','cCustom'),ct=num($('cT').value),cw=num($('cW').value);
   let cweight=0,extra=0,od=0,id=0,len=0;
@@ -5880,7 +5937,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-09-26 · v104';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-06 · v105';})();
 formatAllNums();
 estCalc();
 </script>
