@@ -5,7 +5,7 @@
 <meta name="viewport" id="vpMeta" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>프레스 가공비 견적기</title>
-<script>window.APP_BUILD='v106';</script>
+<script>window.APP_BUILD='v107';</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -391,7 +391,7 @@
   .res-row2{display:flex;gap:14px;flex-wrap:wrap}
   .res-row2>div{flex:1;min-width:130px}
   .res-mat{border-left:2px solid var(--line);padding-left:14px}
-  .res-mnote{font-size:10.5px;color:var(--sub);margin-top:2px;font-weight:600}
+  .res-mnote{font-size:11.5px;color:var(--sub);margin-top:3px;font-weight:600}
 
 
   /* ===== 견적리스트 페이지 ===== */
@@ -5938,7 +5938,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-07 · v106';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-07 · v107';})();
 formatAllNums();
 estCalc();
 </script>
