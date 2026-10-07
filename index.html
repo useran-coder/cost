@@ -5,7 +5,7 @@
 <meta name="viewport" id="vpMeta" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>프레스 가공비 견적기</title>
-<script>window.APP_BUILD='v105';</script>
+<script>window.APP_BUILD='v106';</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -1364,7 +1364,7 @@
       <div class="result">
         <div class="res-top">
           <div class="res-row2">
-            <div><div class="res-label" id="eOneLab">1매(개) 중량</div><div class="res-main"><span class="res-val" id="eOne">0</span><span class="res-unit">kg</span></div></div>
+            <div><div class="res-label" id="eOneLab">1매(개) 중량</div><div class="res-main"><span class="res-val" id="eOne">0</span><span class="res-unit">kg</span></div><div class="res-mnote" id="eOneNote"></div></div>
             <div class="res-mat"><div class="res-label" id="eCostLab">재료비 단가</div><div class="res-main"><span class="res-val" id="eMatCost" style="color:var(--accent)">0</span><span class="res-unit">원</span></div><div class="res-mnote" id="eMatNote">중량 × 강종단가</div></div>
           </div>
           <div class="res-calc" id="eFormula"></div>
@@ -1527,7 +1527,7 @@
     <div class="result">
       <div class="res-top">
         <div class="res-row2">
-          <div><div class="res-label" id="pOneLab">1매(개) 중량</div><div class="res-main"><span class="res-val" id="pOne">0</span><span class="res-unit">kg</span></div></div>
+          <div><div class="res-label" id="pOneLab">1매(개) 중량</div><div class="res-main"><span class="res-val" id="pOne">0</span><span class="res-unit">kg</span></div><div class="res-mnote" id="pOneNote"></div></div>
           <div class="res-mat"><div class="res-label" id="pCostLab">재료비 단가</div><div class="res-main"><span class="res-val" id="pMatCost" style="color:var(--accent)">0</span><span class="res-unit">원</span></div><div class="res-mnote" id="pMatNote">중량 × KG단가</div></div>
         </div>
         <div class="res-calc" id="pFormula"></div>
@@ -3607,6 +3607,7 @@ function renderResBlock(o){
   const html=(id,v)=>{const e=$$(id);if(e)e.innerHTML=v;};
   set(o.idOneLab, many?'합계중량':'1매(개) 중량');
   set(o.idOne,    many?fmt(o.total,3):fmt(o.one,3));
+  set(o.idOneNote,many?(fmt(o.total/1000,3)+' ton'):'');
   set(o.idCostLab,many?'재료비 합계':'재료비 단가');
   set(o.idCost,   many?fmt(o.costAll,0):fmt(o.cost,0));
   set(o.idNote,   (many?'합계중량 × ':'중량 × ')+cf(Math.round(o.unit))+'원/kg'+(o.noteTail||''));
@@ -3645,7 +3646,7 @@ function eCalc(){
     : ('코일 '+cf(num($('eCT').value))+'t'+resOp('×')+'폭 '+cf(num($('eCW').value))+'mm'+resOp('·')+'OD '+cf(num($('eOD').value))+'/ID '+cf(num($('eID').value)));
   renderResBlock({qty:q,one,total,cost,costAll:cost*q,unit,dens:dens,
     matName:(eMode==='plate'?(eMatKey()||''):(eMatKey()||'코일')),dimTxt,noteTail:allowance,
-    idOneLab:'eOneLab',idOne:'eOne',idCostLab:'eCostLab',idCost:'eMatCost',idNote:'eMatNote',idSub:'eSub',idFormula:'eFormula'});
+    idOneLab:'eOneLab',idOne:'eOne',idOneNote:'eOneNote',idCostLab:'eCostLab',idCost:'eMatCost',idNote:'eMatNote',idSub:'eSub',idFormula:'eFormula'});
   EM={one,unit,cost,t,w,l,calcW,calcL,key:eMatKey()};
   if(state.proc==='laser'&&typeof renderProcStd==='function'&&!(document.activeElement&&document.activeElement.closest&&document.activeElement.closest('#procStd')))renderProcStd();
   if(typeof estCalc==='function')estCalc();
@@ -3685,7 +3686,7 @@ function scCalc(){
   renderResBlock({qty:q,one,total,cost:matUnitCost,costAll:matUnitCost*q,unit:mkUnit,dens:pd,
     matName:scMatName('pMat'),dimTxt:(cf(t)+'t'+resOp('×')+cf(w)+resOp('×')+cf(l)+'mm'),
     noteTail:(enteredPlateUnit>0?' (철판단가)':' (강종단가)'),
-    idOneLab:'pOneLab',idOne:'pOne',idCostLab:'pCostLab',idCost:'pMatCost',idNote:'pMatNote',idSub:'pSub',idFormula:'pFormula'});
+    idOneLab:'pOneLab',idOne:'pOne',idOneNote:'pOneNote',idCostLab:'pCostLab',idCost:'pMatCost',idNote:'pMatNote',idSub:'pSub',idFormula:'pFormula'});
   scCur.plate={mat:scMatName('pMat'),dens:pd,t,w,l,qty:q,one,total,kg1,kg2,plate,sum1,sum2,mkUnit,matUnitCost};
   const cd=scDensity('cMat','cCustom'),ct=num($('cT').value),cw=num($('cW').value);
   let cweight=0,extra=0,od=0,id=0,len=0;
@@ -5937,7 +5938,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-06 · v105';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-07 · v106';})();
 formatAllNums();
 estCalc();
 </script>
