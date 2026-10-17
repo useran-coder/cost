@@ -5,7 +5,7 @@
 <meta name="viewport" id="vpMeta" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ffffff">
 <title>프레스 가공비 견적기</title>
-<script>window.APP_BUILD='v107';</script>
+<script>window.APP_BUILD='v108';</script>
 <link rel="preconnect" href="https://cdn.jsdelivr.net">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -195,7 +195,11 @@
   .rec-head .t{font-size:14px;font-weight:700}
   .rec-head .cnt{font-size:12px;color:var(--navy);background:var(--chip);padding:2px 10px;border-radius:20px;font-weight:700}
   .rec-sum{font-size:12.5px;font-weight:700;color:var(--ok);background:var(--okbg);border:1px solid #cfe9da;border-radius:10px;padding:9px 12px;margin-bottom:11px;display:none}
-  .rec-sum.show{display:block}
+  .rec-sum.show{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .rec-sum .rs-l{flex:1 1 auto;min-width:0}
+  .rec-sum .rs-r{margin-left:auto;white-space:nowrap}
+  .rec-sum .rs-r b{color:var(--accent);font-size:13.5px;font-weight:800}
+  .rec-sum .rs-r .k{color:var(--sub);font-weight:700;margin-right:4px}
   .rec-list{display:flex;flex-direction:column;gap:8px;max-height:300px;overflow-y:auto;margin:0 -2px;padding:0 2px}
   .rec-row{background:#f7f8fb;border:1px solid var(--line);border-radius:11px;padding:10px 12px}
   .head-procs{flex:1 1 auto;min-width:0;font-size:11.5px;font-weight:700;color:var(--blue);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -3718,7 +3722,16 @@ function scRender(){
   const sumW=scDB[type].reduce((a,r)=>a+(type==='plate'?r.total:r.weight),0);
   let sumTxt='합계중량 '+scWeight3(sumW)+' kg ('+scWeight3(sumW/1000)+' ton)';
   if(type==='plate'){const s1=scDB.plate.reduce((a,r)=>a+(r.kg1>0?r.sum1:0),0),s2=scDB.plate.reduce((a,r)=>a+(r.kg2>0?r.sum2:0),0);if(s2>0)sumTxt+=' · 단가① '+fmt(s1,0)+'원 / ② '+fmt(s2,0)+'원';else if(s1>0)sumTxt+=' · 단가 합계 '+fmt(s1,0)+'원';}
-  sumEl.textContent=sumTxt;sumEl.classList.add('show');
+  /* v108 : 저장된 데이터의 재료비 단가 합계를 오른쪽에 표시 (목록 행과 같은 기준) */
+  const matSum=scDB[type].reduce((a,r)=>{
+    const wq=Number(type==='plate'?r.total:r.weight)||0, one=Number(type==='plate'?r.one:r.weight)||0;
+    let c=Number(r.matUnitCost)||0;
+    if(!(c>0)){const u=Number(r.mkUnit)||Number(r.kg1)||0;c=one*u;}
+    return a+c;
+  },0);
+  sumEl.innerHTML='<span class="rs-l">'+esc(sumTxt)+'</span>'
+    +(matSum>0?('<span class="rs-r"><span class="k">재료비 단가 합계</span><b>'+fmt(matSum,0)+'원</b></span>'):'');
+  sumEl.classList.add('show');
   list.innerHTML=scDB[type].map(r=>{
     let l1,l2,wt,matCostHtml='';
     if(type==='plate'){
@@ -5938,7 +5951,7 @@ loadEstDB();estRender();estToggleFold(estFoldOpen);renderAsmPage();refreshAsmNam
 try{estTrashRender();const _h=(location.hash||'').replace('#','');if(PAGES.indexOf(_h)>=0&&_h!=='est')showPage(_h,true);}catch(e){}
 scLoadDB();scSyncPlatePrice();scCalc();scRender();
 renderSaveState();
-eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-07 · v107';})();
+eSyncMatPrice();eCalc();(function(){const d=new Date(),wd=['일','월','화','수','목','금','토'][d.getDay()],ymd=`${d.getFullYear()}.${String(d.getMonth()+1).padStart(2,'0')}.${String(d.getDate()).padStart(2,'0')}`;$('barDate').textContent=`${ymd} (${wd})`;if($('barVersion'))$('barVersion').textContent='버전 2026-10-17 · v108';})();
 formatAllNums();
 estCalc();
 </script>
