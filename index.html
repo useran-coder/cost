@@ -2059,7 +2059,7 @@ body.tab-list{background:#fff}
         <div class="frame-addon-row off" id="faRow9"><label class="frame-switch" title="사용 여부"><input type="checkbox" id="faUse9" onchange="frameAddonCalc()"><span class="track"></span></label><span class="nm">물류비</span><div class="suffix"><input class="inp" id="faCost9" inputmode="numeric" value="0" oninput="frameAddonCalc()"><span class="u">원/SET</span></div></div>
         <div class="frame-addon-row off" id="faRow11"><label class="frame-switch" title="사용 여부"><input type="checkbox" id="faUse11" onchange="frameAddonCalc()"><span class="track"></span></label><span class="nm">검사비</span><div class="suffix"><input class="inp" id="faCost11" inputmode="numeric" value="0" oninput="frameAddonCalc()"><span class="u">원/SET</span></div></div>
         <div class="frame-addon-freight" id="frameAddonFreight">
-          <div class="ft-title">문틀 물류비 · 운임 ÷ 적재수량</div>
+          <div class="ft-title">문틀 물류비 · 운임 ÷ 적재수량<span class="fs-box" id="frFreeBox"><label class="fs-chk" title="체크하면 물류비 0원(무상배송)"><input type="checkbox" id="frFreeChk" onchange="frFreeClick(this)"><span>무상배송</span></label><button type="button" class="fs-auto" id="frFreeAuto" onclick="frFreeAutoReset(event)" title="조건에 따라 자동으로 정합니다">자동</button><em class="fs-hint" id="frFreeHint"></em></span><input type="hidden" id="frFreeShip" value=""></div>
           <div class="ft-grid">
             <div class="ft-control"><span class="lab">차종</span><div class="ft-trucks"><button type="button" data-ft="12" onclick="frameAddonTruck('12')">1.2톤</button><button type="button" data-ft="2.5" onclick="frameAddonTruck('2.5')">2.5톤</button><button type="button" data-ft="35" onclick="frameAddonTruck('35')">3.5톤</button><button type="button" data-ft="5" onclick="frameAddonTruck('5')">5톤</button><button type="button" data-ft="11" onclick="frameAddonTruck('11')">11톤</button><button type="button" data-ft="25" onclick="frameAddonTruck('25')">25톤</button></div></div>
             <label class="fld"><span class="lab">적용 운임(1회)</span><div class="suffix"><input class="inp" id="faFreightFare" inputmode="numeric" value="0" oninput="frameAddonFreightInput(true)"><span class="u">원</span></div></label>
@@ -2698,7 +2698,7 @@ window.addEventListener('hashchange',()=>{
 });
 
 /* ================= 문틀 견적 ================= */
-const FRAME_DEFAULTS={frNoAddB:false,frNoAddS:false,frCustomer:'',frProductSpec:'',frQty:'1',frQtyL:'1',frQtyR:'0',frJamb:'150',frWidth:'1000',frHeight:'2100',frGrade:'EGI',frThick:'1.6',frStripAdd:'120',frTopDeduct:'60',frSteelPrice:'1320',frProcKg:'600',frStsGrade:'STS304',frStsJamb:'150',frStsWidth:'1000',frStsHeight:'0',frStsThick:'1.2',frStsStripAdd:'120',frStsDeduct:'60',frStsPrice:'3800',frStsProcKg:'600',frLoss:'0',frExtra:'0',frMargin:'0',frAdjust:'0',frBottomUse:false,frBottomOnly:false,frOffTop:false,frOffCyl:false,frOffHinge:false,frSmallUse:false,frSmallQty:'20',frSmallPct:'10',frWideUse:false,frWideJamb:'110',frWidePct:'10',frWideForce:false,frSurUse:false,frSurTarget:'mat',frSheetUse:false,frNoProc:true,faDefectRate:'0.2',faScrapKg:'0.05',faScrapRate:'400'};
+const FRAME_DEFAULTS={frFreeShip:'',frNoAddB:false,frNoAddS:false,frCustomer:'',frProductSpec:'',frQty:'1',frQtyL:'1',frQtyR:'0',frJamb:'150',frWidth:'1000',frHeight:'2100',frGrade:'EGI',frThick:'1.6',frStripAdd:'120',frTopDeduct:'60',frSteelPrice:'1320',frProcKg:'600',frStsGrade:'STS304',frStsJamb:'150',frStsWidth:'1000',frStsHeight:'0',frStsThick:'1.2',frStsStripAdd:'120',frStsDeduct:'60',frStsPrice:'3800',frStsProcKg:'600',frLoss:'0',frExtra:'0',frMargin:'0',frAdjust:'0',frBottomUse:false,frBottomOnly:false,frOffTop:false,frOffCyl:false,frOffHinge:false,frSmallUse:false,frSmallQty:'20',frSmallPct:'10',frWideUse:false,frWideJamb:'110',frWidePct:'10',frWideForce:false,frSurUse:false,frSurTarget:'mat',frSheetUse:false,frNoProc:true,faDefectRate:'0.2',faScrapKg:'0.05',faScrapRate:'400'};
 for(let i=0;i<21;i++){FRAME_DEFAULTS['faUse'+i]=false;FRAME_DEFAULTS['faCost'+i]='0';}
 FRAME_DEFAULTS['faQty18']='0';FRAME_DEFAULTS['faQty19']='0';
 FRAME_DEFAULTS['frAdjBody']='0';FRAME_DEFAULTS['frAdjSts']='0';FRAME_DEFAULTS['faCondRows']='1';FRAME_DEFAULTS['faStsCondRows']='1';FRAME_DEFAULTS['faEuroSides']='3';FRAME_DEFAULTS['faNctSides']='3';FRAME_DEFAULTS['faBendSides']='3';
@@ -10497,5 +10497,61 @@ function estFtRouteApply(){const e=estFtEstimate();if(!e||e.jeju)return;const s=
   try{renderPosts();estCalc();}catch(e){}
 })();
 </script>
-<style id="v281-css">.adj-clr{color:#c0392b!important}.adj-clr:hover{background:#fdecea!important;border-color:#e6b0aa!important}</style><script id="v281-adjclr">function frameAdjClear(w){const M={body:'frAdjBody',sts:'frAdjSts','':'frAdjust'};const el=$(M[w||'']);if(el)el.value='0';try{const R=FR_ROUND[w||''];if(R){const p=$(R.p);if(p)p.classList.remove('show');const b=$(R.b);if(b)b.classList.remove('on');}}catch(e){}frameCalc();}</script><style id="v282-css">#post_asm .post-inline .pk-g:first-child{flex-basis:100%}#post_asm .post-inline{align-items:flex-start}</style></body>
+<style id="v281-css">.adj-clr{color:#c0392b!important}.adj-clr:hover{background:#fdecea!important;border-color:#e6b0aa!important}</style><script id="v281-adjclr">function frameAdjClear(w){const M={body:'frAdjBody',sts:'frAdjSts','':'frAdjust'};const el=$(M[w||'']);if(el)el.value='0';try{const R=FR_ROUND[w||''];if(R){const p=$(R.p);if(p)p.classList.remove('show');const b=$(R.b);if(b)b.classList.remove('on');}}catch(e){}frameCalc();}</script><style id="v282-css">#post_asm .post-inline .pk-g:first-child{flex-basis:100%}#post_asm .post-inline{align-items:flex-start}</style><style id="v283-css">
+#frameAddonFreight .ft-title{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fs-box{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-weight:500}
+.fs-chk{display:inline-flex;align-items:center;gap:5px;padding:4px 10px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;cursor:pointer;font-size:12px;font-weight:700;color:var(--navy)}
+.fs-chk input{width:15px;height:15px;accent-color:#16a34a;margin:0}
+.fs-box.free .fs-chk{background:#ecfdf5;border-color:#22c55e;color:#15803d}
+.fs-auto{padding:3px 8px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;font-size:11px;color:var(--sub);cursor:pointer}
+.fs-auto.on{background:#1e293b;border-color:#1e293b;color:#fff}
+.fs-hint{font-style:normal;font-size:11px;color:var(--sub)}
+.fs-box.free .fs-hint{color:#15803d;font-weight:600}
+#frameAddonFreight.is-free .ft-grid,#frameAddonFreight.is-free .ft-sizes,#frameAddonFreight.is-free .ft-route{opacity:.45}
+</style><script id="v283-freeship">
+/* v283 : 무상배송 — 조건(바폭·문틀폭·높이·수량 이상)을 만족하면 자동으로 물류비 0원, 사용자가 직접 체크/해제 가능
+   frFreeShip : '' = 자동, '1' = 무상(직접), '0' = 유상(직접) */
+var FREE_SHIP_RULES=[{jamb:100,w:1000,h:2100,min:400},{jamb:100,w:900,h:2100,min:400}];
+function frFreeRuleHit(){
+  const j=num($('frJamb')&&$('frJamb').value),w=num($('frWidth')&&$('frWidth').value),h=num($('frHeight')&&$('frHeight').value),q=num($('frQty')&&$('frQty').value);
+  const r=FREE_SHIP_RULES.find(x=>x.jamb===j&&x.w===w&&x.h===h);
+  return {rule:r||null,hit:!!(r&&q>=r.min),q};
+}
+function frFreeOn(){const m=$('frFreeShip')?$('frFreeShip').value:'';if(m==='1')return true;if(m==='0')return false;return frFreeRuleHit().hit;}
+function frFreeClick(c){$('frFreeShip').value=c.checked?'1':'0';frameCalc();}
+function frFreeAutoReset(e){if(e){e.preventDefault();e.stopPropagation();}$('frFreeShip').value='';frameCalc();}
+function frFreeUi(){
+  const box=$('frFreeBox');if(!box)return;const m=$('frFreeShip').value,on=frFreeOn(),R=frFreeRuleHit();
+  $('frFreeChk').checked=on;box.classList.toggle('free',on);
+  const fb=$('frameAddonFreight');if(fb)fb.classList.toggle('is-free',on);
+  const a=$('frFreeAuto');if(a)a.classList.toggle('on',m==='');
+  const rs=R.rule?`${R.rule.jamb}B ${cf(R.rule.w)}×${cf(R.rule.h)} ${cf(R.rule.min)}SET 이상`:'';
+  let t='';
+  if(m==='1')t='직접 체크 · 물류비 0원';
+  else if(m==='0')t=R.hit?'조건 충족이지만 직접 해제 · 물류비 적용':'직접 해제';
+  else if(R.hit)t='자동 · '+rs+' 조건 충족 → 물류비 0원';
+  else if(R.rule)t=`자동 · ${rs} 시 무상 (현재 ${cf(R.q)}SET)`;
+  else t='자동 · 100B 1000×2100 / 900×2100 400SET 이상 무상';
+  $('frFreeHint').textContent=t;
+  const nm=$('faRow9')&&$('faRow9').querySelector('.nm');if(nm)nm.innerHTML='물류비'+(on?' <small style="color:#15803d;font-weight:700;font-size:11px">무상배송</small>':'');
+}
+(function(){
+  const oT=window.frameAddonTotal;
+  if(typeof oT==='function')window.frameAddonTotal=function(){
+    let r=oT.apply(this,arguments);
+    try{frFreeUi();
+      if(frFreeOn()&&$('faUse9')&&$('faUse9').checked&&r!==0){
+        const amt=Math.max(0,num($('faCost9')&&$('faCost9').value));
+        if(amt){r-=amt;if(typeof frameAddonParts==='object'&&frameAddonParts)frameAddonParts.common=Math.max(0,(frameAddonParts.common||0)-amt);
+          if($('frameAddonSum'))$('frameAddonSum').textContent=won(Math.round(r))+'원';}
+        const fr=$('faFreightResult');if(fr)fr.textContent='SET당 0원 (무상배송 · 원래 '+won(Math.round(amt))+'원)';
+      }}catch(e){}
+    return r;};
+  const oL=window.frameAddonList;
+  if(typeof oL==='function')window.frameAddonList=function(){
+    const l=oL.apply(this,arguments);
+    try{if(frFreeOn()){const i=l.findIndex(x=>/^물류비/.test(x.nm));if(i>=0)l.splice(i,1);}}catch(e){}
+    return l;};
+})();
+</script></body>
 </html>
