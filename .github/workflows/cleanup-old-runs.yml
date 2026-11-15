@@ -1,0 +1,32 @@
+name: cleanup-old-runs
+# Actions 실행 기록 정리 — 최근 N개(기본 10개)만 남기고 나머지 실행 기록을 지움 (Actions 탭 → cleanup-old-runs → Run workflow)
+on:
+  workflow_dispatch:
+    inputs:
+      keep:
+        description: '남길 최근 실행 기록 수'
+        default: '10'
+permissions:
+  actions: write
+  contents: read
+jobs:
+  cleanup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 오래된 실행 기록 지우기
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          KEEP: ${{ inputs.keep || '10' }}
+          SELF: ${{ github.run_id }}
+        run: |
+          gh api --paginate "repos/$REPO/actions/runs?per_page=100" --jq '.workflow_runs[] | "\(.id) \(.status)"' > runs.txt
+          echo "전체 $(wc -l < runs.txt)개"
+          # 지금 이 정리 작업과 아직 끝나지 않은 실행은 빼고, 최근 KEEP 개를 남김
+          grep -v "^$SELF " runs.txt | awk '$2=="completed"{print $1}' | tail -n +$((KEEP+1)) > del.txt
+          echo "지울 기록 $(wc -l < del.txt)개"
+          n=0
+          while read -r id; do
+            gh api -X DELETE "repos/$REPO/actions/runs/$id" >/dev/null && n=$((n+1)) || echo "실패 $id"
+          done < del.txt
+          echo "지운 기록 ${n}개"
